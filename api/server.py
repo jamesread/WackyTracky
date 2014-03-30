@@ -7,10 +7,15 @@ import wrapper
 import json
 import random
 import os
+import argparse
 
 from py2neo.neo4j import Direction
 
 JSON_OK = { "message": "ok"}
+
+parser = argparse.ArgumentParser();
+parser.add_argument("--port", default = 8082, type = int)
+args = parser.parse_args();
 
 class Api(object):
 	wrapper = wrapper.Wrapper()
@@ -259,7 +264,7 @@ api = Api();
 
 cherrypy.config.update({
 	'server.socket_host': '0.0.0.0',
-	'server.socket_port': 8082,
+	'server.socket_port': args.port,
 	'tools.sessions.on': True,
 	'tools.sessions.storage_type': 'ram',
 #	'tools.sessions.storage_path': './sessions',
