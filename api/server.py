@@ -41,9 +41,9 @@ class Api(object):
 
 		return self.outputJson(JSON_OK);
 
-#	@cherrypy.expose
-#	def default(self, *args, **kwargs):
-#		return "Index"
+	@cherrypy.expose
+	def default(self, *args, **kwargs):
+		return "wt API"
 
 	def outputJson(self, structure):
 		cherrypy.response.headers['Content-Type'] = 'application/json'
