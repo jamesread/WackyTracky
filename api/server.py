@@ -175,6 +175,8 @@ class Api(object):
 				raise Exception("Password must be at least 6 character long.");
 
 			api.wrapper.register(args['username'], args['password'], args['email'])
+
+			return self.outputJson(JSON_OK);
 		except Exception as e:
 			return self.outputJsonError(403, str(e))
 
