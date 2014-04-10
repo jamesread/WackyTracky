@@ -8,13 +8,13 @@ import json
 import random
 import os
 import argparse
-
 from py2neo.neo4j import Direction
 
 JSON_OK = { "message": "ok"}
 
 parser = argparse.ArgumentParser();
 parser.add_argument("--port", default = 8082, type = int)
+parser.add_argument("--wallpaperdir", default = "/var/www/html/wallpapers/")
 args = parser.parse_args();
 
 class Api(object):
@@ -184,7 +184,7 @@ class Api(object):
 		try:
 			wallpapers = []
 			
-			for wallpaper in os.listdir("../wallpapers"):
+			for wallpaper in os.listdir(args.wallpaperdir):
 				if wallpaper.endswith(".png") or wallpaper.endswith(".jpg"):
 					wallpapers.append(wallpaper)
 		except Exception as e:
@@ -257,7 +257,7 @@ class Api(object):
 		return self.outputJson({"message": "Logged out!"})
 		
 def CORS():
-	cherrypy.response.headers['Access-Control-Allow-Origin'] = "http://wacky-tracky.teratan.net"
+	cherrypy.response.headers['Access-Control-Allow-Origin'] = "http://hosted.wacky-tracky.com"
 	cherrypy.response.headers['Access-Control-Allow-Credentials'] = "true"
 
 api = Api();
@@ -273,5 +273,5 @@ cherrypy.config.update({
 });
 
 cherrypy.tools.CORS = cherrypy.Tool('before_handler', CORS);
-
+cherrypy.process.plugins.Daemonizer(cherrypy.engine).subscribe()
 cherrypy.quickstart(api)
