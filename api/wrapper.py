@@ -9,8 +9,11 @@ class Wrapper:
 	def createUser(self, username):
 		results, metadata = cypher.execute(self.graphdb, "CREATE (u:User {username: {username}})", params = [["username", username]])
 
+	def deleteUser(self, userid):
+		results, metadata = cypher.execute(self.graphdb, "MATCH (u:User) WHERE id(u) = {userid} DELETE u ", params = [["userid", userid]])
+
 	def getUsers(self):
-		results, metadata = cypher.execute(self.graphdb, "MATCH (u:User) RETURN u");
+		results, metadata = cypher.execute(self.graphdb, "MATCH (u:User) OPTIONAL MATCH (u)-[]->(l:List) OPTIONAL MATCH (u)-[]->(l)-[]->(i2:Item) RETURN u, count(l) AS listCount, count(i2) AS itemCount ORDER BY id(u) ");
 
 		return results;
 
