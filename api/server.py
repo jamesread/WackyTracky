@@ -168,8 +168,8 @@ class Api(object):
 	@cherrypy.expose
 	def register(self, *path, **args):
 		try:
-			if len(args['username']) < 4:
-				raise Exception("Username must be at least 4 characters long.")
+			if len(args['username']) < 3:
+				raise Exception("Username must be at least 3 characters long.")
 
 			if len(args['password']) < 6:
 				raise Exception("Password must be at least 6 character long.");
