@@ -270,7 +270,7 @@ cherrypy.config.update({
 	'tools.sessions.on': True,
 	'tools.sessions.storage_type': 'ram',
 #	'tools.sessions.storage_path': './sessions',
-	'tools.sessions.timeout': 60,
+	'tools.sessions.timeout': 20160,
 	'tools.CORS.on': True,
 });
 
