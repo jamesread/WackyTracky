@@ -13,7 +13,7 @@ class Wrapper:
 		results, metadata = cypher.execute(self.graphdb, "MATCH (u:User) WHERE id(u) = {userid} DELETE u ", params = [["userid", userid]])
 
 	def getUsers(self):
-		results, metadata = cypher.execute(self.graphdb, "MATCH (u:User) OPTIONAL MATCH (u)-[]->(l:List) OPTIONAL MATCH (u)-[]->(l)-[]->(i2:Item) RETURN u, count(l) AS listCount, count(i2) AS itemCount ORDER BY id(u) ");
+		results, metadata = cypher.execute(self.graphdb, "MATCH (u:User) OPTIONAL MATCH (u)-[]->(l:List) OPTIONAL MATCH (u)-[]->(l:List)-[]->(i2:Item) RETURN u, count(l) AS listCount, count(i2) AS itemCount ORDER BY id(u) ");
 
 		return results;
 
