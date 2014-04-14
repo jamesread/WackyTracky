@@ -152,6 +152,11 @@ class Api(object):
 		return self.outputJson(JSON_OK);
 
 	@cherrypy.expose
+	def renameItem(self, *path, **args):
+		self.wrapper.setTaskContent(int(args['id']), args['content']);
+		return self.outputJson(JSON_OK);
+
+	@cherrypy.expose
 	def deleteList(self, *path, **args):
 		self.wrapper.deleteList(int(args['id']));
 

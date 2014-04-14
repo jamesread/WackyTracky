@@ -17,6 +17,9 @@ class Wrapper:
 
 		return results;
 
+	def setTaskContent(self, itemId, content):
+		results, metadata = cypher.execute(self.graphdb, "MATCH (i:Item) WHERE id(i) = {itemId} SET i.content = {content} ", params = [["itemId", itemId], ["content", content]])
+
 	def createList(self, username, title):
 		results, metadata = cypher.execute(self.graphdb, "MATCH (u:User) WHERE u.username = {username} CREATE (u)-[:owns]->(l:List {title: {title}})", params = [["title", title], ["username", username]]);
 
