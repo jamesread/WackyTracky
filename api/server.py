@@ -45,7 +45,10 @@ class Api(object):
 	def default(self, *args, **kwargs):
 		return "wt API"
 
-	def outputJson(self, structure):
+	def outputJson(self, structure, download=False, downloadFilename = "output.json"):
+		if download:
+			cherrypy.response.headers['Content-Disposition'] = 'attachment; filename="' + downloadFilename + '" '
+			
 		cherrypy.response.headers['Content-Type'] = 'application/json'
 
 		return json.dumps(structure);
@@ -55,6 +58,29 @@ class Api(object):
 		self.wrapper.createTag(self.getUsername(), args['title'])
 
 		return self.outputJson(JSON_OK);
+
+	@cherrypy.expose
+	def listDownload(self, *path, **args):
+		items = self.wrapper.getItemsFromList(int(args['id']));
+
+		ret = []
+		for row in items: 
+			singleItem = row[0]
+
+			ret.append(self.normalizeItem(singleItem))
+
+		if args['format'] == "json":
+			return self.outputJson(ret, download = True, downloadFilename = "list" + args['id'] + ".json");
+		else:
+			retStr = ""
+
+			for item in ret:
+				retStr += item['content'] + "\n"
+
+			cherrypy.response.headers['Content-Disposition'] = 'attachment; filename="list' + args['id'] + '.txt" '
+			cherrypy.response.headers['Content-Type'] = 'text/plain'
+
+			return retStr
 
 	@cherrypy.expose
 	def listTags(self, *path, **args):
@@ -68,7 +94,8 @@ class Api(object):
 			ret.append({
 				"id": singleTag.id,
 				"title": singleTag['title'],
-				"shortTitle": singleTag['shortTitle']
+				"shortTitle": singleTag['shortTitle'],
+				"backgroundColor": singleTag['backgroundColor']
 			});
 
 		return self.outputJson(ret);
@@ -94,6 +121,12 @@ class Api(object):
 	@cherrypy.expose
 	def createList(self, *path, **args):
 		self.wrapper.createList(self.getUsername(), args["title"]);
+
+		return self.outputJson(JSON_OK);
+
+	@cherrypy.expose
+	def setItemParent(self, *path, **args):
+		self.wrapper.setItemParent(self.getUsername(), args['item'], args['newParent'])
 
 		return self.outputJson(JSON_OK);
 
@@ -236,7 +269,7 @@ class Api(object):
 
 	@cherrypy.expose
 	def updateTag(self, *path, **args):
-		updatedTag = self.wrapper.updateTag(int(args['id']), args['newTitle'], args['shortTitle'])
+		updatedTag = self.wrapper.updateTag(int(args['id']), args['newTitle'], args['shortTitle'], args['backgroundColor'])
 
 		return self.outputJson(updatedTag)
 
