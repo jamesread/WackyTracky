@@ -33,6 +33,11 @@ class Wrapper:
 
 		return results;
 
+	def setItemParent(self, username, item, newParent):
+		results, metadata = cypher.execute(self.graphdb, "MATCH (u:User)-[]->(i:Item) CREATE ", params = [])
+
+		return results
+
 	def createTag(self, username, title):
 		results, metadata = cypher.execute(self.graphdb, "MATCH (u:User) WHERE u.username = {username} CREATE (u)-[:owns]->(t:Tag {title: {title}}) ", params = [["username", username], ["title", title]]);
 
@@ -50,14 +55,15 @@ class Wrapper:
 		if sort not in [ "content", "dueDate" ]:
 			sort = "content"
 
-		print "Sorting by ", sort
-
 		results, metadata = cypher.execute(self.graphdb, "MATCH (l:List)-[]->(i:Item) WHERE id(l) = {listId} RETURN i ORDER BY i." + sort, params = [["listId", listId]]);
 
 		return results
 
-	def getSubItems(self, parentId):
-		results, metadata = cypher.execute(self.graphdb, "MATCH (p:Item)-[]->(i:Item) WHERE id(p) = {parentId} RETURN i ", params = [["parentId", parentId]]);
+	def getSubItems(self, parentId, sort = None):
+		if sort not in [ "content", "dueDate" ]:
+			sort = "content"
+
+		results, metadata = cypher.execute(self.graphdb, "MATCH (p:Item)-[]->(i:Item) WHERE id(p) = {parentId} RETURN i ORDER BY i." + sort, params = [["parentId", parentId]]);
 
 		return results
 
@@ -70,8 +76,8 @@ class Wrapper:
 	def setDueDate(self, itemId, dueDate):
 		results, metadata = cypher.execute(self.graphdb, "MATCH (i:Item) WHERE id(i) = {itemId} SET i.dueDate = {dueDate} ", params = [["itemId", itemId],["dueDate", dueDate]]);
 
-	def updateTag(self, itemId, title, shortTitle):
-		results, metadata = cypher.execute(self.graphdb, "MATCH (t:Tag) WHERE id(t) = {itemId} SET t.title = {title}, t.shortTitle = {shortTitle} RETURN t", params = [["itemId", itemId], ["title", title], ["shortTitle", shortTitle]]);
+	def updateTag(self, itemId, title, shortTitle, backgroundColor):
+		results, metadata = cypher.execute(self.graphdb, "MATCH (t:Tag) WHERE id(t) = {itemId} SET t.title = {title}, t.shortTitle = {shortTitle}, t.backgroundColor = {backgroundColor} RETURN t", params = [["itemId", itemId], ["title", title], ["shortTitle", shortTitle], ["backgroundColor", backgroundColor]]);
 
 		for result in results:
 			tag = result[0]
@@ -79,7 +85,8 @@ class Wrapper:
 			return {
 				"id": tag.id,
 				"title": tag['title'],
-				"shortTitle": tag['shortTitle']
+				"shortTitle": tag['shortTitle'],
+				"backgroundColor": tag['backgroundColor']
 			}
 
 		return None

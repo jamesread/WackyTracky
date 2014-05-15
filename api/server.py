@@ -166,7 +166,7 @@ class Api(object):
 	@cherrypy.expose
 	def listTasks(self, *path, **args):
 		if "task" in args:
-			items = self.wrapper.getSubItems(int(args['task']))
+			items = self.wrapper.getSubItems(int(args['task']), args['sort'])
 		else:
 			items = self.wrapper.getItemsFromList(int(args['list']), args['sort'])
 
