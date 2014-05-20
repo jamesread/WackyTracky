@@ -115,6 +115,10 @@ class Wrapper:
 
 		return;
 
+	def changePassword(self, username, hashedPassword):
+		results, metadata = cypher.execute(self.graphdb, "MATCH (u:User) WHERE u.username = {username} SET u.password = {hashedPassword} ", params = [["username", username], ["hashedPassword", hashedPassword]]);
+
+
 	def getUser(self, username = None):
 		if username == None:
 			username = username

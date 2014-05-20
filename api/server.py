@@ -179,6 +179,12 @@ class Api(object):
 		return self.outputJson(ret);
 
 	@cherrypy.expose
+	def changePassword(self, *path, **args):
+		self.wrapper.changePassword(self.getUsername(), args['hashedPassword']);
+
+		return self.outputJson(JSON_OK)
+
+	@cherrypy.expose
 	def deleteTask(self, *path, **args):
 		self.wrapper.deleteTask(int(args['id']))
 
