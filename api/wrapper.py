@@ -21,7 +21,14 @@ class Wrapper:
 		results, metadata = cypher.execute(self.graphdb, "MATCH (i:Item) WHERE id(i) = {itemId} SET i.content = {content} ", params = [["itemId", itemId], ["content", content]])
 
 	def createList(self, username, title):
-		results, metadata = cypher.execute(self.graphdb, "MATCH (u:User) WHERE u.username = {username} CREATE (u)-[:owns]->(l:List {title: {title}})", params = [["title", title], ["username", username]]);
+		results, metadata = cypher.execute(self.graphdb, "MATCH (u:User) WHERE u.username = {username} CREATE (u)-[:owns]->(l:List {title: {title}}) RETURN id(l)", params = [["title", title], ["username", username]]);
+
+		return results;
+
+	def getList(self, username, listId):
+		results, metadata = cypher.execute(self.graphdb, "MATCH (u:User)-[]->(l:List) WHERE u.username = {username} AND id(l) = {listId} RETURN l ORDER BY l.title", params = [["username", username], ["listId", listId]]);
+
+		return results;
 
 	def getLists(self, username):
 		results, metadata = cypher.execute(self.graphdb, "MATCH (u:User)-[]->(l:List) WHERE u.username = {username} RETURN l ORDER BY l.title", params = [["username", username]]);
@@ -70,8 +77,8 @@ class Wrapper:
 	def deleteTask(self, itemId):
 		results, metadata = cypher.execute(self.graphdb, "MATCH (i:Item) WHERE id(i) = {itemId} OPTIONAL MATCH (i)<-[r]-() OPTIONAL MATCH (i)-[linkTagged:tagged]->(tag:Tag) DELETE i,r, linkTagged, tag", params = [["itemId", itemId]])
 
-	def updateList(self, listId, title, sort):
-		results, metadata = cypher.execute(self.graphdb, "MATCH (l:List) WHERE id(l) = {listId} SET l.title = {title}, l.sort = {sort} ", params = [["listId", listId], ["title", title], ["sort", sort]]);
+	def updateList(self, listId, title, sort, timeline):
+		results, metadata = cypher.execute(self.graphdb, "MATCH (l:List) WHERE id(l) = {listId} SET l.title = {title}, l.sort = {sort}, l.timeline = {timeline} ", params = [["listId", listId], ["title", title], ["sort", sort], ["timeline", timeline]]);
 
 	def setDueDate(self, itemId, dueDate):
 		results, metadata = cypher.execute(self.graphdb, "MATCH (i:Item) WHERE id(i) = {itemId} SET i.dueDate = {dueDate} ", params = [["itemId", itemId],["dueDate", dueDate]]);

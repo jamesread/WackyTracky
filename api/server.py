@@ -1,6 +1,7 @@
 #!/usr/bin/python
 
 import cherrypy
+from cherrypy import _cperror
 from cherrypy._cperror import HTTPError
 from cherrypy.lib import sessions
 import wrapper
@@ -9,13 +10,25 @@ import random
 import os
 import argparse
 from py2neo.neo4j import Direction
+from sys import exc_info
 
 JSON_OK = { "message": "ok"}
 
 parser = argparse.ArgumentParser();
 parser.add_argument("--port", default = 8082, type = int)
 parser.add_argument("--wallpaperdir", default = "/var/www/html/wallpapers/")
+parser.add_argument("--foreground", action = 'store_true')
 args = parser.parse_args();
+
+class HttpQueryArgChecker:
+	def __init__(self, args):
+		self.args = args;
+
+	def requireArg(self, arg):
+		if arg not in self.args:
+			raise cherrypy.HTTPError(403, "Argument not provided:" + arg)
+
+		return self
 
 class Api(object):
 	wrapper = wrapper.Wrapper()
@@ -31,7 +44,7 @@ class Api(object):
 
 	@cherrypy.expose
 	def listUpdate(self, *path, **args):
-		self.wrapper.updateList(int(args['list']), args['title'], args['sort'])
+		self.wrapper.updateList(int(args['list']), args['title'], args['sort'], args['timeline'])
 
 		return self.outputJson(JSON_OK);
 
@@ -101,6 +114,21 @@ class Api(object):
 		return self.outputJson(ret);
 
 	@cherrypy.expose
+	def getList(self, *path, **args):
+		self.checkLoggedIn();
+		HttpQueryArgChecker(args).requireArg('listId');
+
+		l = self.wrapper.getList(self.getUsername(), int(args['listId']));
+
+		if len(l) == 0:
+			return self.outputJsonError(404, "List not found")
+
+		singleList = l[0][0]
+		structList = self.normalizeList(singleList);
+
+		return self.outputJson(structList);
+
+	@cherrypy.expose
 	def listLists(self, *path, **args):
 		lists = self.wrapper.getLists(self.getUsername());
 
@@ -109,20 +137,30 @@ class Api(object):
 		for row in lists:
 			singleList = row[0]
 
-			ret.append({
-				"id": singleList.id,
-				"title": singleList['title'],
-				"sort": singleList['sort'],
-				"count": len(singleList.get_related_nodes(Direction.OUTGOING))
-			})
+			ret.append(self.normalizeList(singleList))
 
 		return self.outputJson(ret)
 
+	def normalizeList(self, singleList):
+		return {
+			"id": singleList.id,
+			"title": singleList['title'],
+			"sort": singleList['sort'],
+			"timeline": singleList['timeline'],
+			"count": len(singleList.get_related_nodes(Direction.OUTGOING))
+		}
+
+
 	@cherrypy.expose
 	def createList(self, *path, **args):
-		self.wrapper.createList(self.getUsername(), args["title"]);
+		createdList = self.wrapper.createList(self.getUsername(), args["title"]);
 
-		return self.outputJson(JSON_OK);
+		for row in createdList:
+			newListId = row[0]
+
+			return self.outputJson({"newListId": newListId})
+
+		return self.outputJsonError(404, "no list created");
 
 	@cherrypy.expose
 	def setItemParent(self, *path, **args):
@@ -133,6 +171,15 @@ class Api(object):
 	@cherrypy.expose
 	def createTask(self, *path, **args):
 		if (args['parentType'] == "list"):
+			l = self.wrapper.getList(self.getUsername(), int(args['parentId']));
+
+			singleList = l[0][0]
+			structList = self.normalizeList(singleList);
+
+			if (structList['count'] > 50):
+				raise self.outputJsonError(403, "List is too big!")
+
+
 			createdItems = self.wrapper.createListItem(int(args['parentId']), args['content'])
 		else:
 			createdItems = self.wrapper.createSubItem(int(args['parentId']), args['content'])
@@ -165,6 +212,8 @@ class Api(object):
 
 	@cherrypy.expose
 	def listTasks(self, *path, **args):
+		self.checkLoggedIn();
+
 		if "task" in args:
 			items = self.wrapper.getSubItems(int(args['task']), args['sort'])
 		else:
@@ -279,8 +328,11 @@ class Api(object):
 
 		return self.outputJson(updatedTag)
 
+
 	@cherrypy.expose
 	def authenticate(self, *path, **args):
+		HttpQueryArgChecker(args).requireArg('username');
+
 		user, password = api.wrapper.getUser(args['username']);
 
 		if user == None:
@@ -306,6 +358,28 @@ def CORS():
 	cherrypy.response.headers['Access-Control-Allow-Origin'] = "http://hosted.wacky-tracky.com"
 	cherrypy.response.headers['Access-Control-Allow-Credentials'] = "true"
 
+def http_error_handler(status, message, traceback, version):
+	return json.dumps({
+		"httpStatus": status, 
+		"type": "httpError",
+		"message": message
+	});
+
+	
+def error_handler():
+	cherrypy.response.status = 500;
+	cherrypy.response.headers['Content-Type'] = "text/plain"
+
+	exceptionInfo = exc_info()
+	excType = exceptionInfo[0]
+	exception = exc_info()[1]
+
+	# Clients get a simple version.
+	cherrypy.response.body = "\nUnhandled exception.\n" + "Message: " + exception.message + "\n" + "Type: " + str(excType.__name__)
+
+	# Logs get a full version
+	print exceptionInfo
+
 api = Api();
 
 cherrypy.config.update({
@@ -316,8 +390,13 @@ cherrypy.config.update({
 #	'tools.sessions.storage_path': './sessions',
 	'tools.sessions.timeout': 20160,
 	'tools.CORS.on': True,
+	'request.error_response': error_handler,
+	'request.error_page': {'default':  http_error_handler}
 });
 
 cherrypy.tools.CORS = cherrypy.Tool('before_handler', CORS);
-cherrypy.process.plugins.Daemonizer(cherrypy.engine).subscribe()
+
+if not args.foreground:
+	cherrypy.process.plugins.Daemonizer(cherrypy.engine).subscribe()
+
 cherrypy.quickstart(api)
