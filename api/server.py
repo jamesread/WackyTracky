@@ -142,7 +142,7 @@ class Api(object):
 		return self.outputJson(ret)
 
 	def normalizeList(self, singleList):
-		return {
+		return {  
 			"id": singleList.id,
 			"title": singleList['title'],
 			"sort": singleList['sort'],
@@ -250,11 +250,12 @@ class Api(object):
 
 		return self.outputJson(JSON_OK);
 
-	def outputJsonError(self, code, msg):
+	def outputJsonError(self, code, msg, uniqueType = ""):
 		cherrypy.response.status = code;
 
 		return self.outputJson({
 			"type": "Error",
+			"uniqueType": uniqueType,
 			"message": msg
 		})
 
@@ -336,10 +337,10 @@ class Api(object):
 		user, password = api.wrapper.getUser(args['username']);
 
 		if user == None:
-			return self.outputJsonError(403, "User not found: " + args['username'])
+			return self.outputJsonError(403, "User not found: " + args['username'], uniqueType = "user-not-found")
 
 		if args['password'] != password:
-			return self.outputJsonError(403, "Password is incorrect.")
+			return self.outputJsonError(403, "Password is incorrect.", uniqueType = "user-wrong-password")
 
 		cherrypy.session.regenerate();
 		cherrypy.session['username'] = user['username'];
