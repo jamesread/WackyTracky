@@ -112,12 +112,7 @@ class Wrapper:
 
 		return len(results) > 0
 
-	def register(self, username, hashedPassword, email):
-		user, password = self.getUser(username);
-
-		if user != None:
-			raise Exception("User already exists")
-
+	def register(self, username, hashedPassword, email):	
 		results, metadata = cypher.execute(self.graphdb, "CREATE (u:User {username: {username}, password: {password}, email: {email}}) ", params = [["username", username], ["password", hashedPassword], ["email", email]])
 
 		return;

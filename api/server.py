@@ -262,11 +262,16 @@ class Api(object):
 	@cherrypy.expose
 	def register(self, *path, **args):
 		try:
+			user, password = api.wrapper.getUser(args['username']);
+
+			if user != None:
+				return self.outputJsonError(403, "User already exists", uniqueType = "username-already-exists");
+
 			if len(args['username']) < 3:
-				raise Exception("Username must be at least 3 characters long.")
+				return self.outputJsonError(403, "Username must be at least 3 characters long.", uniqueType = "username-too-short")
 
 			if len(args['password']) < 6:
-				raise Exception("Password must be at least 6 character long.");
+				return self.outputJsonError(403, "Password must be at least 6 character long.", uniqueType = "password-too-short")
 
 			api.wrapper.register(args['username'], args['password'], args['email'])
 
