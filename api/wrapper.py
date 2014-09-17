@@ -30,6 +30,11 @@ class Wrapper:
 
 		return results;
 
+	def getListByTitle(self, username, listTitle):
+		results, metadata = cypher.execute(self.graphdb, "MATCH (u:User)-[]->(l:List) WHERE u.username = {username} AND l.title = {listTitle} RETURN l ORDER BY l.title", params = [["username", username], ["listTitle", listTitle]]);
+
+		return results;
+
 	def getLists(self, username):
 		results, metadata = cypher.execute(self.graphdb, "MATCH (u:User)-[]->(l:List) WHERE u.username = {username} RETURN l ORDER BY l.title", params = [["username", username]]);
 

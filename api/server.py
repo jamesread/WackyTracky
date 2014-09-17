@@ -129,6 +129,22 @@ class Api(object):
 		return self.outputJson(structList);
 
 	@cherrypy.expose
+	def getListByTitle(self, *path, **args):
+		self.checkLoggedIn();
+
+		HttpQueryArgChecker(args).requireArg('listTitle');
+
+		l = self.wrapper.getListByTitle(self.getUsername(), args['listTitle'])
+
+		if len(l) == 0:
+			return self.outputJsonError(404, "List not found by title", uniqueType = "list-not-found");
+
+		singleList = l[0][0]
+		structList = self.normalizeList(singleList)
+		
+		return self.outputJson(structList);
+
+	@cherrypy.expose
 	def listLists(self, *path, **args):
 		lists = self.wrapper.getLists(self.getUsername());
 
@@ -172,6 +188,9 @@ class Api(object):
 	def createTask(self, *path, **args):
 		if (args['parentType'] == "list"):
 			l = self.wrapper.getList(self.getUsername(), int(args['parentId']));
+
+			if (len(l) == 0):
+				return self.outputJsonError(404, "Cannot get the owning list in which to create a task.", uniqueType = "create-on-nonexistant-list")
 
 			singleList = l[0][0]
 			structList = self.normalizeList(singleList);
