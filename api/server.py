@@ -64,7 +64,7 @@ class Api(object):
 			
 		cherrypy.response.headers['Content-Type'] = 'application/json'
 
-		return json.dumps(structure);
+		return json.dumps(structure, indent = 4);
 
 	@cherrypy.expose
 	def createTag(self, *path, **args):
@@ -370,7 +370,10 @@ class Api(object):
 		cherrypy.session['username'] = user['username'];
 		cherrypy.session.save();
 
-		return self.outputJson(user);
+		return self.outputJson({
+			"username": user['username'],
+			"id": cherrypy.session.id,
+		});
 
 	@cherrypy.expose
 	def logout(self, *path, **args):
