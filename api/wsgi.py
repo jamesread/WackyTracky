@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 
 import cherrypy
 import atexit
@@ -19,23 +19,23 @@ if cherrypy.engine.state == 0:
 
 class Root:
 	def __init__(self):
-		print "init"
+		print("init")
 
 	@cherrypy.expose
 	def index(self, *args, **kwargs):
-		print "index"
+		print("index")
 		return "hi";
 
 	@cherrypy.expose
 	def default(self):
-		print "default1"
+		print("default1")
 		return "defaulggt"
 
 	index.exposed = True
 	default.exposed = True
 
 def application(environ, start_response):
-	print "app()"
+	print("app()")
 
 	cherrypy.tree.mount(Root())
 	return cherrypy.tree(environ, start_response);

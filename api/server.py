@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 
 import cherrypy
 from cherrypy import _cperror
@@ -308,7 +308,7 @@ class Api(object):
 				if wallpaper.endswith(".png") or wallpaper.endswith(".jpg"):
 					wallpapers.append(wallpaper)
 		except Exception as e:
-			print e
+			print(e)
 
 		if len(wallpapers) == 0:
 			return None
@@ -406,7 +406,7 @@ def error_handler():
 	cherrypy.response.body = "\nUnhandled exception.\n" + "Message: " + exception.message + "\n" + "Type: " + str(excType.__name__)
 
 	# Logs get a full version
-	print exceptionInfo
+	print(exceptionInfo)
 
 api = Api();
 

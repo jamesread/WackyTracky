@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 
 import argparse 
 import wrapper
@@ -17,6 +17,6 @@ for ret in api.getLists(args.username):
 
 	table.add_row([tasklist.id, tasklist['title']])
 
-print table
+print(table)
 
 

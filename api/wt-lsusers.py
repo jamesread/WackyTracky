@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 
 import wrapper
 from prettytable import PrettyTable
@@ -12,4 +12,4 @@ for ret in api.getUsers():
 
 	table.add_row([user.id, user['username'], user['email'], ret[1], ret[2]])
 
-print table
+print(table)
