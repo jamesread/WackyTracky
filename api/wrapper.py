@@ -1,143 +1,171 @@
 #!/usr/bin/python3
 
-from py2neo import neo4j, cypher
+from os import getenv
+from neo4j.v1 import GraphDatabase
+from neo4j.exceptions import ServiceUnavailable
 
 class Wrapper:
-	def __init__(self):
-		self.graphdb = neo4j.GraphDatabaseService()
+  def __init__(self):
+    username = getenv("WT_SERVER_USERNAME")
+    password = getenv("WT_SERVER_PASSWORD")
 
-	def createUser(self, username):
-		results, metadata = cypher.execute(self.graphdb, "CREATE (u:User {username: {username}})", params = [["username", username]])
+    if username == None or password == None:
+      raise RuntimeError("Username or password was not set: WT_SERVER_USERNAME, WT_SERVER_PASSWORD")
 
-	def deleteUser(self, userid):
-		results, metadata = cypher.execute(self.graphdb, "MATCH (u:User) WHERE id(u) = {userid} DELETE u ", params = [["userid", userid]])
+    uri = "bolt://{}:{}@localhost".format(username, password)
 
-	def getUsers(self):
-		results, metadata = cypher.execute(self.graphdb, "MATCH (u:User) OPTIONAL MATCH (u)-[]->(l:List) OPTIONAL MATCH (u)-[]->(l:List)-[]->(i2:Item) RETURN u, count(l) AS listCount, count(i2) AS itemCount ORDER BY id(u) ");
+    try:
+      self.conn = GraphDatabase.driver(uri, auth = (username, password))
+      self.session = self.conn.session()
+    except ServiceUnavailable as e:
+      raise Exception(str(e))
 
-		return results;
+  def createUser(self, username):
+    results = self.session.run("CREATE (u:User {username: {username}})", username = username)
 
-	def setTaskContent(self, itemId, content):
-		results, metadata = cypher.execute(self.graphdb, "MATCH (i:Item) WHERE id(i) = {itemId} SET i.content = {content} ", params = [["itemId", itemId], ["content", content]])
+  def deleteUser(self, userid):
+    results = self.session.run("MATCH (u:User) WHERE id(u) = {userid} DELETE u ", userid = userid)
 
-	def createList(self, username, title):
-		results, metadata = cypher.execute(self.graphdb, "MATCH (u:User) WHERE u.username = {username} CREATE (u)-[:owns]->(l:List {title: {title}}) RETURN id(l)", params = [["title", title], ["username", username]]);
+  def getUsers(self):
+    results = self.session.run("MATCH (u:User) OPTIONAL MATCH (u)-[]->(l:List) OPTIONAL MATCH (u)-[]->(l:List)-[]->(i2:Item) RETURN u, count(l) AS listCount, count(i2) AS itemCount ORDER BY id(u) ");
 
-		return results;
+    return results;
 
-	def getList(self, username, listId):
-		results, metadata = cypher.execute(self.graphdb, "MATCH (u:User)-[]->(l:List) WHERE u.username = {username} AND id(l) = {listId} RETURN l ORDER BY l.title", params = [["username", username], ["listId", listId]]);
+  def setTaskContent(self, itemId, content):
+    results = self.session.run("MATCH (i:Item) WHERE id(i) = {itemId} SET i.content = {content} ", itemId = itemId, content = content)
 
-		return results;
+  def createList(self, username, title):
+    results = self.session.run("MATCH (u:User) WHERE u.username = {username} CREATE (u)-[:owns]->(l:List {title: {title}}) RETURN id(l)", title = title, username = username);
 
-	def getListByTitle(self, username, listTitle):
-		results, metadata = cypher.execute(self.graphdb, "MATCH (u:User)-[]->(l:List) WHERE u.username = {username} AND l.title = {listTitle} RETURN l ORDER BY l.title", params = [["username", username], ["listTitle", listTitle]]);
+    return results;
 
-		return results;
+  def getSingleList(self, username, listId):
+    results = self.session.run("MATCH (u:User)-[]->(l:List) OPTIONAL MATCH (l)-[]->(subLists:List) OPTIONAL MATCH (l)-->(i:Item) WITH u, l, count(subLists) AS countSubLists, count(i) AS countItems WHERE u.username = {username} AND id(l) = {listId} RETURN l, countSubLists, countItems ORDER BY l.title", username = username, listId = listId).single();
 
-	def getLists(self, username):
-		results, metadata = cypher.execute(self.graphdb, "MATCH (u:User)-[]->(l:List) WHERE u.username = {username} RETURN l ORDER BY l.title", params = [["username", username]]);
+    return results;
 
-		return results;
+  def getListByTitle(self, username, listTitle):
+    results = self.session.run("MATCH (u:User)-[]->(l:List) WHERE u.username = {username} AND l.title = {listTitle} RETURN l ORDER BY l.title", username = username, listTitle = listTitle);
 
-	def getTags(self, username):
-		results, metadata = cypher.execute(self.graphdb, "MATCH (u:User)-[]->(t:Tag) WHERE u.username = {username} RETURN t ", params = [["username", username]]);
+    return results;
 
-		return results;
+  def getLists(self, username):
+    results = self.session.run("MATCH (u:User)-[]->(l:List) OPTIONAL MATCH (l)-->(subLists:List) OPTIONAL MATCH (l)-->(i:Item) WITH u, l, count(subLists) AS countSubLists, count(i) AS countItems WHERE u.username = {username} RETURN l, countSubLists, countItems ORDER BY l.title", username = username);
 
-	def setItemParent(self, username, item, newParent):
-		results, metadata = cypher.execute(self.graphdb, "MATCH (u:User)-[]->(i:Item) CREATE ", params = [])
+    return results;
 
-		return results
+  def getTags(self, username):
+    results = self.session.run("MATCH (u:User)-[]->(t:Tag) WHERE u.username = {username} RETURN t ", username = username);
 
-	def createTag(self, username, title):
-		results, metadata = cypher.execute(self.graphdb, "MATCH (u:User) WHERE u.username = {username} CREATE (u)-[:owns]->(t:Tag {title: {title}}) ", params = [["username", username], ["title", title]]);
+    return results;
 
-	def createListItem(self, listId, content):
-		results, metadata = cypher.execute(self.graphdb, "MATCH (l:List) WHERE id(l) = {listId} CREATE (l)-[:owns]->(i:Item {content: {content}}) RETURN i", params = [["listId", listId], ["content", content]])
+  def setItemParent(self, username, item, newParent):
+    results = self.session.run("MATCH (u:User)-[]->(i:Item) CREATE ")
 
-		return results
+    return results
 
-	def createSubItem(self, itemId, content):
-		results, metadata = cypher.execute(self.graphdb, "MATCH (i:Item) WHERE id(i) = {itemId} CREATE i-[:owns]->(ni:Item {content: {content}}) RETURN ni", params = [["itemId", itemId], ["content", content]]);
+  def createTag(self, username, title):
+    results = self.session.run("MATCH (u:User) WHERE u.username = {username} CREATE (u)-[:owns]->(t:Tag {title: {title}}) ", username = username, title = title);
 
-		return results
+  def createListItem(self, listId, content):
+    results = self.session.run("MATCH (l:List) WHERE id(l) = {listId} CREATE (l)-[:owns]->(i:Item {content: {content}}) WITH i, 0 as countItems RETURN i, countItems", listId = listId, content = content)
 
-	def getItemsFromList(self, listId, sort = None):
-		if sort not in [ "content", "dueDate" ]:
-			sort = "content"
+    return results
 
-		results, metadata = cypher.execute(self.graphdb, "MATCH (l:List)-[]->(i:Item) WHERE id(l) = {listId} RETURN i ORDER BY i." + sort, params = [["listId", listId]]);
+  def createSubItem(self, itemId, content):
+    results = self.session.run("MATCH (i:Item) WHERE id(i) = {itemId} CREATE (i)-[:owns]->(ni:Item {content: {content}}) RETURN ni", itemId = itemId, content = content)
 
-		return results
+    return results
 
-	def getSubItems(self, parentId, sort = None):
-		if sort not in [ "content", "dueDate" ]:
-			sort = "content"
+  def getItemsFromList(self, listId, sort = None):
+    if sort not in [ "content", "dueDate" ]:
+      sort = "content"
 
-		results, metadata = cypher.execute(self.graphdb, "MATCH (p:Item)-[]->(i:Item) WHERE id(p) = {parentId} RETURN i ORDER BY i." + sort, params = [["parentId", parentId]]);
+    results = self.session.run("MATCH (l:List)-[]->(i:Item) OPTIONAL MATCH (i)-->(subItem:Item) OPTIONAL MATCH (externalItem:ExternalItem) WHERE i = externalItem WITH l, i, count(subItem) AS countItems, externalItem WHERE id(l) = {listId} WITH i, countItems, externalItem RETURN i, countItems, externalItems ORDER BY i." + sort, listId = listId);
 
-		return results
+    return results
 
-	def deleteTask(self, itemId):
-		results, metadata = cypher.execute(self.graphdb, "MATCH (i:Item) WHERE id(i) = {itemId} OPTIONAL MATCH (i)<-[r]-() OPTIONAL MATCH (i)-[linkTagged:tagged]->(tag:Tag) DELETE i,r, linkTagged, tag", params = [["itemId", itemId]])
+  def getSubItems(self, parentId, sort = None):
+    if sort not in [ "content", "dueDate" ]:
+      sort = "content"
 
-	def updateList(self, listId, title, sort, timeline):
-		results, metadata = cypher.execute(self.graphdb, "MATCH (l:List) WHERE id(l) = {listId} SET l.title = {title}, l.sort = {sort}, l.timeline = {timeline} ", params = [["listId", listId], ["title", title], ["sort", sort], ["timeline", timeline]]);
+    results = self.session.run("MATCH (p:Item)-[]->(i:Item) WHERE id(p) = {parentId} RETURN i ORDER BY i." + sort, parentId = parentId);
 
-	def setDueDate(self, itemId, dueDate):
-		results, metadata = cypher.execute(self.graphdb, "MATCH (i:Item) WHERE id(i) = {itemId} SET i.dueDate = {dueDate} ", params = [["itemId", itemId],["dueDate", dueDate]]);
+    return results
 
-	def updateTag(self, itemId, title, shortTitle, backgroundColor):
-		results, metadata = cypher.execute(self.graphdb, "MATCH (t:Tag) WHERE id(t) = {itemId} SET t.title = {title}, t.shortTitle = {shortTitle}, t.backgroundColor = {backgroundColor} RETURN t", params = [["itemId", itemId], ["title", title], ["shortTitle", shortTitle], ["backgroundColor", backgroundColor]]);
+  def deleteTask(self, itemId):
+    results = self.session.run("MATCH (i:Item) WHERE id(i) = {itemId} OPTIONAL MATCH (i)<-[r]-() OPTIONAL MATCH (i)-[linkTagged:tagged]->(tag:Tag) DELETE i,r, linkTagged, tag", itemId = itemId)
 
-		for result in results:
-			tag = result[0]
+  def updateList(self, listId, title, sort, timeline):
+    results = self.session.run("MATCH (l:List) WHERE id(l) = {listId} SET l.title = {title}, l.sort = {sort}, l.timeline = {timeline} ", listId = listId, title = title, sort = sort, timeline = timeline);
 
-			return {
-				"id": tag.id,
-				"title": tag['title'],
-				"shortTitle": tag['shortTitle'],
-				"backgroundColor": tag['backgroundColor']
-			}
+  def setDueDate(self, itemId, dueDate):
+    results = self.session.run("MATCH (i:Item) WHERE id(i) = {itemId} SET i.dueDate = {dueDate} ", itemId = itemId, dueDate = dueDate);
 
-		return None
+  def updateTag(self, itemId, title, shortTitle, backgroundColor):
+    results = self.session.run("MATCH (t:Tag) WHERE id(t) = {itemId} SET t.title = {title}, t.shortTitle = {shortTitle}, t.backgroundColor = {backgroundColor} RETURN t", itemId = itemId, title = title, shortTitle = shortTitle, backgroundColor = backgroundColor);
 
-	def deleteList(self, itemId):
-		results, metadata = cypher.execute(self.graphdb, "MATCH (l:List) WHERE id(l) = {listId} OPTIONAL MATCH (l)<-[userLink]-() DELETE l, userLink", params = [["listId", itemId]]);
+    for result in results:
+      tag = result[0]
 
-	def tag(self, itemId, tagId):
-		results, metadata = cypher.execute(self.graphdb, "MATCH (i:Item), (t:Tag) WHERE id(i) = {itemId} AND id(t) = {tagId} CREATE UNIQUE (i)-[:tagged]->(t) ", params = [["tagId", tagId], ["itemId", itemId]]);
+      return {
+        "id": tag.id,
+        "title": tag['title'],
+        "shortTitle": tag['shortTitle'],
+        "backgroundColor": tag['backgroundColor']
+      }
 
-	def untag(self, itemId, tagId):
-		results, metadata = cypher.execute(self.graphdb, "MATCH (i:Item)-[link:tagged]->(t:Tag) WHERE id(i) = {itemId} AND id(t) = {tagId} DELETE link ", params = [["itemId", itemId], ["tagId", tagId]]);
+    return None
 
-	def hasItemGotTag(self, itemId, tagId):
-		results, metadata = cypher.execute(self.graphdb, "MATCH (i:Item)-[r]->(t:Tag) WHERE id(i) = {itemId} AND id(t) = {tagId} RETURN r", params = [["itemId", itemId], ["tagId", tagId]]);
+  def deleteList(self, itemId):
+    results = self.session.run("MATCH (l:List) WHERE id(l) = {listId} OPTIONAL MATCH (l)<-[userLink]-() DELETE l, userLink", listId = itemId);
 
-		return len(results) > 0
+  def tag(self, itemId, tagId):
+    results = self.session.run("MATCH (i:Item), (t:Tag) WHERE id(i) = {itemId} AND id(t) = {tagId} CREATE UNIQUE (i)-[:tagged]->(t) ", tagId = tagId, itemId = itemId);
 
-	def register(self, username, hashedPassword, email):	
-		results, metadata = cypher.execute(self.graphdb, "CREATE (u:User {username: {username}, password: {password}, email: {email}}) ", params = [["username", username], ["password", hashedPassword], ["email", email]])
+  def untag(self, itemId, tagId):
+    results = self.session.run("MATCH (i:Item)-[link:tagged]->(t:Tag) WHERE id(i) = {itemId} AND id(t) = {tagId} DELETE link ", itemId = itemId, tagId = tagId);
 
-		return;
+  def hasItemGotTag(self, itemId, tagId):
+    results = self.session.run("MATCH (i:Item)-[r]->(t:Tag) WHERE id(i) = {itemId} AND id(t) = {tagId} RETURN r", itemId = itemId, tagId = tagId);
 
-	def changePassword(self, username, hashedPassword):
-		results, metadata = cypher.execute(self.graphdb, "MATCH (u:User) WHERE u.username = {username} SET u.password = {hashedPassword} ", params = [["username", username], ["hashedPassword", hashedPassword]]);
+    tagCount = 0;
+
+    for r in results:
+      tagCount += 1
+
+    return tagCount > 0
+
+  def register(self, username, hashedPassword, email):  
+    results = self.session.run("CREATE (u:User {username: {username}, password: {password}, email: {email}}) ", username = usenrame, password = hashedPassword, email = email)
+
+    return;
+
+  def changePassword(self, username, hashedPassword):
+    results = self.session.run("MATCH (u:User) WHERE u.username = {username} SET u.password = {hashedPassword} RETURN u", username = username, hashedPassword = hashedPassword);
+
+    return results
 
 
-	def getUser(self, username = None):
-		if username == None:
-			username = username
+  def getUser(self, username = None):
+    if username == None:
+      username = username
 
-		results, metadata = cypher.execute(self.graphdb, "MATCH (u:User) WHERE u.username = {username} RETURN u LIMIT 1", params = [["username", username]]);
+    results = self.session.run("MATCH (u:User) WHERE u.username = {username} RETURN u LIMIT 1", username = username);
+    results = results.values()
 
-		if len(results) == 0:
-			return [None, None]
-		else: 
-			for row in results:
-				user = row[0]
+    if len(results) == 0:
+      return [None, None]
+    else: 
+      for row in results:
+        user = row[0]
 
-				return [{
-					"username": user['username'],
-				}, user['password']]
+        return [{
+          "username": user['username'],
+        }, user['password']]
+
+import __main__ as main
+if not hasattr(main, '__file__'):
+  global wtapi
+  wtapi = Wrapper()
+  print("WT API reloaded")

@@ -2,3 +2,4 @@
 **/*.swp
 wallpapers
 **/sessions
+**/__pycache__

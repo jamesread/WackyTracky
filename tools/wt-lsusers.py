@@ -1,5 +1,6 @@
 #!/usr/bin/python3
 
+import __init__
 import wrapper
 from prettytable import PrettyTable
 
