@@ -8,12 +8,13 @@ import wrapper
 import json
 import random
 import os
-import argparse
 from sys import exc_info
+
+import commonArgumentParser
 
 JSON_OK = { "message": "ok"}
 
-parser = argparse.ArgumentParser();
+parser = commonArgumentParser.getNew();
 parser.add_argument("--port", default = 8082, type = int)
 parser.add_argument("--wallpaperdir", default = "/var/www/html/wallpapers/")
 parser.add_argument("--background", action = 'store_true')
@@ -31,7 +32,7 @@ class HttpQueryArgChecker:
     return self
 
 class Api(object):
-  wrapper = wrapper.Wrapper()
+  wrapper = wrapper.Wrapper(args.dbUser, args.dbPass)
 
   @cherrypy.expose
   def tag(self, *path, **args):
@@ -412,6 +413,7 @@ cherrypy.config.update({
   'server.socket_port': args.port,
   'tools.CORS.on': True,
   'tools.sessions.on': True,
+  'tools.sessions.locking': 'early',
   'tools.sessions.storage_class': cherrypy.lib.sessions.FileSession,
   'tools.sessions.storage_path': '/tmp/wt-sessions',
   'tools.sessions.timeout': 20160,

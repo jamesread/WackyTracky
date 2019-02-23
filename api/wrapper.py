@@ -5,10 +5,7 @@ from neo4j.v1 import GraphDatabase
 from neo4j.exceptions import ServiceUnavailable
 
 class Wrapper:
-  def __init__(self):
-    username = getenv("WT_SERVER_USERNAME")
-    password = getenv("WT_SERVER_PASSWORD")
-
+  def __init__(self, username, password):
     if username == None or password == None:
       raise RuntimeError("Username or password was not set: WT_SERVER_USERNAME, WT_SERVER_PASSWORD")
 
@@ -81,7 +78,7 @@ class Wrapper:
     if sort not in [ "content", "dueDate" ]:
       sort = "content"
 
-    results = self.session.run("MATCH (l:List)-[]->(i:Item) OPTIONAL MATCH (i)-->(subItem:Item) OPTIONAL MATCH (externalItem:ExternalItem) WHERE i = externalItem WITH l, i, count(subItem) AS countItems, externalItem WHERE id(l) = {listId} WITH i, countItems, externalItem RETURN i, countItems, externalItems ORDER BY i." + sort, listId = listId);
+    results = self.session.run("MATCH (l:List)-[]->(i:Item) OPTIONAL MATCH (i)-->(subItem:Item) OPTIONAL MATCH (externalItem:ExternalItem) WHERE i = externalItem WITH l, i, count(subItem) AS countItems, externalItem WHERE id(l) = {listId} WITH i, countItems, externalItem RETURN i, countItems, externalItem ORDER BY i." + sort, listId = listId);
 
     return results
 
@@ -163,6 +160,9 @@ class Wrapper:
         return [{
           "username": user['username'],
         }, user['password']]
+
+def fromArgs(args):
+    return Wrapper(args.dbUser, args.dbPass)
 
 import __main__ as main
 if not hasattr(main, '__file__'):
