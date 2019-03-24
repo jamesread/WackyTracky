@@ -70,7 +70,7 @@ class Wrapper:
     return results
 
   def createSubItem(self, itemId, content):
-    results = self.session.run("MATCH (i:Item) WHERE id(i) = {itemId} CREATE (i)-[:owns]->(ni:Item {content: {content}}) RETURN ni", itemId = itemId, content = content)
+    results = self.session.run("MATCH (i:Item) WHERE id(i) = {itemId} CREATE (i)-[:owns]->(ni:Item {content: {content}}) WITH ni as i, 0 as countItems RETURN i, countItems", itemId = itemId, content = content)
 
     return results
 
@@ -86,7 +86,7 @@ class Wrapper:
     if sort not in [ "content", "dueDate" ]:
       sort = "content"
 
-    results = self.session.run("MATCH (p:Item)-[]->(i:Item) WHERE id(p) = {parentId} RETURN i ORDER BY i." + sort, parentId = parentId);
+    results = self.session.run("MATCH (p:Item)-[]->(i:Item) WHERE id(p) = {parentId} OPTIONAL MATCH (i)-->(subItem:Item) WITH i, count(subItem) as countItems RETURN i, countItems ORDER BY i." + sort, parentId = parentId);
 
     return results
 

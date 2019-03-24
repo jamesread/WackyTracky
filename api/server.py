@@ -79,7 +79,7 @@ class Api(object):
 
     ret = []
     for row in items: 
-      singleItem = row[0]
+      singleItem = row
 
       ret.append(self.normalizeItem(singleItem))
 
@@ -411,12 +411,12 @@ api = Api();
 cherrypy.config.update({
   'server.socket_host': '0.0.0.0',
   'server.socket_port': args.port,
-  'tools.CORS.on': True,
   'tools.sessions.on': True,
   'tools.sessions.locking': 'early',
-  'tools.sessions.storage_class': cherrypy.lib.sessions.FileSession,
-  'tools.sessions.storage_path': '/tmp/wt-sessions',
+#  'tools.sessions.storage_class': cherrypy.lib.sessions.FileSession,
+#  'tools.sessions.storage_path': '/tmp/wt-sessions',
   'tools.sessions.timeout': 20160,
+  'tools.CORS.on': True,
   'request.error_response': error_handler,
   'request.error_page': {'default':  http_error_handler}
 });
