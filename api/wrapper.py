@@ -3,14 +3,13 @@
 from os import getenv
 from neo4j.v1 import GraphDatabase
 from neo4j.exceptions import ServiceUnavailable
+import logging
+import configparser
 
 class Wrapper:
-  def __init__(self):
-    username = getenv("WT_SERVER_USERNAME")
-    password = getenv("WT_SERVER_PASSWORD")
-
+  def __init__(self, username = None, password = None):
     if username == None or password == None:
-      raise RuntimeError("Username or password was not set: WT_SERVER_USERNAME, WT_SERVER_PASSWORD")
+        username, password = self.loadAuthCredentials()
 
     uri = "bolt://{}:{}@localhost".format(username, password)
 
@@ -19,6 +18,13 @@ class Wrapper:
       self.session = self.conn.session()
     except ServiceUnavailable as e:
       raise Exception(str(e))
+
+
+  def loadAuthCredentials(self):
+    config = configparser.ConfigParser()
+    config.read("/etc/wacky-tracky/server.cfg")
+
+    return config["server"]["neo4j_username"], config["server"]["neo4j_password"]
 
   def createUser(self, username):
     results = self.session.run("CREATE (u:User {username: {username}})", username = username)
@@ -68,22 +74,32 @@ class Wrapper:
     results = self.session.run("MATCH (u:User) WHERE u.username = {username} CREATE (u)-[:owns]->(t:Tag {title: {title}}) ", username = username, title = title);
 
   def createListItem(self, listId, content):
-    results = self.session.run("MATCH (l:List) WHERE id(l) = {listId} CREATE (l)-[:owns]->(i:Item {content: {content}}) WITH i, 0 as countItems RETURN i, countItems", listId = listId, content = content)
+    return self.session.run("MATCH (l:List) WHERE id(l) = {listId} CREATE (l)-[:owns]->(i:Item {content: {content}}) WITH i, 0 as countItems RETURN i, countItems", listId = listId, content = content).single()
 
-    return results
+  def createOrFindListItem(self, listId, content, externalId):
+    listItem = self.session.run("MATCH (i:ExternalItem) WHERE i.externalId = {externalId} RETURN i", externalId = externalId).single()
+
+    if listItem is None:
+      return self.createListItem(listId, content)
+    else:
+      return listItem
 
   def createSubItem(self, itemId, content):
-    results = self.session.run("MATCH (i:Item) WHERE id(i) = {itemId} CREATE (i)-[:owns]->(ni:Item {content: {content}}) RETURN ni", itemId = itemId, content = content)
-
-    return results
+    return self.session.run("MATCH (i:Item) WHERE id(i) = {itemId} CREATE (i)-[:owns]->(ni:Item {content: {content}}) RETURN ni", itemId = itemId, content = content).single()
 
   def getItemsFromList(self, listId, sort = None):
     if sort not in [ "content", "dueDate" ]:
       sort = "content"
 
-    results = self.session.run("MATCH (l:List)-[]->(i:Item) OPTIONAL MATCH (i)-->(subItem:Item) OPTIONAL MATCH (externalItem:ExternalItem) WHERE i = externalItem WITH l, i, count(subItem) AS countItems, externalItem WHERE id(l) = {listId} WITH i, countItems, externalItem RETURN i, countItems, externalItems ORDER BY i." + sort, listId = listId);
+    results = self.session.run("MATCH (l:List)-[]->(i:Item) WHERE id(l) = {listId} OPTIONAL MATCH (i2:ExternalItem) WHERE i2 = i OPTIONAL MATCH (i)-->(subItem:Item)  WITH l, i, count(subItem) AS countItems, labels(i) AS itemLabels RETURN i, countItems, itemLabels, id(i) ORDER BY i." + sort, listId = listId)
 
     return results
+
+  def addItemLabel(self, itemId, label):
+    self.session.run("MATCH (i) WHERE id(i) = {id} SET i:" + label + "  RETURN i", id = itemId)
+
+  def setItemProperty(self, itemId, key, val):
+    self.session.run("MATCH (i) WHERE id(i) = {id} SET i." + key + " = {value}  RETURN i", id = itemId, value = val)
 
   def getSubItems(self, parentId, sort = None):
     if sort not in [ "content", "dueDate" ]:

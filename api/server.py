@@ -8,16 +8,18 @@ import wrapper
 import json
 import random
 import os
-import argparse
+import configargparse
 from sys import exc_info
 
 JSON_OK = { "message": "ok"}
 
-parser = argparse.ArgumentParser();
+parser = configargparse.ArgParser(default_config_files=["/etc/wacky-tracky/server.cfg"])
 parser.add_argument("--port", default = 8082, type = int)
 parser.add_argument("--wallpaperdir", default = "/var/www/html/wallpapers/")
 parser.add_argument("--background", action = 'store_true')
 parser.add_argument("--corsDomain", default = "*")
+parser.add_argument("--neo4j_username", required = True)
+parser.add_argument("--neo4j_password", required = True)
 args = parser.parse_args();
 
 class HttpQueryArgChecker:
@@ -31,7 +33,7 @@ class HttpQueryArgChecker:
     return self
 
 class Api(object):
-  wrapper = wrapper.Wrapper()
+  wrapper = wrapper.Wrapper(args.neo4j_username, args.neo4j_password)
 
   @cherrypy.expose
   def tag(self, *path, **args):
@@ -203,9 +205,7 @@ class Api(object):
     else:
       createdItems = self.wrapper.createSubItem(int(args['parentId']), args['content'])
 
-    for row in createdItems:
-      return self.outputJson(self.normalizeItem(row));
-
+    return self.outputJson(self.normalizeItem(row));
 
   def getItemTags(self, singleItem):
     ret = []
@@ -214,15 +214,28 @@ class Api(object):
 
   def normalizeItem(self, singleItemRecord):
     item = singleItemRecord['i']
+    url = ""
+    source = ""
+    icon = None
 
-    print("normalizeItem", singleItemRecord)
+    if "url" in item:
+      url = item["url"]
+
+    if "source" in item:
+      source = item["source"]
+
+    if "icon" in item:
+      icon = item["icon"]
 
     return {
       "hasChildren": singleItemRecord['countItems'] > 0,
       "content": item['content'],
       "tags": self.getItemTags(singleItemRecord),
       "dueDate": item['dueDate'],
-      "id": item.id
+      "id": item.id,
+      "url": url,
+      "source": source,
+      "icon": icon
     }
 
   @cherrypy.expose
