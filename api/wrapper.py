@@ -83,7 +83,7 @@ class Wrapper:
       return self.createListItem(listId, content)
     else:
       return listItem
-
+  
   def createSubItem(self, itemId, content):
     return self.session.run("MATCH (i:Item) WHERE id(i) = {itemId} CREATE (i)-[:owns]->(ni:Item {content: {content}}) RETURN ni", itemId = itemId, content = content).single()
 
@@ -91,7 +91,7 @@ class Wrapper:
     if sort not in [ "content", "dueDate" ]:
       sort = "content"
 
-    results = self.session.run("MATCH (l:List)-[]->(i:Item) WHERE id(l) = {listId} OPTIONAL MATCH (i2:ExternalItem) WHERE i2 = i OPTIONAL MATCH (i)-->(subItem:Item)  WITH l, i, count(subItem) AS countItems, labels(i) AS itemLabels RETURN i, countItems, itemLabels, id(i) ORDER BY i." + sort, listId = listId)
+    results = self.session.run("MATCH (l:List)-[]->(i:Item) OPTIONAL MATCH (i)-->(subItem:Item) OPTIONAL MATCH (externalItem:ExternalItem) WHERE i = externalItem WITH l, i, count(subItem) AS countItems, externalItem WHERE id(l) = {listId} WITH i, countItems, externalItem RETURN i, countItems, externalItem ORDER BY i." + sort, listId = listId);
 
     return results
 
@@ -105,7 +105,7 @@ class Wrapper:
     if sort not in [ "content", "dueDate" ]:
       sort = "content"
 
-    results = self.session.run("MATCH (p:Item)-[]->(i:Item) WHERE id(p) = {parentId} RETURN i ORDER BY i." + sort, parentId = parentId);
+    results = self.session.run("MATCH (p:Item)-[]->(i:Item) WHERE id(p) = {parentId} OPTIONAL MATCH (i)-->(subItem:Item) WITH i, count(subItem) as countItems RETURN i, countItems ORDER BY i." + sort, parentId = parentId);
 
     return results
 
@@ -179,6 +179,9 @@ class Wrapper:
         return [{
           "username": user['username'],
         }, user['password']]
+
+def fromArgs(args):
+    return Wrapper(args.dbUser, args.dbPass)
 
 import __main__ as main
 if not hasattr(main, '__file__'):

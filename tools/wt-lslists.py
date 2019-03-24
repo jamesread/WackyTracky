@@ -9,7 +9,7 @@ parser = argparse.ArgumentParser();
 parser.add_argument('--username', '-u', required = True)
 args = parser.parse_args();
 
-api = wrapper.Wrapper();
+api = wrapper.fromArgs(args);
 
 table = PrettyTable(['ID', 'Title'])
 

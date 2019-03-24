@@ -4,7 +4,9 @@ import __init__
 import wrapper
 from prettytable import PrettyTable
 
-api = wrapper.Wrapper();
+import commonArgumentParser
+
+api = wrapper.fromArgs()
 
 table = PrettyTable(['ID', 'Username', 'Email', 'Lists', 'Items'])
 
