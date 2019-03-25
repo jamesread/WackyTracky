@@ -24,7 +24,7 @@ class Wrapper:
     config = configparser.ConfigParser()
     config.read("/etc/wacky-tracky/server.cfg")
 
-    return config["server"]["neo4j_username"], config["server"]["neo4j_password"]
+    return config["server"]["dbUser"], config["server"]["dbPassword"]
 
   def createUser(self, username):
     results = self.session.run("CREATE (u:User {username: {username}})", username = username)
@@ -181,7 +181,7 @@ class Wrapper:
         }, user['password']]
 
 def fromArgs(args):
-    return Wrapper(args.dbUser, args.dbPass)
+    return Wrapper(args.dbUser, args.dbPassword)
 
 import __main__ as main
 if not hasattr(main, '__file__'):

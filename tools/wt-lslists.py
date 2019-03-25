@@ -5,7 +5,9 @@ import argparse
 import wrapper
 from prettytable import PrettyTable
 
-parser = argparse.ArgumentParser();
+import commonArgumentParser
+
+parser = commonArgumentParser.getNew()
 parser.add_argument('--username', '-u', required = True)
 args = parser.parse_args();
 

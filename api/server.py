@@ -19,8 +19,6 @@ parser.add_argument("--port", default = 8082, type = int)
 parser.add_argument("--wallpaperdir", default = "/var/www/html/wallpapers/")
 parser.add_argument("--background", action = 'store_true')
 parser.add_argument("--corsDomain", default = "*")
-parser.add_argument("--neo4j_username", required = True)
-parser.add_argument("--neo4j_password", required = True)
 args = parser.parse_args();
 
 class HttpQueryArgChecker:
@@ -34,7 +32,7 @@ class HttpQueryArgChecker:
     return self
 
 class Api(object):
-  wrapper = wrapper.Wrapper(args.neo4j_username, args.neo4j_password)
+  wrapper = wrapper.Wrapper(args.dbUser, args.dbPassword)
 
   @cherrypy.expose
   def tag(self, *path, **args):
