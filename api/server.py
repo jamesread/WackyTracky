@@ -204,7 +204,7 @@ class Api(object):
     else:
       createdItems = self.wrapper.createSubItem(int(args['parentId']), args['content'])
 
-    return self.outputJson(self.normalizeItem(row));
+    return self.outputJson(self.normalizeItem(createdItems));
 
   def getItemTags(self, singleItem):
     ret = []

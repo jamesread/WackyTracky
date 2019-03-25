@@ -85,7 +85,7 @@ class Wrapper:
       return listItem
   
   def createSubItem(self, itemId, content):
-    return self.session.run("MATCH (i:Item) WHERE id(i) = {itemId} CREATE (i)-[:owns]->(ni:Item {content: {content}}) RETURN ni", itemId = itemId, content = content).single()
+    return self.session.run("MATCH (pi:Item) WHERE id(pi) = {itemId} CREATE (pi)-[:owns]->(i:Item {content: {content}}) WITH i, 0 as countItems RETURN i, countItems", itemId = itemId, content = content).single()
 
   def getItemsFromList(self, listId, sort = None):
     if sort not in [ "content", "dueDate" ]:
