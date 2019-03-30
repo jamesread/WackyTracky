@@ -61,7 +61,7 @@ class Wrapper:
     return results;
 
   def getTags(self, username):
-    results = self.session.run("MATCH (u:User)-[]->(t:Tag) WHERE u.username = {username} RETURN t ", username = username);
+    results = self.session.run("MATCH (u:User)-[]->(t:Tag) OPTIONAL MATCH (t)-[]->(tv:TagValue) WHERE u.username = {username} RETURN t, tv ", username = username);
 
     return results;
 
@@ -70,8 +70,11 @@ class Wrapper:
 
     return results
 
+  def createTagValue(self, tagId)
+    results = self.session.run("MATCH (t:Tag) WHERE id(t) = {tagId} CREATE (tv)-[:type]->(tv:TagValue) ", username = username, title = title);
+
   def createTag(self, username, title):
-    results = self.session.run("MATCH (u:User) WHERE u.username = {username} CREATE (u)-[:owns]->(t:Tag {title: {title}}) ", username = username, title = title);
+    results = self.session.run("MATCH (u:User) WHERE u.username = {username} CREATE (u)-[:owns]->(t:Tag {title: {title}})-[:type]->(tv:TagValue {textualValue:'default'}) ", username = username, title = title);
 
   def createListItem(self, listId, content):
     return self.session.run("MATCH (l:List) WHERE id(l) = {listId} CREATE (l)-[:owns]->(i:Item {content: {content}}) WITH i, 0 as countItems RETURN i, countItems", listId = listId, content = content).single()
@@ -91,9 +94,35 @@ class Wrapper:
     if sort not in [ "content", "dueDate" ]:
       sort = "content"
 
-    results = self.session.run("MATCH (l:List)-[]->(i:Item) OPTIONAL MATCH (i)-->(subItem:Item) OPTIONAL MATCH (externalItem:ExternalItem) WHERE i = externalItem WITH l, i, count(subItem) AS countItems, externalItem WHERE id(l) = {listId} WITH i, countItems, externalItem RETURN i, countItems, externalItem ORDER BY i." + sort, listId = listId);
+    results = self.session.run("MATCH (l:List)-[]->(i:Item) OPTIONAL MATCH (i)-->(tv:TagValue) OPTIONAL MATCH (i)-->(subItem:Item) OPTIONAL MATCH (externalItem:ExternalItem) WHERE i = externalItem WITH l, i, count(tv) AS countTagValues, count(subItem) AS countItems, externalItem WHERE id(l) = {listId} WITH i, countTagValues, countItems, externalItem RETURN i, countTagValues, countItems, externalItem ORDER BY i." + sort, listId = listId);
 
     return results
+
+  def deleteTag(self, itemId):
+    results = self.session.run("MATCH (t:Tag)-[tr]-() WHERE id(t) = {tagId} DELETE tr, t", tagId = itemId)
+    return results
+
+  def getItemTags(self, itemId):
+    ret = []
+
+    print("Get Item Tags for item: " + str(itemId))
+
+    results = self.session.run("MATCH (i)-->(tv:TagValue)<--(t:Tag) WHERE id(i) = {itemId} RETURN tv, t", itemId = itemId)
+
+    for row in results:
+        numericValue = 0
+        if row['tv']['numericValue'] not in ("", None):
+            numericValue = int(row['tv']['numericValue'])
+
+        ret.append({
+            "tagId": row['t'].id,
+            "title": row['t']['title'],
+            "numericValue": numericValue,
+            "textualValue": row['tv']['textualValue'],
+            "backgroundColor": row['tv']['backgroundColor']
+        })
+
+    return ret
 
   def addItemLabel(self, itemId, label):
     self.session.run("MATCH (i) WHERE id(i) = {id} SET i:" + label + "  RETURN i", id = itemId)
@@ -110,25 +139,39 @@ class Wrapper:
     return results
 
   def deleteTask(self, itemId):
-    results = self.session.run("MATCH (i:Item) WHERE id(i) = {itemId} OPTIONAL MATCH (i)<-[r]-() OPTIONAL MATCH (i)-[linkTagged:tagged]->(tag:Tag) DELETE i,r, linkTagged, tag", itemId = itemId)
+    results = self.session.run("MATCH (i:Item) WHERE id(i) = {itemId} OPTIONAL MATCH (i)<-[r]-() OPTIONAL MATCH (i)-[linkTagged]->(tv:TagValue) DELETE i,r, linkTagged, tv", itemId = itemId)
 
-  def updateList(self, listId, title, sort, timeline):
-    results = self.session.run("MATCH (l:List) WHERE id(l) = {listId} SET l.title = {title}, l.sort = {sort}, l.timeline = {timeline} ", listId = listId, title = title, sort = sort, timeline = timeline);
+  def updateList(self, listId, title, sort):
+    results = self.session.run("MATCH (l:List) WHERE id(l) = {listId} SET l.title = {title}, l.sort = {sort} ", listId = listId, title = title, sort = sort);
 
   def setDueDate(self, itemId, dueDate):
     results = self.session.run("MATCH (i:Item) WHERE id(i) = {itemId} SET i.dueDate = {dueDate} ", itemId = itemId, dueDate = dueDate);
 
-  def updateTag(self, itemId, title, shortTitle, backgroundColor):
-    results = self.session.run("MATCH (t:Tag) WHERE id(t) = {itemId} SET t.title = {title}, t.shortTitle = {shortTitle}, t.backgroundColor = {backgroundColor} RETURN t", itemId = itemId, title = title, shortTitle = shortTitle, backgroundColor = backgroundColor);
+  def updateTag(self, itemId, title, shortTitle, backgroundColor, textualValue, numericValue, tagValueId):
+    try:
+        numericValue = int(numericValue)
+    except:
+        numericValue = 1
+
+    cql =  "MATCH (t:Tag) WHERE id(t) = {itemId} MATCH (tv:TagValue) WHERE id(tv) = {tagValueId} SET t.title = {title}, t.shortTitle = {shortTitle}, tv.backgroundColor = {backgroundColor}, tv.textualValue = {textualValue}, tv.numericValue = {numericValue} RETURN t, tv"
+
+    results = self.session.run(cql, itemId = itemId, title = title, shortTitle = shortTitle, backgroundColor = backgroundColor, textualValue = textualValue, numericValue = numericValue, tagValueId = tagValueId);
+
 
     for result in results:
-      tag = result[0]
+      print("xxxxxxxx update tag and tv !")
+
+      tag = result['t']
+      tv = result['tv']
 
       return {
         "id": tag.id,
         "title": tag['title'],
         "shortTitle": tag['shortTitle'],
-        "backgroundColor": tag['backgroundColor']
+        "tagValueId": tv.id,
+        "numericValue": tv["numericValue"],
+        "textualValue": tv["textualValue"],
+        "backgroundColor": tv['backgroundColor']
       }
 
     return None
@@ -136,14 +179,14 @@ class Wrapper:
   def deleteList(self, itemId):
     results = self.session.run("MATCH (l:List) WHERE id(l) = {listId} OPTIONAL MATCH (l)<-[userLink]-() DELETE l, userLink", listId = itemId);
 
-  def tag(self, itemId, tagId):
-    results = self.session.run("MATCH (i:Item), (t:Tag) WHERE id(i) = {itemId} AND id(t) = {tagId} CREATE UNIQUE (i)-[:tagged]->(t) ", tagId = tagId, itemId = itemId);
+  def tag(self, itemId, tagId, tagValueId):
+    results = self.session.run("MATCH (i:Item), (t:Tag)-->(tv:TagValue) WHERE id(i) = {itemId} AND id(t) = {tagId} AND id(tv) = {tagValueId} CREATE (i)-[:tagged]->(tv) ", tagId = tagId, itemId = itemId, tagValueId = tagValueId);
 
-  def untag(self, itemId, tagId):
-    results = self.session.run("MATCH (i:Item)-[link:tagged]->(t:Tag) WHERE id(i) = {itemId} AND id(t) = {tagId} DELETE link ", itemId = itemId, tagId = tagId);
+  def untag(self, itemId, tagId, tagValueId):
+    results = self.session.run("MATCH (i:Item)-[link:tagged]->(tv:TagValue) WHERE id(i) = {itemId} AND id(tv) = {tagValueId} DELETE link ", itemId = itemId, tagValueId = tagValueId);
 
-  def hasItemGotTag(self, itemId, tagId):
-    results = self.session.run("MATCH (i:Item)-[r]->(t:Tag) WHERE id(i) = {itemId} AND id(t) = {tagId} RETURN r", itemId = itemId, tagId = tagId);
+  def hasItemGotTag(self, itemId, tagValueId):
+    results = self.session.run("MATCH (i:Item)-[r]->(tv:TagValue) WHERE id(i) = {itemId} AND id(tv) = {tagValueId} RETURN r", itemId = itemId, tagValueId = tagValueId);
 
     tagCount = 0;
 

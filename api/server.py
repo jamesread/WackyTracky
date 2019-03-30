@@ -36,16 +36,16 @@ class Api(object):
 
   @cherrypy.expose
   def tag(self, *path, **args):
-    if self.wrapper.hasItemGotTag(int(args['item']), int(args['tag'])):
-      self.wrapper.untag(int(args['item']), int(args['tag']));
+    if self.wrapper.hasItemGotTag(int(args['item']), int(args['tagValueId'])):
+      self.wrapper.untag(int(args['item']), int(args['tag']), int(args['tagValueId']));
     else:
-      self.wrapper.tag(int(args['item']), int(args['tag']));
+      self.wrapper.tag(int(args['item']), int(args['tag']), int(args['tagValueId']));
 
     return self.outputJson(JSON_OK);
 
   @cherrypy.expose
   def listUpdate(self, *path, **args):
-    self.wrapper.updateList(int(args['list']), args['title'], args['sort'], args['timeline'])
+    self.wrapper.updateList(int(args['id']), args['title'], args['sort'])
 
     return self.outputJson(JSON_OK);
 
@@ -72,6 +72,10 @@ class Api(object):
     self.wrapper.createTag(self.getUsername(), args['title'])
 
     return self.outputJson(JSON_OK);
+
+  @cherrypy.expose
+  def addTagValue(self, *path, **args):
+    return self.createTagValue(int(args['tagId']))
 
   @cherrypy.expose
   def listDownload(self, *path, **args):
@@ -103,13 +107,17 @@ class Api(object):
     ret = []
 
     for row in tags:
-      singleTag = row[0]
+      singleTag = row['t']
+      tagValue = row['tv']
 
       ret.append({
         "id": singleTag.id,
         "title": singleTag['title'],
         "shortTitle": singleTag['shortTitle'],
-        "backgroundColor": singleTag['backgroundColor']
+        "tagValueId": tagValue.id,
+        "numericValue": tagValue["numericValue"],
+        "textualValue": tagValue["textualValue"],
+        "backgroundColor": tagValue['backgroundColor']
       });
 
     return self.outputJson(ret);
@@ -206,16 +214,13 @@ class Api(object):
 
     return self.outputJson(self.normalizeItem(createdItems));
 
-  def getItemTags(self, singleItem):
-    ret = []
-
-    return ret;
-
   def normalizeItem(self, singleItemRecord):
     item = singleItemRecord['i']
     url = ""
     source = ""
-    icon = None
+    icon = ""
+    tags = []
+    tagNumericProduct = 1
 
     if "url" in item:
       url = item["url"]
@@ -226,10 +231,18 @@ class Api(object):
     if "icon" in item:
       icon = item["icon"]
 
+    if 'countTagValues' in singleItemRecord.keys() and singleItemRecord['countTagValues'] > 0:
+        tags = self.wrapper.getItemTags(item.id)
+
+        for tag in tags: 
+            if tag['numericValue'] > 0:
+                tagNumericProduct *= tag['numericValue']
+
     return {
       "hasChildren": singleItemRecord['countItems'] > 0,
       "content": item['content'],
-      "tags": self.getItemTags(singleItemRecord),
+      "tags": tags,
+      "tagNumericProduct": tagNumericProduct,
       "dueDate": item['dueDate'],
       "id": item.id,
       "url": url,
@@ -240,17 +253,30 @@ class Api(object):
   @cherrypy.expose
   def listTasks(self, *path, **args):
     self.checkLoggedIn();
+    
+    databaseSorts = ["default"]
+    pythonSorts = ["tagNumericProduct"]
+
+    sortBy = args['sort']
+
+    if sortBy not in databaseSorts:
+        sortBy = "content"
 
     if "task" in args:
       print("listTasks, getSubItems")
-      items = self.wrapper.getSubItems(int(args['task']), args['sort'])
+      items = self.wrapper.getSubItems(int(args['task']), sortBy)
     else:
       print("listTasks, getItemsFromList")
-      items = self.wrapper.getItemsFromList(int(args['list']), args['sort'])
+      items = self.wrapper.getItemsFromList(int(args['list']), sortBy)
 
     ret = []
     for itemRecord in items: 
       ret.append(self.normalizeItem(itemRecord))
+
+    print("sort: " + args["sort"])
+    if args['sort'] in pythonSorts:
+        print("Doing a python sort!")
+        ret.sort(key = lambda x: x[args['sort']], reverse = True)
 
     return self.outputJson(ret);
 
@@ -265,6 +291,12 @@ class Api(object):
     self.wrapper.deleteTask(int(args['id']))
 
     return self.outputJson(JSON_OK);
+
+  @cherrypy.expose
+  def deleteTag(self, *path, **args):
+    self.wrapper.deleteTag(int(args['id']))
+
+    return self.outputJson(JSON_OK)
 
   @cherrypy.expose
   def renameItem(self, *path, **args):
@@ -313,7 +345,7 @@ class Api(object):
       wallpapers = []
       
       for wallpaper in os.listdir(args.wallpaperdir):
-        if wallpaper.endswith(".png") or wallpaper.endswith(".jpg"):
+        if wallpaper.endswith(".png") or wallpaper.endswith(".jpg") or wallpaper.endswith(".webp"):
           wallpapers.append(wallpaper)
     except Exception as e:
       print(e)
@@ -357,7 +389,7 @@ class Api(object):
 
   @cherrypy.expose
   def updateTag(self, *path, **args):
-    updatedTag = self.wrapper.updateTag(int(args['id']), args['newTitle'], args['shortTitle'], args['backgroundColor'])
+    updatedTag = self.wrapper.updateTag(int(args['id']), args['newTitle'], args['shortTitle'], args['backgroundColor'], args["textualValue"], args["numericValue"], int(args['tagValueId']))
 
     return self.outputJson(updatedTag)
 
