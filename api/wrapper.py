@@ -70,8 +70,10 @@ class Wrapper:
 
     return results
 
-  def createTagValue(self, tagId)
-    results = self.session.run("MATCH (t:Tag) WHERE id(t) = {tagId} CREATE (tv)-[:type]->(tv:TagValue) ", username = username, title = title);
+  def createTagValue(self, tagId):
+    results = self.session.run("MATCH (t:Tag) WHERE id(t) = {tagId} CREATE (t)-[:type]->(tv:TagValue {textualValue:'default'}) ", tagId = tagId);
+
+    return results
 
   def createTag(self, username, title):
     results = self.session.run("MATCH (u:User) WHERE u.username = {username} CREATE (u)-[:owns]->(t:Tag {title: {title}})-[:type]->(tv:TagValue {textualValue:'default'}) ", username = username, title = title);
@@ -183,17 +185,7 @@ class Wrapper:
     results = self.session.run("MATCH (i:Item), (t:Tag)-->(tv:TagValue) WHERE id(i) = {itemId} AND id(t) = {tagId} AND id(tv) = {tagValueId} CREATE (i)-[:tagged]->(tv) ", tagId = tagId, itemId = itemId, tagValueId = tagValueId);
 
   def untag(self, itemId, tagId, tagValueId):
-    results = self.session.run("MATCH (i:Item)-[link:tagged]->(tv:TagValue) WHERE id(i) = {itemId} AND id(tv) = {tagValueId} DELETE link ", itemId = itemId, tagValueId = tagValueId);
-
-  def hasItemGotTag(self, itemId, tagValueId):
-    results = self.session.run("MATCH (i:Item)-[r]->(tv:TagValue) WHERE id(i) = {itemId} AND id(tv) = {tagValueId} RETURN r", itemId = itemId, tagValueId = tagValueId);
-
-    tagCount = 0;
-
-    for r in results:
-      tagCount += 1
-
-    return tagCount > 0
+    results = self.session.run("MATCH (i:Item)-[link:tagged]->(tv:TagValue)<-[]-(t:Tag) WHERE id(i) = {itemId} AND id(t) = {tagId} DELETE link ", itemId = itemId, tagId = tagId);
 
   def register(self, username, hashedPassword, email):  
     results = self.session.run("CREATE (u:User {username: {username}, password: {password}, email: {email}}) ", username = usenrame, password = hashedPassword, email = email)

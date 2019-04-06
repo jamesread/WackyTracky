@@ -36,10 +36,9 @@ class Api(object):
 
   @cherrypy.expose
   def tag(self, *path, **args):
-    if self.wrapper.hasItemGotTag(int(args['item']), int(args['tagValueId'])):
-      self.wrapper.untag(int(args['item']), int(args['tag']), int(args['tagValueId']));
-    else:
-      self.wrapper.tag(int(args['item']), int(args['tag']), int(args['tagValueId']));
+    self.wrapper.untag(int(args['item']), int(args['tag']), int(args['tagValueId']));
+
+    self.wrapper.tag(int(args['item']), int(args['tag']), int(args['tagValueId']));
 
     return self.outputJson(JSON_OK);
 
@@ -75,7 +74,9 @@ class Api(object):
 
   @cherrypy.expose
   def addTagValue(self, *path, **args):
-    return self.createTagValue(int(args['tagId']))
+    self.wrapper.createTagValue(int(args['tagId']))
+
+    return self.outputJson(JSON_OK);
 
   @cherrypy.expose
   def listDownload(self, *path, **args):
