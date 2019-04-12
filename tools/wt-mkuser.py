@@ -8,7 +8,7 @@ import commonArgumentParser
 
 parser = commonArgumentParser.getNew()
 parser.add_argument("--username", required = True)
-args = parser.parse_args()
+args, unknown = parser.parse_known_args()
 
 api = wrapper.fromArgs(args)
 

@@ -9,7 +9,7 @@ import commonArgumentParser
 parser = commonArgumentParser.getNew()
 parser.add_argument('--username', '-u', required = True)
 parser.add_argument("--password", required = True)
-args = parser.parse_args();
+args, unknown = parser.parse_known_args();
 
 m = hashlib.sha1()
 m.update(args.password.encode())

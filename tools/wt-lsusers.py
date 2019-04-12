@@ -6,7 +6,9 @@ from prettytable import PrettyTable
 
 import commonArgumentParser
 
-api = wrapper.fromArgs()
+parser = commonArgumentParser.getNew()
+args, _ = parser.parse_known_args()
+api = wrapper.fromArgs(args)
 
 table = PrettyTable(['ID', 'Username', 'Email', 'Lists', 'Items'])
 

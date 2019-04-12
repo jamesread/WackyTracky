@@ -9,6 +9,8 @@ import json
 import random
 import os
 from sys import exc_info
+import io
+import csv
 
 import commonArgumentParser
 
@@ -32,13 +34,15 @@ class HttpQueryArgChecker:
     return self
 
 class Api(object):
-  wrapper = wrapper.Wrapper(args.dbUser, args.dbPassword)
+  wrapper = wrapper.Wrapper(args.dbUser, args.dbPassword, args.dbServer)
 
   @cherrypy.expose
   def tag(self, *path, **args):
-    self.wrapper.untag(int(args['item']), int(args['tag']), int(args['tagValueId']));
-
-    self.wrapper.tag(int(args['item']), int(args['tag']), int(args['tagValueId']));
+    if self.wrapper.hasItemGotTag(int(args['item']), int(args['tagValueId'])):
+        self.wrapper.untag(int(args['item']), int(args['tag']), int(args['tagValueId']));
+    else:
+        self.wrapper.untag(int(args['item']), int(args['tag']), int(args['tagValueId']));
+        self.wrapper.tag(int(args['item']), int(args['tag']), int(args['tagValueId']));
 
     return self.outputJson(JSON_OK);
 
@@ -90,6 +94,18 @@ class Api(object):
 
     if args['format'] == "json":
       return self.outputJson(ret, download = True, downloadFilename = "list" + args['id'] + ".json");
+    elif args['format'] == "csv": 
+      retStr = io.StringIO()      
+      writer = csv.writer(retStr);
+      writer.writerow(["ID", "Content", "Numeric Product"])
+
+      for item in ret:
+        writer.writerow([item['id'], item['content'], item['tagNumericProduct']])
+
+      cherrypy.response.headers['Content-Disposition'] = 'attachment; filename="list' + args['id'] + '.csv" '
+      cherrypy.response.headers['Content-Type'] = 'text/csv'
+
+      return retStr.getvalue();
     else:
       retStr = ""
 
@@ -255,7 +271,7 @@ class Api(object):
   def listTasks(self, *path, **args):
     self.checkLoggedIn();
     
-    databaseSorts = ["default"]
+    databaseSorts = ["default", "content", "id"]
     pythonSorts = ["tagNumericProduct"]
 
     sortBy = args['sort']

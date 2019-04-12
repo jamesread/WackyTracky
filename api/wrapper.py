@@ -7,11 +7,15 @@ import logging
 import configparser
 
 class Wrapper:
-  def __init__(self, username = None, password = None):
+  def __init__(self, username = None, password = None, server = None):
     if username == None or password == None:
-        username, password = self.loadAuthCredentials()
+        username, password, server = self.loadAuthCredentials()
 
-    uri = "bolt://{}:{}@localhost".format(username, password)
+    print(username, password, server)
+
+    uri = "bolt://{}:{}@{}".format(username, password, server)
+
+    print("Connecting to " + uri)
 
     try:
       self.conn = GraphDatabase.driver(uri, auth = (username, password))
@@ -24,7 +28,7 @@ class Wrapper:
     config = configparser.ConfigParser()
     config.read("/etc/wacky-tracky/server.cfg")
 
-    return config["server"]["dbUser"], config["server"]["dbPassword"]
+    return config["server"]["dbUser"], config["server"]["dbPassword"], config["server"]["dbServer"]
 
   def createUser(self, username):
     results = self.session.run("CREATE (u:User {username: {username}})", username = username)
@@ -61,7 +65,7 @@ class Wrapper:
     return results;
 
   def getTags(self, username):
-    results = self.session.run("MATCH (u:User)-[]->(t:Tag) OPTIONAL MATCH (t)-[]->(tv:TagValue) WHERE u.username = {username} RETURN t, tv ", username = username);
+    results = self.session.run("MATCH (u:User)-[]->(t:Tag) OPTIONAL MATCH (t)-[]->(tv:TagValue) WHERE u.username = {username} RETURN t, tv ORDER BY t.title, tv.numericValue", username = username);
 
     return results;
 
@@ -93,10 +97,17 @@ class Wrapper:
     return self.session.run("MATCH (pi:Item) WHERE id(pi) = {itemId} CREATE (pi)-[:owns]->(i:Item {content: {content}}) WITH i, 0 as countItems RETURN i, countItems", itemId = itemId, content = content).single()
 
   def getItemsFromList(self, listId, sort = None):
-    if sort not in [ "content", "dueDate" ]:
+    if sort not in [ "content", "dueDate", "id" ]:
       sort = "content"
 
-    results = self.session.run("MATCH (l:List)-[]->(i:Item) OPTIONAL MATCH (i)-->(tv:TagValue) OPTIONAL MATCH (i)-->(subItem:Item) OPTIONAL MATCH (externalItem:ExternalItem) WHERE i = externalItem WITH l, i, count(tv) AS countTagValues, count(subItem) AS countItems, externalItem WHERE id(l) = {listId} WITH i, countTagValues, countItems, externalItem RETURN i, countTagValues, countItems, externalItem ORDER BY i." + sort, listId = listId);
+    if sort == "id":
+        sort = "id(i)"
+    else:
+        sort = "i." + sort
+
+    print("final sort:" + sort)
+
+    results = self.session.run("MATCH (l:List)-[]->(i:Item) OPTIONAL MATCH (i)-->(tv:TagValue) OPTIONAL MATCH (i)-->(subItem:Item) OPTIONAL MATCH (externalItem:ExternalItem) WHERE i = externalItem WITH l, i, count(tv) AS countTagValues, count(subItem) AS countItems, externalItem WHERE id(l) = {listId} WITH i, countTagValues, countItems, externalItem RETURN i, countTagValues, countItems, externalItem ORDER BY " + sort, listId = listId);
 
     return results
 
@@ -109,7 +120,7 @@ class Wrapper:
 
     print("Get Item Tags for item: " + str(itemId))
 
-    results = self.session.run("MATCH (i)-->(tv:TagValue)<--(t:Tag) WHERE id(i) = {itemId} RETURN tv, t", itemId = itemId)
+    results = self.session.run("MATCH (i)-->(tv:TagValue)<--(t:Tag) WHERE id(i) = {itemId} RETURN tv, t ORDER BY t.title", itemId = itemId)
 
     for row in results:
         numericValue = 0
@@ -117,7 +128,8 @@ class Wrapper:
             numericValue = int(row['tv']['numericValue'])
 
         ret.append({
-            "tagId": row['t'].id,
+            "id": row['t'].id,
+            "tagValueId": row['tv'].id,
             "title": row['t']['title'],
             "numericValue": numericValue,
             "textualValue": row['tv']['textualValue'],
@@ -187,6 +199,12 @@ class Wrapper:
   def untag(self, itemId, tagId, tagValueId):
     results = self.session.run("MATCH (i:Item)-[link:tagged]->(tv:TagValue)<-[]-(t:Tag) WHERE id(i) = {itemId} AND id(t) = {tagId} DELETE link ", itemId = itemId, tagId = tagId);
 
+  def hasItemGotTag(self, itemId, tagValueId):
+    results = self.session.run("MATCH (i:Item)-[r]->(t:TagValue) WHERE id(i) = {itemId} AND id(t) = {tagValueId} RETURN r", itemId = itemId, tagValueId = tagValueId);
+    results = results.values()
+
+    return len(results) > 0
+
   def register(self, username, hashedPassword, email):  
     results = self.session.run("CREATE (u:User {username: {username}, password: {password}, email: {email}}) ", username = usenrame, password = hashedPassword, email = email)
 
@@ -216,7 +234,7 @@ class Wrapper:
         }, user['password']]
 
 def fromArgs(args):
-    return Wrapper(args.dbUser, args.dbPassword)
+    return Wrapper(args.dbUser, args.dbPassword, args.dbServer)
 
 import __main__ as main
 if not hasattr(main, '__file__'):
