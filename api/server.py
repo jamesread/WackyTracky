@@ -82,15 +82,70 @@ class Api(object):
 
     return self.outputJson(JSON_OK);
 
+  def addItemsRecursively(self, ret, level, items):
+    for row in items: 
+      singleItem = self.normalizeItem(row)
+
+      if level > 0:
+          singleItem['content'] = ("\t" * level) + singleItem['content']
+
+      ret.append(singleItem);
+
+      if singleItem['hasChildren'] > 0: 
+        subitems = self.wrapper.getSubItems(singleItem['id'])
+
+        self.addItemsRecursively(ret, level + 1, subitems);
+
+    return ret
+
+  @cherrypy.expose
+  def listTickView(self, *path, **args):
+    HttpQueryArgChecker(args).requireArg('listId');
+    
+    cherrypy.response.headers['Content-Type'] = 'text/html; charset=utf-8'
+
+    ret = ""
+    ret += """
+    <style>
+    body {
+        font-family: sans-serif;
+    }
+    p {
+        padding: .1em;
+    }
+    input:checked + label {
+        background-color: #a1ffa1;
+    }
+    </style>
+    """
+
+    items = [];
+    items = self.addItemsRecursively(items, 0, self.wrapper.getItemsFromList(int(args['listId'])));
+
+    for item in items:
+        tickbox = '<input type = "checkbox" id = "' + str(item['id']) + '" />'
+
+        lastTabIndex = item['content'].rfind("\t")
+        lastTabIndex += 1
+
+        if lastTabIndex > -1:
+            prefix = "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" * lastTabIndex;
+            content = item['content'][lastTabIndex:]
+        else: 
+            prefix = ""
+            content = item['content']
+
+        ret += "<p>"
+        ret += prefix + tickbox + ' <label for = "' + str(item['id']) + '">' + content + "</label><br>" 
+        ret += "</p>"
+
+    return ret.encode("utf8")
+
+
   @cherrypy.expose
   def listDownload(self, *path, **args):
-    items = self.wrapper.getItemsFromList(int(args['id']));
-
-    ret = []
-    for row in items: 
-      singleItem = row
-
-      ret.append(self.normalizeItem(singleItem))
+    ret = [];
+    ret = self.addItemsRecursively(ret, 0, self.wrapper.getItemsFromList(int(args['id'])));
 
     if args['format'] == "json":
       return self.outputJson(ret, download = True, downloadFilename = "list" + args['id'] + ".json");
@@ -142,6 +197,7 @@ class Api(object):
   @cherrypy.expose
   def getList(self, *path, **args):
     self.checkLoggedIn();
+
     HttpQueryArgChecker(args).requireArg('listId');
 
     singleList = self.wrapper.getSingleList(self.getUsername(), int(args['listId']));
@@ -274,10 +330,10 @@ class Api(object):
     databaseSorts = ["default", "content", "id"]
     pythonSorts = ["tagNumericProduct"]
 
-    sortBy = args['sort']
+    sortBy = "content"
 
-    if sortBy not in databaseSorts:
-        sortBy = "content"
+    if "sort" in args and args['sort'] in databaseSorts:
+        sortBy = args['sort']
 
     if "task" in args:
       print("listTasks, getSubItems")
@@ -441,7 +497,11 @@ class Api(object):
     
 def CORS():
   print("Registering CORS handler")
-  cherrypy.response.headers['Access-Control-Allow-Origin'] = args.corsDomain
+  #print(cherrypy.request.origin)
+
+  if args.corsDomain != "exclude":
+      cherrypy.response.headers['Access-Control-Allow-Origin'] = args.corsDomain
+
   cherrypy.response.headers['Access-Control-Allow-Credentials'] = "true"
 
 def http_error_handler(status, message, traceback, version):
