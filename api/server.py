@@ -34,7 +34,7 @@ class HttpQueryArgChecker:
     return self
 
 class Api(object):
-  wrapper = wrapper.Wrapper(args.dbUser, args.dbPassword, args.dbServer)
+  wrapper = wrapper.fromArgs(args);
 
   @cherrypy.expose
   def tag(self, *path, **args):

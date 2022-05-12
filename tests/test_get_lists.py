@@ -1,8 +1,9 @@
+#!/usr/bin/env python3 
+
 import wrapper
 
-
 def test_get_lists():
-  api = wrapper.Wrapper()
+  api = wrapper.fromParams()
 
   assert api != None
 

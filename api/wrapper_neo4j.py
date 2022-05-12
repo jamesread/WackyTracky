@@ -4,15 +4,10 @@ from os import getenv
 from neo4j.v1 import GraphDatabase
 from neo4j.exceptions import ServiceUnavailable
 import logging
-import configparser
+import commonArgumentParser 
 
-class Wrapper:
+class WrapperNeo4j:
   def __init__(self, username = None, password = None, server = None):
-    if username == None or password == None:
-        username, password, server = self.loadAuthCredentials()
-
-    print(username, password, server)
-
     uri = "bolt://{}:{}@{}".format(username, password, server)
 
     print("Connecting to " + uri)
@@ -23,12 +18,6 @@ class Wrapper:
     except ServiceUnavailable as e:
       raise Exception(str(e))
 
-
-  def loadAuthCredentials(self):
-    config = configparser.ConfigParser()
-    config.read("/etc/wacky-tracky/server.cfg")
-
-    return config["server"]["dbUser"], config["server"]["dbPassword"], config["server"]["dbServer"]
 
   def createUser(self, username):
     results = self.session.run("CREATE (u:User {username: {username}})", username = username)
@@ -232,9 +221,6 @@ class Wrapper:
         return [{
           "username": user['username'],
         }, user['password']]
-
-def fromArgs(args):
-    return Wrapper(args.dbUser, args.dbPassword, args.dbServer)
 
 import __main__ as main
 if not hasattr(main, '__file__'):
