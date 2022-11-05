@@ -1,0 +1,50 @@
+syntax = "proto3";
+
+option go_package = "gen/grpc";
+
+import "google/api/annotations.proto";
+
+message GetLists {} 
+message GetListsRequest {} 
+message GetListsResponse {} 
+
+message CreateTask {} 
+message CreateTaskRequest {} 
+message CreateTaskResponse {} 
+
+message Tag {}
+message TagRequest {}
+message TagResponse {} 
+
+message UpdateList {}
+message UpdateListRequest {}
+message UpdateListResponse {}
+
+service WackyTrackyClientApi {
+	rpc GetLists(GetListsRequest) returns (GetListsResponse) {
+		option (google.api.http) = {
+			get: "/api/GetLists"
+		};
+	}
+
+	rpc CreateTask(CreateTaskRequest) returns (CreateTaskResponse) {
+		option (google.api.http) = {
+			post: "/api/Task/Create"
+			body: "*"
+		};
+	}
+
+	rpc Tag(TagRequest) returns (TagResponse) {
+		option (google.api.http) = {
+			post: "/api/Tag"
+			body: "*"
+		};
+	}
+
+	rpc UpdateList(UpdateListRequest) returns (UpdateListResponse) {
+		option (google.api.http) = {
+			post: "/api/List/Update"
+			body: "*"
+		};
+	}
+}
