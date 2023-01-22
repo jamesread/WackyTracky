@@ -136,18 +136,18 @@ func GetItems(listId int) {
 			"listId": listId,
 		})
 
-		var list []string
+		var items []interface{}
 
 		if err != nil {
 			log.Errorf("%v", err)
 			return nil, err
 		} else {
 			for res.Next() {
-				list = append(list, res.Record().Values[0].(string))
+				items = append(items, res.Record().Values[0])
 			}
 		}
 
-		return list, nil
+		return items, nil
 	})
 
 	log.Infof("%v %v", ret, err)

@@ -4,9 +4,11 @@ option go_package = "gen/grpc";
 
 import "google/api/annotations.proto";
 
-message GetLists {} 
+message List {}
 message GetListsRequest {} 
-message GetListsResponse {} 
+message GetListsResponse {
+	repeated List Lists = 1;
+} 
 
 message CreateTask {} 
 message CreateTaskRequest {} 
@@ -16,14 +18,30 @@ message Tag {}
 message TagRequest {}
 message TagResponse {} 
 
+message GetTagsRequest{}
+message GetTagsResponse{
+	repeated Tag Tags = 1;
+}
+
 message UpdateList {}
 message UpdateListRequest {}
 message UpdateListResponse {}
 
+message InitRequest {}
+message InitResponse {
+	string Wallpaper = 1;
+}
+
 service WackyTrackyClientApi {
+	rpc Init(InitRequest) returns (InitResponse) {
+		option (google.api.http) = {
+			get: "/api/Init"
+		};
+	}
+
 	rpc GetLists(GetListsRequest) returns (GetListsResponse) {
 		option (google.api.http) = {
-			get: "/api/GetLists"
+			get: "/api/ListLists"
 		};
 	}
 
@@ -47,4 +65,13 @@ service WackyTrackyClientApi {
 			body: "*"
 		};
 	}
+
+	rpc GetTags(GetTagsRequest) returns (GetTagsResponse) {
+		option (google.api.http) = {
+			get: "/api/ListTags"
+		};
+
+	}
+
+
 }
