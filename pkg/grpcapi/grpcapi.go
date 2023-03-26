@@ -53,6 +53,8 @@ func (api *wackyTrackyClientApi) GetLists(ctx context.Context, req *pb.GetListsR
 }
 
 func (api *wackyTrackyClientApi) GetTags(ctx context.Context, req *pb.GetTagsRequest) (*pb.GetTagsResponse, error) {
+//	neo4j.GetTags()
+
 	res := &pb.GetTagsResponse{}
 
 	return res, nil

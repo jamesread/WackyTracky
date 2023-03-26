@@ -43,10 +43,8 @@ func startRestGateway() (error) {
 }
 
 func allowCors(h http.Handler) http.Handler {
-		log.Infof("Cors")
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if origin := r.Header.Get("Origin"); origin != "" {
-		log.Infof("Cors")
 			w.Header().Set("Access-Control-Allow-Origin", origin)
 		}
 
