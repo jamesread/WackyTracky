@@ -2,6 +2,7 @@ package neo4j
 
 import (
 	"github.com/neo4j/neo4j-go-driver/v5/neo4j"
+	"github.com/neo4j/neo4j-go-driver/v5/neo4j/dbtype"
 
 	log "github.com/sirupsen/logrus"
 )
@@ -125,12 +126,28 @@ func GetLists() ([]string, error) {
 	return ret.([]string), nil
 }
 
-func GetItems(listId int) {
+func GetSubItems(itemId int64) (any, any) {
+	connect()
+
+	/*
+	cql := "MATCH (p:Item)-->(i:Item) WHERE id(p) = ? RETURN i"
+
+	ret, err := session.ReadTransaction(func(tx neo4j.Transaction) (any, error) {
+		return nil, nil
+	})
+
+	*/
+
+	return nil, nil
+}
+
+func GetItems(listId int64) {
 	connect()
 
 	cql := "MATCH (l:List)-[]->(i:Item) OPTIONAL MATCH (i)-->(tv:TagValue) OPTIONAL MATCH (i)-->(subItem:Item) OPTIONAL MATCH (externalItem:ExternalItem) WHERE i = externalItem WITH l, i, count(tv) AS countTagValues, count(subItem) AS countItems, externalItem WHERE id(l) = $listId WITH i, countTagValues, countItems, externalItem RETURN i, countTagValues, countItems, externalItem ORDER BY id(i)"
 
-	log.Infof("getting items from list")
+	log.Infof("getting items from list %v", listId)
+
 	ret, err := session.ReadTransaction(func(tx neo4j.Transaction) (any, error) {
 		res, err := tx.Run(cql, map[string]any {
 			"listId": listId,
@@ -143,6 +160,9 @@ func GetItems(listId int) {
 			return nil, err
 		} else {
 			for res.Next() {
+				x := res.Record().Values[0].(dbtype.Node)
+				log.Infof("%+v", x)
+				GetSubItems(x.Id)
 				items = append(items, res.Record().Values[0])
 			}
 		}

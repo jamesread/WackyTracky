@@ -37,7 +37,9 @@ func startRestGateway() (error) {
 
 	err := gw.RegisterWackyTrackyClientApiHandlerFromEndpoint(ctx, mux, "0.0.0.0:8083", opts)
 
-	log.Errorf("Regiser REST: %v", err)
+	if err != nil {
+		log.Errorf("Register REST: %v", err)
+	}
 
 	return http.ListenAndServe("0.0.0.0:8082", allowCors(mux))
 }
