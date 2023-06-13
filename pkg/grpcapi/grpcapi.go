@@ -44,10 +44,25 @@ func (api *wackyTrackyClientApi) CreateTask(ctx context.Context, req *pb.CreateT
 	return nil, nil
 }
 
+func (api *wackyTrackyClientApi) CreateList(ctx context.Context, req *pb.CreateListRequest) (*pb.CreateListResponse, error) {
+	return nil, nil
+}
+
+
 func (api *wackyTrackyClientApi) GetLists(ctx context.Context, req *pb.GetListsRequest) (*pb.GetListsResponse, error) {
-	neo4j.GetLists()
+	lists, _ := neo4j.GetLists()
 
 	res := &pb.GetListsResponse {}
+
+	for _, dblist := range(lists) {
+		l := &pb.List{
+			Title: dblist.Title,
+			ID: dblist.ID,
+		}
+
+		res.Lists = append(res.Lists, l)
+	}
+
 
 	return res, nil
 }
