@@ -1,19 +1,21 @@
 module github.com/wacky-tracky/wacky-tracky-server
 
-go 1.18
+go 1.19
 
 require (
-	github.com/grpc-ecosystem/grpc-gateway/v2 v2.7.3
-	github.com/neo4j/neo4j-go-driver/v5 v5.0.0
-	github.com/sirupsen/logrus v1.8.1
-	google.golang.org/genproto v0.0.0-20220118154757-00ab72f36ad5
-	google.golang.org/grpc v1.43.0
-	google.golang.org/protobuf v1.27.1
+	github.com/grpc-ecosystem/grpc-gateway/v2 v2.16.0
+	github.com/neo4j/neo4j-go-driver/v5 v5.9.0
+	github.com/sirupsen/logrus v1.9.3
+	google.golang.org/genproto/googleapis/api v0.0.0-20230530153820-e85fd2cbaebc
+	google.golang.org/grpc v1.55.0
+	google.golang.org/protobuf v1.30.0
 )
 
 require (
-	github.com/golang/protobuf v1.5.2 // indirect
-	golang.org/x/net v0.0.0-20210825183410-e898025ed96a // indirect
-	golang.org/x/sys v0.0.0-20220722155257-8c9f86f7a55f // indirect
-	golang.org/x/text v0.3.8 // indirect
+	github.com/golang/protobuf v1.5.3 // indirect
+	golang.org/x/net v0.11.0 // indirect
+	golang.org/x/sys v0.9.0 // indirect
+	golang.org/x/text v0.10.0 // indirect
+	google.golang.org/genproto v0.0.0-20230530153820-e85fd2cbaebc // indirect
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20230530153820-e85fd2cbaebc // indirect
 )
