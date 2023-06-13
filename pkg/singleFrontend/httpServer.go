@@ -6,6 +6,9 @@ import (
 
 func StartServers() {
 	go grpcapi.Start()
+	
+	go startRestGateway()
+	go startWebUIServer()
 
 	startSingleFrontend()
 }

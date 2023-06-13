@@ -19,7 +19,9 @@ type wackyTrackyClientApi struct {
 }
 
 func Start() {
-	log.Infof("Starting API: %v", RuntimeConfig.ListenAddressGrpc)
+	log.WithFields(log.Fields {
+		"address": RuntimeConfig.ListenAddressGrpc,
+	}).Infof("Starting API")
 
 	lis, err := net.Listen("tcp", RuntimeConfig.ListenAddressGrpc)
 
@@ -45,8 +47,19 @@ func (api *wackyTrackyClientApi) CreateTask(ctx context.Context, req *pb.CreateT
 func (api *wackyTrackyClientApi) GetLists(ctx context.Context, req *pb.GetListsRequest) (*pb.GetListsResponse, error) {
 	neo4j.GetLists()
 
-	return nil, nil
+	res := &pb.GetListsResponse {}
+
+	return res, nil
 }
+
+func (api *wackyTrackyClientApi) GetTags(ctx context.Context, req *pb.GetTagsRequest) (*pb.GetTagsResponse, error) {
+//	neo4j.GetTags()
+
+	res := &pb.GetTagsResponse{}
+
+	return res, nil
+}
+
 
 func (api *wackyTrackyClientApi) Tag(ctx context.Context, req *pb.TagRequest) (*pb.TagResponse, error) {
 	return nil, nil
@@ -54,6 +67,14 @@ func (api *wackyTrackyClientApi) Tag(ctx context.Context, req *pb.TagRequest) (*
 
 func (api *wackyTrackyClientApi) UpdateList(ctx context.Context, req *pb.UpdateListRequest) (*pb.UpdateListResponse, error) {
 	return nil, nil
+}
+
+func (api *wackyTrackyClientApi) Init(ctx context.Context, req *pb.InitRequest) (*pb.InitResponse, error) {
+	res := &pb.InitResponse{
+		Wallpaper: "wallpaper.jpg",
+	}
+
+	return res, nil
 }
 
 func newServer() *wackyTrackyClientApi {

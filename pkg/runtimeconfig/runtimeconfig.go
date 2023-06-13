@@ -11,7 +11,7 @@ var RuntimeConfig = config{
 	ListenAddressGrpc: "localhost:8083",
 	ListenAddressRest: "localhost:8082",
 	ListenAddressWebUI: "localhost:8084",
-	ListenAddressSingleHTTPFrontend: "0.0.0.0:8085",
+	ListenAddressSingleHTTPFrontend: "0.0.0.0:8080",
 };
 
 
