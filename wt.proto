@@ -4,13 +4,21 @@ option go_package = "gen/grpc";
 
 import "google/api/annotations.proto";
 
-message List {}
+message List {
+	uint64 ID = 1;
+	string Title = 2;
+}
 message GetListsRequest {} 
 message GetListsResponse {
 	repeated List Lists = 1;
-} 
+}
 
-message CreateTask {} 
+message CreateListRequest {
+	string Title = 1;
+}
+
+message CreateListResponse{}
+
 message CreateTaskRequest {} 
 message CreateTaskResponse {} 
 
@@ -48,6 +56,13 @@ service WackyTrackyClientApi {
 	rpc CreateTask(CreateTaskRequest) returns (CreateTaskResponse) {
 		option (google.api.http) = {
 			post: "/api/Task/Create"
+			body: "*"
+		};
+	}
+
+	rpc CreateList(CreateListRequest) returns (CreateListResponse) {
+		option (google.api.http) = {
+			post: "/api/List/Create"
 			body: "*"
 		};
 	}

@@ -91,29 +91,36 @@ func greeting() (string, error) {
 	return greeting.(string), nil
 }
 
-func GetLists() ([]string, error) {
+type DBList struct {
+	ID uint64
+	Title string
+}
+
+func GetLists() ([]DBList, error) {
 	connect()
+
 
 	cql := "MATCH (n:List) RETURN n.title, id(n)"
 
 	log.Infof("getting lists")
-	ret, err := session.ReadTransaction(func(tx neo4j.Transaction) (any, error) {
+
+	var ret []DBList
+	_, err := session.ReadTransaction(func(tx neo4j.Transaction) (any, error) {
 		res, err := tx.Run(cql, nil)
 
-		var list []string
 
 		if err != nil {
 			log.Errorf("%v", err)
 			return nil, err
 		} else {
 			for res.Next() {
-				list = append(list, res.Record().Values[0].(string))
-
-				log.Infof("%v %v", res.Record().Values[0], res.Record().Values[1])
+				ret = append(ret, DBList {
+					Title: res.Record().Values[0].(string),
+				})
 			}
 		}
 
-		return list, nil
+		return nil, nil
 
 	})
 
@@ -121,9 +128,10 @@ func GetLists() ([]string, error) {
 		log.Errorf("%v", err)
 		return nil, err
 	}
-	log.Infof("got lists: %+v", ret.([]string))
 
-	return ret.([]string), nil
+	log.Infof("got lists: %+v", ret)
+
+	return ret, nil
 }
 
 func GetSubItems(itemId int64) (any, any) {
