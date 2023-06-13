@@ -3,3 +3,6 @@
 wallpapers
 **/sessions
 **/__pycache__
+gen
+/wacky-tracky-server
+tmp
