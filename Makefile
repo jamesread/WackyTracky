@@ -1,5 +1,5 @@
 default:
-	go build github.com/wacky-tracky/wacky-tracky-server/cmd/wt/
+	go build 
 
 grpc:
 	buf generate
