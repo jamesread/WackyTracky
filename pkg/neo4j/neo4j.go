@@ -12,7 +12,11 @@ var (
 	session neo4j.Session
 )
 
-func connect() (string, error) {
+func connect() (error) {
+	if driver != nil {
+		return nil // FIXME driver might be initialized but stale/disconnected
+	}
+
 	log.Infof("Connecting to neo4j")
 
 	uri := "bolt://neo4j:7687"
@@ -25,7 +29,7 @@ func connect() (string, error) {
 
 	if err != nil {
 		log.Errorf("%v", err)
-		return "", err
+		return err
 	}
 
 	log.Infof("Driver created")
@@ -47,7 +51,7 @@ func connect() (string, error) {
 
 	log.Infof("Connected");
 
-	return "", nil
+	return nil
 }
 
 func greeting() (string, error) {
@@ -91,62 +95,108 @@ func greeting() (string, error) {
 	return greeting.(string), nil
 }
 
+type DBTag struct {
+	ID uint64
+	Title string
+}
+
+func readTx(cql string) ([]dbtype.Node) {
+	return readTxParams(cql, map[string]any {})
+}
+
+func readTxParams(cql string, params map[string]any) ([]dbtype.Node) {
+	var ret []dbtype.Node
+
+	connect()
+
+	_, err := session.ReadTransaction(func(tx neo4j.Transaction) (any, error) {
+		res, err := tx.Run(cql, params)
+
+		if err != nil {
+			return nil, err
+		} else {
+			for res.Next() {
+				ret = append(ret, res.Record().Values[0].(dbtype.Node))
+			}
+
+			return nil, nil
+		}
+	})
+
+	if err != nil {
+		log.Errorf("readTx %v", err)
+	}
+
+	return ret
+}
+
+func GetTags () ([]DBTag, error) {
+	var ret []DBTag
+
+	cql := "MATCH (t:Tag) RETURN t"
+
+	for _, tag := range(readTx(cql)) {
+		log.Infof("tag props %+v", tag.Props)
+
+		dbtag := DBTag {
+			ID: uint64(tag.Id),
+			Title: tag.Props["title"].(string),
+		}
+
+		ret = append(ret, dbtag)
+	}
+
+	log.Infof("tags: %+v", ret)
+
+	return ret, nil
+}
+
 type DBList struct {
 	ID uint64
 	Title string
 }
 
+type DBItem struct {
+	ID uint64
+}
+
 func GetLists() ([]DBList, error) {
 	connect()
-
-
-	cql := "MATCH (n:List) RETURN n.title, id(n)"
 
 	log.Infof("getting lists")
 
 	var ret []DBList
-	_, err := session.ReadTransaction(func(tx neo4j.Transaction) (any, error) {
-		res, err := tx.Run(cql, nil)
 
+	cql := "MATCH (n:List) RETURN n"
 
-		if err != nil {
-			log.Errorf("%v", err)
-			return nil, err
-		} else {
-			for res.Next() {
-				ret = append(ret, DBList {
-					Title: res.Record().Values[0].(string),
-				})
-			}
-		}
-
-		return nil, nil
-
-	})
-
-	if err != nil {
-		log.Errorf("%v", err)
-		return nil, err
+	for _, lst := range(readTx(cql)) {
+		ret = append(ret, DBList {
+			ID: uint64(lst.Id),
+			Title: lst.Props["title"].(string),
+		})
 	}
-
+	
 	log.Infof("got lists: %+v", ret)
 
 	return ret, nil
 }
 
-func GetSubItems(itemId int64) (any, any) {
-	connect()
+func GetSubItems(itemId int64) ([]DBItem) {
+	cql := "MATCH (p:Item)-->(i:Item) WHERE id(p) = $parentItemId RETURN i"
 
-	/*
-	cql := "MATCH (p:Item)-->(i:Item) WHERE id(p) = ? RETURN i"
+	params := map[string]any {
+		"parentItemId": itemId,
+	}
 
-	ret, err := session.ReadTransaction(func(tx neo4j.Transaction) (any, error) {
-		return nil, nil
-	})
+	var ret []DBItem
 
-	*/
+	for _, subitem := range(readTxParams(cql, params)) {
+		ret = append(ret, DBItem {
+			ID: uint64(subitem.Id),
+		})
+	}
 
-	return nil, nil
+	return ret
 }
 
 func GetItems(listId int64) {
@@ -169,7 +219,7 @@ func GetItems(listId int64) {
 		} else {
 			for res.Next() {
 				x := res.Record().Values[0].(dbtype.Node)
-				log.Infof("%+v", x)
+				log.Infof("Items %+v", x)
 				GetSubItems(x.Id)
 				items = append(items, res.Record().Values[0])
 			}

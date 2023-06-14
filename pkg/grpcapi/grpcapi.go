@@ -68,9 +68,18 @@ func (api *wackyTrackyClientApi) GetLists(ctx context.Context, req *pb.GetListsR
 }
 
 func (api *wackyTrackyClientApi) GetTags(ctx context.Context, req *pb.GetTagsRequest) (*pb.GetTagsResponse, error) {
-//	neo4j.GetTags()
+	tags, _ := neo4j.GetTags()
 
 	res := &pb.GetTagsResponse{}
+
+	for _, dbtag := range(tags) {
+		t := &pb.Tag {
+			ID: dbtag.ID,
+			Title: dbtag.Title,
+		}
+
+		res.Tags = append(res.Tags, t)
+	}
 
 	return res, nil
 }

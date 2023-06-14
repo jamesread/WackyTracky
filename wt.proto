@@ -22,7 +22,11 @@ message CreateListResponse{}
 message CreateTaskRequest {} 
 message CreateTaskResponse {} 
 
-message Tag {}
+message Tag {
+	uint64 ID = 1;
+	string Title = 2;
+}
+
 message TagRequest {}
 message TagResponse {} 
 
