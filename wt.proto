@@ -35,6 +35,19 @@ message GetTagsResponse{
 	repeated Tag Tags = 1;
 }
 
+message Item {
+	uint64 ID = 1;
+	string Content = 2;
+}
+
+message GetItemsRequest {
+	uint64 ListID = 1;
+}
+
+message GetItemsResponse {
+	repeated Item Items = 1;
+}
+
 message UpdateList {}
 message UpdateListRequest {}
 message UpdateListResponse {}
@@ -56,6 +69,13 @@ service WackyTrackyClientApi {
 			get: "/api/ListLists"
 		};
 	}
+
+	rpc GetItems(GetItemsRequest) returns (GetItemsResponse) {
+		option (google.api.http) = {
+			get: "/api/listTasks"
+		};
+	}
+
 
 	rpc CreateTask(CreateTaskRequest) returns (CreateTaskResponse) {
 		option (google.api.http) = {

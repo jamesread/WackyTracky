@@ -4,21 +4,24 @@ import (
 	"net"
 	"google.golang.org/grpc"
 	pb "github.com/wacky-tracky/wacky-tracky-server/gen/grpc"
+	db "github.com/wacky-tracky/wacky-tracky-server/pkg/db"
 
 	"context"
 
 	log "github.com/sirupsen/logrus"
 
 	. "github.com/wacky-tracky/wacky-tracky-server/pkg/runtimeconfig"
-	
-	"github.com/wacky-tracky/wacky-tracky-server/pkg/neo4j"
 )
+
+var dbconn db.DB
 
 type wackyTrackyClientApi struct {
 //	pb.UnimplementedWackyTrackyClientApiServer
 }
 
-func Start() {
+func Start(newdb db.DB) {
+	dbconn = newdb
+
 	log.WithFields(log.Fields {
 		"address": RuntimeConfig.ListenAddressGrpc,
 	}).Infof("Starting API")
@@ -37,7 +40,25 @@ func Start() {
 
 	go grpcServer.Serve(lis)
 
-	neo4j.GetItems(418)
+	dbconn.GetItems(418)
+}
+
+func (api *wackyTrackyClientApi) GetItems(ctx context.Context, req *pb.GetItemsRequest) (*pb.GetItemsResponse, error) {
+	items, err := dbconn.GetItems(req.ListID)
+
+	ret := &pb.GetItemsResponse{}
+
+	if err != nil {
+		return ret, err
+	}
+
+	for _, item := range items {
+		ret.Items = append(ret.Items, &pb.Item {
+			ID: item.ID,
+		})
+	}
+
+	return ret, nil
 }
 
 func (api *wackyTrackyClientApi) CreateTask(ctx context.Context, req *pb.CreateTaskRequest) (*pb.CreateTaskResponse, error) {
@@ -50,7 +71,7 @@ func (api *wackyTrackyClientApi) CreateList(ctx context.Context, req *pb.CreateL
 
 
 func (api *wackyTrackyClientApi) GetLists(ctx context.Context, req *pb.GetListsRequest) (*pb.GetListsResponse, error) {
-	lists, _ := neo4j.GetLists()
+	lists, _ := dbconn.GetLists()
 
 	res := &pb.GetListsResponse {}
 
@@ -68,7 +89,7 @@ func (api *wackyTrackyClientApi) GetLists(ctx context.Context, req *pb.GetListsR
 }
 
 func (api *wackyTrackyClientApi) GetTags(ctx context.Context, req *pb.GetTagsRequest) (*pb.GetTagsResponse, error) {
-	tags, _ := neo4j.GetTags()
+	tags, _ := dbconn.GetTags()
 
 	res := &pb.GetTagsResponse{}
 

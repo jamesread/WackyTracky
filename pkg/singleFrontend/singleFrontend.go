@@ -37,5 +37,5 @@ func startSingleFrontend() {
         Handler: mux,
     }
 
-    log.Fatal(srv.ListenAndServe())
+    log.Panic(srv.ListenAndServe())
 }

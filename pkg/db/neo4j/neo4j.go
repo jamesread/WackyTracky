@@ -3,6 +3,7 @@ package neo4j
 import (
 	"github.com/neo4j/neo4j-go-driver/v5/neo4j"
 	"github.com/neo4j/neo4j-go-driver/v5/neo4j/dbtype"
+	db "github.com/wacky-tracky/wacky-tracky-server/pkg/db"
 
 	log "github.com/sirupsen/logrus"
 )
@@ -11,6 +12,10 @@ var (
 	driver neo4j.Driver
 	session neo4j.Session
 )
+
+type Neo4jDB struct {
+	db.DB
+}
 
 func connect() (error) {
 	if driver != nil {
@@ -95,11 +100,6 @@ func greeting() (string, error) {
 	return greeting.(string), nil
 }
 
-type DBTag struct {
-	ID uint64
-	Title string
-}
-
 func readTx(cql string) ([]dbtype.Node) {
 	return readTxParams(cql, map[string]any {})
 }
@@ -130,15 +130,15 @@ func readTxParams(cql string, params map[string]any) ([]dbtype.Node) {
 	return ret
 }
 
-func GetTags () ([]DBTag, error) {
-	var ret []DBTag
+func GetTags () ([]db.DBTag, error) {
+	var ret []db.DBTag
 
 	cql := "MATCH (t:Tag) RETURN t"
 
 	for _, tag := range(readTx(cql)) {
 		log.Infof("tag props %+v", tag.Props)
 
-		dbtag := DBTag {
+		dbtag := db.DBTag {
 			ID: uint64(tag.Id),
 			Title: tag.Props["title"].(string),
 		}
@@ -151,47 +151,38 @@ func GetTags () ([]DBTag, error) {
 	return ret, nil
 }
 
-type DBList struct {
-	ID uint64
-	Title string
-}
-
-type DBItem struct {
-	ID uint64
-}
-
-func GetLists() ([]DBList, error) {
+func GetLists() ([]db.DBList, error) {
 	connect()
 
 	log.Infof("getting lists")
 
-	var ret []DBList
+	var ret []db.DBList
 
 	cql := "MATCH (n:List) RETURN n"
 
 	for _, lst := range(readTx(cql)) {
-		ret = append(ret, DBList {
+		ret = append(ret, db.DBList {
 			ID: uint64(lst.Id),
 			Title: lst.Props["title"].(string),
 		})
 	}
-	
+
 	log.Infof("got lists: %+v", ret)
 
 	return ret, nil
 }
 
-func GetSubItems(itemId int64) ([]DBItem) {
+func GetSubItems(itemId int64) ([]db.DBItem) {
 	cql := "MATCH (p:Item)-->(i:Item) WHERE id(p) = $parentItemId RETURN i"
 
 	params := map[string]any {
 		"parentItemId": itemId,
 	}
 
-	var ret []DBItem
+	var ret []db.DBItem
 
 	for _, subitem := range(readTxParams(cql, params)) {
-		ret = append(ret, DBItem {
+		ret = append(ret, db.DBItem {
 			ID: uint64(subitem.Id),
 		})
 	}
@@ -199,7 +190,7 @@ func GetSubItems(itemId int64) ([]DBItem) {
 	return ret
 }
 
-func GetItems(listId int64) {
+func GetItems(listId int64) ([]db.DBItem, error) {
 	connect()
 
 	cql := "MATCH (l:List)-[]->(i:Item) OPTIONAL MATCH (i)-->(tv:TagValue) OPTIONAL MATCH (i)-->(subItem:Item) OPTIONAL MATCH (externalItem:ExternalItem) WHERE i = externalItem WITH l, i, count(tv) AS countTagValues, count(subItem) AS countItems, externalItem WHERE id(l) = $listId WITH i, countTagValues, countItems, externalItem RETURN i, countTagValues, countItems, externalItem ORDER BY id(i)"
@@ -229,4 +220,6 @@ func GetItems(listId int64) {
 	})
 
 	log.Infof("%v %v", ret, err)
+
+	return nil, nil
 }
