@@ -7,8 +7,10 @@ import "google/api/annotations.proto";
 message List {
 	uint64 ID = 1;
 	string Title = 2;
+	uint64 CountTasks = 3;
 }
-message GetListsRequest {} 
+
+message GetListsRequest {}
 message GetListsResponse {
 	repeated List Lists = 1;
 }
@@ -19,8 +21,12 @@ message CreateListRequest {
 
 message CreateListResponse{}
 
-message CreateTaskRequest {} 
-message CreateTaskResponse {} 
+message CreateTaskRequest {
+	string Content = 1;
+}
+
+message CreateTaskResponse {
+}
 
 message Tag {
 	uint64 ID = 1;
@@ -35,17 +41,19 @@ message GetTagsResponse{
 	repeated Tag Tags = 1;
 }
 
-message Item {
+message Task {
 	uint64 ID = 1;
 	string Content = 2;
+	uint64 ParentId = 3;
+	string ParentType = 4;
 }
 
-message GetItemsRequest {
+message ListTasksRequest {
 	uint64 ListID = 1;
 }
 
-message GetItemsResponse {
-	repeated Item Items = 1;
+message ListTasksResponse {
+	repeated Task Tasks = 1;
 }
 
 message UpdateList {}
@@ -70,9 +78,9 @@ service WackyTrackyClientApi {
 		};
 	}
 
-	rpc GetItems(GetItemsRequest) returns (GetItemsResponse) {
+	rpc ListTasks(ListTasksRequest) returns (ListTasksResponse) {
 		option (google.api.http) = {
-			get: "/api/listTasks"
+			get: "/api/Task/List"
 		};
 	}
 

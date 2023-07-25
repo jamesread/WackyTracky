@@ -24,15 +24,13 @@ func Start(newdb db.DB) {
 
 	log.WithFields(log.Fields {
 		"address": RuntimeConfig.ListenAddressGrpc,
-	}).Infof("Starting API")
+	}).Infof("Starting GRPC API")
 
 	lis, err := net.Listen("tcp", RuntimeConfig.ListenAddressGrpc)
 
 	if err != nil {
 		log.Fatalf("Failed to listen - %v", err)
 		return
-	} else {
-		log.Infof("Listening")
 	}
 
 	grpcServer := grpc.NewServer()
@@ -40,21 +38,24 @@ func Start(newdb db.DB) {
 
 	go grpcServer.Serve(lis)
 
-	dbconn.GetItems(418)
+	dbconn.GetTasks(418)
 }
 
-func (api *wackyTrackyClientApi) GetItems(ctx context.Context, req *pb.GetItemsRequest) (*pb.GetItemsResponse, error) {
-	items, err := dbconn.GetItems(req.ListID)
+func (api *wackyTrackyClientApi) ListTasks(ctx context.Context, req *pb.ListTasksRequest) (*pb.ListTasksResponse, error) {
+	items, err := dbconn.GetTasks(req.ListID)
 
-	ret := &pb.GetItemsResponse{}
+	ret := &pb.ListTasksResponse{}
 
 	if err != nil {
 		return ret, err
 	}
 
 	for _, item := range items {
-		ret.Items = append(ret.Items, &pb.Item {
+		ret.Tasks = append(ret.Tasks, &pb.Task {
 			ID: item.ID,
+			Content: item.Content,
+			ParentId: item.ParentId,
+			ParentType: item.ParentType,
 		})
 	}
 
@@ -62,7 +63,11 @@ func (api *wackyTrackyClientApi) GetItems(ctx context.Context, req *pb.GetItemsR
 }
 
 func (api *wackyTrackyClientApi) CreateTask(ctx context.Context, req *pb.CreateTaskRequest) (*pb.CreateTaskResponse, error) {
-	return nil, nil
+	dbconn.CreateTask(req.Content)
+
+	res := &pb.CreateTaskResponse{}
+
+	return res, nil
 }
 
 func (api *wackyTrackyClientApi) CreateList(ctx context.Context, req *pb.CreateListRequest) (*pb.CreateListResponse, error) {
@@ -79,6 +84,7 @@ func (api *wackyTrackyClientApi) GetLists(ctx context.Context, req *pb.GetListsR
 		l := &pb.List{
 			Title: dblist.Title,
 			ID: dblist.ID,
+			CountTasks: dblist.CountTasks,
 		}
 
 		res.Lists = append(res.Lists, l)

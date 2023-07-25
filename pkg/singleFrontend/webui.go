@@ -6,16 +6,19 @@ import (
 )
 
 func findWebuiDir() string {
-	return "../wacky-tracky-client-html5/dist/"
+	return "../wacky-tracky-client-html5/src/"
 }
 
 func startWebUIServer() {
+	uidir := findWebuiDir()
+
 	log.WithFields(log.Fields{
 		"address": "0.0.0.0:8084",
+		"uidir": uidir,
 	}).Info("Starting WebUI server")
 
 	mux := http.NewServeMux()
-	mux.Handle("/", http.FileServer(http.Dir(findWebuiDir())))
+	mux.Handle("/", http.FileServer(http.Dir(uidir)))
 //	mux.HandleFunc("/webUiSettings.json", generateWebUISettings)
 
 	srv := &http.Server{

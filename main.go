@@ -2,16 +2,24 @@ package main
 
 import (
 	"github.com/wacky-tracky/wacky-tracky-server/pkg/singleFrontend"
-	. "github.com/wacky-tracky/wacky-tracky-server/pkg/runtimeconfig"
+	"github.com/wacky-tracky/wacky-tracky-server/pkg/runtimeconfig"
 	log "github.com/sirupsen/logrus"
+	"github.com/spf13/cobra"
 )
+
+var root = &cobra.Command {
+	Use: "wt",
+	Run: mainRoot,
+}
+
+func mainRoot(cmd *cobra.Command, args []string) {
+	singleFrontend.StartServers(runtimeconfig.RuntimeConfig.DB)
+}
 
 func main() {
 	log.Info("wacky-tracky")
 
-	log.WithFields(log.Fields{
-		"ListenAddress": RuntimeConfig.ListenAddressSingleHTTPFrontend,
-	}).Infof("config")
+	root.PersistentFlags().StringVarP(&runtimeconfig.RuntimeConfig.DB, "db", "D", "neo4j", "The database to use")
 
-	singleFrontend.StartServers()
+	root.Execute()
 }

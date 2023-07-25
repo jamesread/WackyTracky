@@ -172,17 +172,17 @@ func GetLists() ([]db.DBList, error) {
 	return ret, nil
 }
 
-func GetSubItems(itemId int64) ([]db.DBItem) {
+func GetSubItems(itemId int64) ([]db.DBTask) {
 	cql := "MATCH (p:Item)-->(i:Item) WHERE id(p) = $parentItemId RETURN i"
 
 	params := map[string]any {
 		"parentItemId": itemId,
 	}
 
-	var ret []db.DBItem
+	var ret []db.DBTask
 
 	for _, subitem := range(readTxParams(cql, params)) {
-		ret = append(ret, db.DBItem {
+		ret = append(ret, db.DBTask {
 			ID: uint64(subitem.Id),
 		})
 	}
@@ -190,7 +190,7 @@ func GetSubItems(itemId int64) ([]db.DBItem) {
 	return ret
 }
 
-func GetItems(listId int64) ([]db.DBItem, error) {
+func (db Neo4jDB) GetTasks(listId uint64) ([]db.DBTask, error) {
 	connect()
 
 	cql := "MATCH (l:List)-[]->(i:Item) OPTIONAL MATCH (i)-->(tv:TagValue) OPTIONAL MATCH (i)-->(subItem:Item) OPTIONAL MATCH (externalItem:ExternalItem) WHERE i = externalItem WITH l, i, count(tv) AS countTagValues, count(subItem) AS countItems, externalItem WHERE id(l) = $listId WITH i, countTagValues, countItems, externalItem RETURN i, countTagValues, countItems, externalItem ORDER BY id(i)"

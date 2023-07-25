@@ -8,17 +8,21 @@ type DBTag struct {
 type DBList struct {
 	ID uint64
 	Title string
+	CountTasks uint64
 }
 
-type DBItem struct {
+type DBTask struct {
 	ID uint64
 	Content string
+	ParentId uint64
+	ParentType string
 }
 
 
 type DB interface {
 	GetTags() ([]DBTag, error)
-	GetItems(listId uint64) ([]DBItem, error)
+	GetTasks(listId uint64) ([]DBTask, error)
 	GetLists() ([]DBList, error)
+	CreateTask(content string) (error)
 }
 

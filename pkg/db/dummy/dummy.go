@@ -7,48 +7,62 @@ import (
 
 type Dummy struct {
 	dbconn.DB
+
+	tasks []dbconn.DBTask
+	tags []dbconn.DBTag
+	lists []dbconn.DBList
 }
 
-func (db Dummy) GetItems(listId uint64) ([]dbconn.DBItem, error) {
-	var ret []dbconn.DBItem
+func (db Dummy) setup() {
+	db.tasks = []dbconn.DBTask {
+		dbconn.DBTask {
+			ID: 1,
+			Content: "First Task",
+		},
+		dbconn.DBTask {
+			ID: 2,
+			Content: "Second Task",
+		},
+	}
 
-	ret = append(ret, dbconn.DBItem{
-		ID: 1,
-		Content: "one",
-	})
+	db.tags = []dbconn.DBTag {
+		dbconn.DBTag {
+			ID: 1,
+			Title: "First tag",
+		},
+	}
 
-	ret = append(ret, dbconn.DBItem{
-		ID: 2,
-		Content: "two",
-	})
+	db.lists = []dbconn.DBList {
+		dbconn.DBList {
+			ID: 1,
+			Title: "First list",
+			CountTasks: 9,
+		},
+		dbconn.DBList {
+			ID: 2,
+			Title: "Second list",
+			CountTasks: 4,
+		},
+	}
+}
 
-	return ret, nil
+func (db Dummy) GetTasks(listId uint64) ([]dbconn.DBTask, error) {
+	return db.tasks, nil
 }
 
 func (db Dummy) GetTags() ([]dbconn.DBTag, error) {
-	var ret []dbconn.DBTag
-
-
-	ret = append(ret, dbconn.DBTag {
-		ID: 1,
-		Title: "One",
-	})
-
-	return ret, nil
+	return db.tags, nil
 }
 
 func (db Dummy) GetLists() ([]dbconn.DBList, error) {
-	var ret []dbconn.DBList
+	return db.lists, nil
+}
 
-	ret = append(ret, dbconn.DBList{
-		ID: 1,
+func (db Dummy) CreateTask(content string) (error) {
+	db.tasks = append(db.tasks, dbconn.DBTask {
+		ID: uint64(len(db.tasks) + 1),
+		Content: content,
 	})
 
-	ret = append(ret, dbconn.DBList{
-		ID: 2,
-	})
-
-
-
-	return ret, nil
+	return nil
 }
