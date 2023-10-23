@@ -4,29 +4,29 @@ import (
 	"context"
 	log "github.com/sirupsen/logrus"
 
-	"net/http"
 	"google.golang.org/grpc"
+	"net/http"
 
-	gw "github.com/wacky-tracky/wacky-tracky-server/gen/grpc"
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
+	gw "github.com/wacky-tracky/wacky-tracky-server/gen/grpc"
 	"google.golang.org/protobuf/encoding/protojson"
 )
 
-func startRestGateway() (error) {
+func startRestGateway() error {
 	ctx := context.Background()
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 
-	mux := runtime.NewServeMux( 
+	mux := runtime.NewServeMux(
 		/*
-		runtime.WithMetadata(func(ctx, context.Context, request *http.Request) metadata.MD {
-			return md
-		}
+			runtime.WithMetadata(func(ctx, context.Context, request *http.Request) metadata.MD {
+				return md
+			}
 		*/
 		runtime.WithMarshalerOption(runtime.MIMEWildcard, &runtime.HTTPBodyMarshaler{
-			Marshaler: &runtime.JSONPb {
-				MarshalOptions: protojson.MarshalOptions {
-					UseProtoNames: true,
+			Marshaler: &runtime.JSONPb{
+				MarshalOptions: protojson.MarshalOptions{
+					UseProtoNames:   true,
 					EmitUnpopulated: true,
 				},
 			},

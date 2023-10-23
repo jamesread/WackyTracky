@@ -1,13 +1,13 @@
 package main
 
 import (
-	"github.com/wacky-tracky/wacky-tracky-server/pkg/singleFrontend"
-	"github.com/wacky-tracky/wacky-tracky-server/pkg/runtimeconfig"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
+	"github.com/wacky-tracky/wacky-tracky-server/pkg/runtimeconfig"
+	"github.com/wacky-tracky/wacky-tracky-server/pkg/singleFrontend"
 )
 
-var root = &cobra.Command {
+var root = &cobra.Command{
 	Use: "wt",
 	Run: mainRoot,
 }

@@ -1,10 +1,10 @@
 package grpcapi
 
 import (
-	"net"
-	"google.golang.org/grpc"
 	pb "github.com/wacky-tracky/wacky-tracky-server/gen/grpc"
 	db "github.com/wacky-tracky/wacky-tracky-server/pkg/db"
+	"google.golang.org/grpc"
+	"net"
 
 	"context"
 
@@ -16,13 +16,13 @@ import (
 var dbconn db.DB
 
 type wackyTrackyClientApi struct {
-//	pb.UnimplementedWackyTrackyClientApiServer
+	// pb.UnimplementedWackyTrackyClientApiServer
 }
 
 func Start(newdb db.DB) {
 	dbconn = newdb
 
-	log.WithFields(log.Fields {
+	log.WithFields(log.Fields{
 		"address": RuntimeConfig.ListenAddressGrpc,
 	}).Infof("Starting GRPC API")
 
@@ -51,10 +51,10 @@ func (api *wackyTrackyClientApi) ListTasks(ctx context.Context, req *pb.ListTask
 	}
 
 	for _, item := range items {
-		ret.Tasks = append(ret.Tasks, &pb.Task {
-			ID: item.ID,
-			Content: item.Content,
-			ParentId: item.ParentId,
+		ret.Tasks = append(ret.Tasks, &pb.Task{
+			ID:         item.ID,
+			Content:    item.Content,
+			ParentId:   item.ParentId,
 			ParentType: item.ParentType,
 		})
 	}
@@ -74,22 +74,20 @@ func (api *wackyTrackyClientApi) CreateList(ctx context.Context, req *pb.CreateL
 	return nil, nil
 }
 
-
 func (api *wackyTrackyClientApi) GetLists(ctx context.Context, req *pb.GetListsRequest) (*pb.GetListsResponse, error) {
 	lists, _ := dbconn.GetLists()
 
-	res := &pb.GetListsResponse {}
+	res := &pb.GetListsResponse{}
 
-	for _, dblist := range(lists) {
+	for _, dblist := range lists {
 		l := &pb.List{
-			Title: dblist.Title,
-			ID: dblist.ID,
+			Title:      dblist.Title,
+			ID:         dblist.ID,
 			CountTasks: dblist.CountTasks,
 		}
 
 		res.Lists = append(res.Lists, l)
 	}
-
 
 	return res, nil
 }
@@ -99,9 +97,9 @@ func (api *wackyTrackyClientApi) GetTags(ctx context.Context, req *pb.GetTagsReq
 
 	res := &pb.GetTagsResponse{}
 
-	for _, dbtag := range(tags) {
-		t := &pb.Tag {
-			ID: dbtag.ID,
+	for _, dbtag := range tags {
+		t := &pb.Tag{
+			ID:    dbtag.ID,
 			Title: dbtag.Title,
 		}
 
@@ -110,7 +108,6 @@ func (api *wackyTrackyClientApi) GetTags(ctx context.Context, req *pb.GetTagsReq
 
 	return res, nil
 }
-
 
 func (api *wackyTrackyClientApi) Tag(ctx context.Context, req *pb.TagRequest) (*pb.TagResponse, error) {
 	return nil, nil

@@ -1,10 +1,10 @@
 package singleFrontend
 
 import (
-	"github.com/wacky-tracky/wacky-tracky-server/pkg/grpcapi"
+	log "github.com/sirupsen/logrus"
 	"github.com/wacky-tracky/wacky-tracky-server/pkg/db/dummy"
 	"github.com/wacky-tracky/wacky-tracky-server/pkg/db/neo4j"
-	log "github.com/sirupsen/logrus"
+	"github.com/wacky-tracky/wacky-tracky-server/pkg/grpcapi"
 )
 
 func StartServers(db string) {

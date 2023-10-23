@@ -9,7 +9,7 @@ import (
 )
 
 var (
-	driver neo4j.Driver
+	driver  neo4j.Driver
 	session neo4j.Session
 )
 
@@ -17,7 +17,7 @@ type Neo4jDB struct {
 	db.DB
 }
 
-func connect() (error) {
+func connect() error {
 	if driver != nil {
 		return nil // FIXME driver might be initialized but stale/disconnected
 	}
@@ -28,7 +28,7 @@ func connect() (error) {
 	username := "neo4j"
 	password := "password"
 
-	var err error;
+	var err error
 
 	driver, err = neo4j.NewDriver(uri, neo4j.BasicAuth(username, password, ""))
 
@@ -42,7 +42,7 @@ func connect() (error) {
 	//defer driver.Close()
 
 	session = driver.NewSession(neo4j.SessionConfig{
-		AccessMode: neo4j.AccessModeWrite,
+		AccessMode:   neo4j.AccessModeWrite,
 		DatabaseName: "neo4j",
 	})
 
@@ -54,7 +54,7 @@ func connect() (error) {
 	greeting()
 	greeting()
 
-	log.Infof("Connected");
+	log.Infof("Connected")
 
 	return nil
 }
@@ -76,7 +76,6 @@ func greeting() (string, error) {
 			log.Infof("Wrote TX")
 			transaction.Commit()
 		}
-
 
 		if result.Next() {
 			ret := result.Record().Values[0]
@@ -100,11 +99,11 @@ func greeting() (string, error) {
 	return greeting.(string), nil
 }
 
-func readTx(cql string) ([]dbtype.Node) {
-	return readTxParams(cql, map[string]any {})
+func readTx(cql string) []dbtype.Node {
+	return readTxParams(cql, map[string]any{})
 }
 
-func readTxParams(cql string, params map[string]any) ([]dbtype.Node) {
+func readTxParams(cql string, params map[string]any) []dbtype.Node {
 	var ret []dbtype.Node
 
 	connect()
@@ -130,16 +129,16 @@ func readTxParams(cql string, params map[string]any) ([]dbtype.Node) {
 	return ret
 }
 
-func GetTags () ([]db.DBTag, error) {
+func GetTags() ([]db.DBTag, error) {
 	var ret []db.DBTag
 
 	cql := "MATCH (t:Tag) RETURN t"
 
-	for _, tag := range(readTx(cql)) {
+	for _, tag := range readTx(cql) {
 		log.Infof("tag props %+v", tag.Props)
 
-		dbtag := db.DBTag {
-			ID: uint64(tag.Id),
+		dbtag := db.DBTag{
+			ID:    uint64(tag.Id),
 			Title: tag.Props["title"].(string),
 		}
 
@@ -160,9 +159,9 @@ func GetLists() ([]db.DBList, error) {
 
 	cql := "MATCH (n:List) RETURN n"
 
-	for _, lst := range(readTx(cql)) {
-		ret = append(ret, db.DBList {
-			ID: uint64(lst.Id),
+	for _, lst := range readTx(cql) {
+		ret = append(ret, db.DBList{
+			ID:    uint64(lst.Id),
 			Title: lst.Props["title"].(string),
 		})
 	}
@@ -172,17 +171,17 @@ func GetLists() ([]db.DBList, error) {
 	return ret, nil
 }
 
-func GetSubItems(itemId int64) ([]db.DBTask) {
+func GetSubItems(itemId int64) []db.DBTask {
 	cql := "MATCH (p:Item)-->(i:Item) WHERE id(p) = $parentItemId RETURN i"
 
-	params := map[string]any {
+	params := map[string]any{
 		"parentItemId": itemId,
 	}
 
 	var ret []db.DBTask
 
-	for _, subitem := range(readTxParams(cql, params)) {
-		ret = append(ret, db.DBTask {
+	for _, subitem := range readTxParams(cql, params) {
+		ret = append(ret, db.DBTask{
 			ID: uint64(subitem.Id),
 		})
 	}
@@ -198,7 +197,7 @@ func (db Neo4jDB) GetTasks(listId uint64) ([]db.DBTask, error) {
 	log.Infof("getting items from list %v", listId)
 
 	ret, err := session.ReadTransaction(func(tx neo4j.Transaction) (any, error) {
-		res, err := tx.Run(cql, map[string]any {
+		res, err := tx.Run(cql, map[string]any{
 			"listId": listId,
 		})
 
