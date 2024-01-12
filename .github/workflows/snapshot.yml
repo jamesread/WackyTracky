@@ -7,8 +7,7 @@ on:
     branches: [ "master" ]
 
 jobs:
-
-  build:
+  snapshot:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -20,13 +19,3 @@ jobs:
 
       - name: Build
         run: make -w grpc default
-
-      - name: goreleaser
-        uses: goreleaser/goreleaser-action@v4.2.0
-        with:
-          distribution: goreleaser
-          version: latest
-          args: release --clean
-        env:
-          GITHUB_TOKEN: ${{ secrets.CONTAINER_TOKEN }}
-
