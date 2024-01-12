@@ -17,7 +17,7 @@ type Neo4jDB struct {
 	db.DB
 }
 
-func connect() error {
+func (self Neo4jDB) Connect() error {
 	if driver != nil {
 		return nil // FIXME driver might be initialized but stale/disconnected
 	}
@@ -51,7 +51,6 @@ func connect() error {
 
 	log.Infof("Session created")
 
-	greeting()
 	greeting()
 
 	log.Infof("Connected")
@@ -106,7 +105,6 @@ func readTx(cql string) []dbtype.Node {
 func readTxParams(cql string, params map[string]any) []dbtype.Node {
 	var ret []dbtype.Node
 
-	connect()
 
 	_, err := session.ReadTransaction(func(tx neo4j.Transaction) (any, error) {
 		res, err := tx.Run(cql, params)
@@ -129,11 +127,13 @@ func readTxParams(cql string, params map[string]any) []dbtype.Node {
 	return ret
 }
 
-func GetTags() ([]db.DBTag, error) {
+func (self Neo4jDB) GetTags() ([]db.DBTag, error) {
 	var ret []db.DBTag
 
-	cql := "MATCH (t:Tag) RETURN t"
+	//cql := "MATCH (t:Tag) RETURN t"
 
+	//readTx(cql);
+	/*
 	for _, tag := range readTx(cql) {
 		log.Infof("tag props %+v", tag.Props)
 
@@ -144,15 +144,14 @@ func GetTags() ([]db.DBTag, error) {
 
 		ret = append(ret, dbtag)
 	}
+	*/
 
 	log.Infof("tags: %+v", ret)
 
 	return ret, nil
 }
 
-func GetLists() ([]db.DBList, error) {
-	connect()
-
+func (self Neo4jDB) GetLists() ([]db.DBList, error) {
 	log.Infof("getting lists")
 
 	var ret []db.DBList
@@ -190,8 +189,6 @@ func GetSubItems(itemId int64) []db.DBTask {
 }
 
 func (db Neo4jDB) GetTasks(listId uint64) ([]db.DBTask, error) {
-	connect()
-
 	cql := "MATCH (l:List)-[]->(i:Item) OPTIONAL MATCH (i)-->(tv:TagValue) OPTIONAL MATCH (i)-->(subItem:Item) OPTIONAL MATCH (externalItem:ExternalItem) WHERE i = externalItem WITH l, i, count(tv) AS countTagValues, count(subItem) AS countItems, externalItem WHERE id(l) = $listId WITH i, countTagValues, countItems, externalItem RETURN i, countTagValues, countItems, externalItem ORDER BY id(i)"
 
 	log.Infof("getting items from list %v", listId)

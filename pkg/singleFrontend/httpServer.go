@@ -8,11 +8,15 @@ import (
 )
 
 func StartServers(db string) {
-	log.Infof("DB: %v", db)
+	log.Infof("DB Backend: %v", db)
 
 	switch db {
 	case "neo4j":
-		go grpcapi.Start(neo4j.Neo4jDB{})
+		dbi := neo4j.Neo4jDB{}
+
+		log.Infof("dbi: %+v", dbi)
+
+		go grpcapi.Start(dbi)
 	default:
 		go grpcapi.Start(dummy.Dummy{})
 	}

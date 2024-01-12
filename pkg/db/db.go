@@ -19,6 +19,7 @@ type DBTask struct {
 }
 
 type DB interface {
+	Connect() (error)
 	GetTags() ([]DBTag, error)
 	GetTasks(listId uint64) ([]DBTask, error)
 	GetLists() ([]DBList, error)

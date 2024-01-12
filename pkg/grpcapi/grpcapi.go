@@ -21,6 +21,7 @@ type wackyTrackyClientApi struct {
 
 func Start(newdb db.DB) {
 	dbconn = newdb
+	dbconn.Connect()
 
 	log.WithFields(log.Fields{
 		"address": RuntimeConfig.ListenAddressGrpc,

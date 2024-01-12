@@ -12,6 +12,12 @@ type Dummy struct {
 	lists []dbconn.DBList
 }
 
+func (db Dummy) Connect() (error) {
+	db.setup()
+
+	return nil
+}
+
 func (db Dummy) setup() {
 	db.tasks = []dbconn.DBTask{
 		dbconn.DBTask{
