@@ -1,4 +1,4 @@
-default:
+default: grpc
 	go build 
 
 grpc:
