@@ -20,3 +20,10 @@ jobs:
 
       - name: Build
         run: make -w grpc default
+
+      - name: goreleaser
+        uses: goreleaser/goreleaser-action@v4.2.0
+        with:
+          distribution: goreleaser
+          version: latest
+          args: release --clean
