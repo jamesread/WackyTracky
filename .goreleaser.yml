@@ -46,7 +46,7 @@ archives: []
 
 dockers:
   - image_templates:
-      - "ghcr.io/jamesread/wacky-tracky-server:{{ .Tag }}-amd64"
+      - "ghcr.io/wacky-tracky/wacky-tracky-server:{{ .Tag }}-amd64"
     dockerfile: Dockerfile
     goos: linux
     goarch: amd64
@@ -60,7 +60,7 @@ release:
   footer: |
     ## Container images (from GitHub)
 
-    - `docker pull ghcr.io/jamesread/wacky-tracky-server:{{ .Version }}`
+    - `docker pull ghcr.io/wacky-tracky/wacky-tracky-server:{{ .Version }}`
 
     ## Upgrade warnings, or breaking changes
 
