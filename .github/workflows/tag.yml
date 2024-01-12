@@ -1,10 +1,9 @@
-name: Go
+name: tag
 
 on:
   push:
-    branches: [ "master" ]
-  pull_request:
-    branches: [ "master" ]
+    tags:
+      - '*'
 
 jobs:
   tag:
