@@ -1,4 +1,4 @@
 wacky-tracky-server
 ===================
 
-The Python/neo4j Server
+The server that serves the apps, and saves your data in a database. 
