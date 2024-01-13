@@ -18,8 +18,8 @@ func startWebUIServer() {
 	wallpaperDir := findWallpaperDir()
 
 	log.WithFields(log.Fields{
-		"address": "0.0.0.0:8084",
-		"uidir":   uidir,
+		"address":      "0.0.0.0:8084",
+		"uidir":        uidir,
 		"wallpaperDir": wallpaperDir,
 	}).Info("Starting WebUI server")
 

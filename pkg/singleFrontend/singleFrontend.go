@@ -3,6 +3,8 @@ package singleFrontend
 import (
 	. "github.com/wacky-tracky/wacky-tracky-server/pkg/runtimeconfig"
 
+	"github.com/prometheus/client_golang/prometheus/promhttp"
+
 	log "github.com/sirupsen/logrus"
 	"net/http"
 	"net/http/httputil"
@@ -31,6 +33,8 @@ func startSingleFrontend() {
 		log.Debugf("ui req: %v", r.URL)
 		webuiProxy.ServeHTTP(w, r)
 	})
+
+	mux.Handle("/metrics", promhttp.Handler())
 
 	srv := &http.Server{
 		Addr:    RuntimeConfig.ListenAddressSingleHTTPFrontend,

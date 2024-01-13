@@ -15,7 +15,7 @@ builds:
     main: main.go
 
     ldflags:
-      - -s -w -X main.version={{.Version}} -X main.commit={{.ShortCommit}} -X main.date={{ .CommitDate }}
+      - -s -w -X buildinfo.Version={{.Version}} -X buildinfo.Commit={{.ShortCommit}} -X buildinfo.Date={{ .CommitDate }}
 
 checksum:
   name_template: 'checksums.txt'

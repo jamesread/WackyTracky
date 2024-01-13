@@ -65,7 +65,20 @@ message InitResponse {
 	string Wallpaper = 1;
 }
 
+message VersionRequest {}
+message VersionResponse {
+	string version = 1;
+	string commit = 2;
+	string date = 3;
+}
+
 service WackyTrackyClientApi {
+	rpc Version(VersionRequest) returns (VersionResponse) {
+		option (google.api.http) = {
+			get: "/api/Version"
+		};
+	}
+
 	rpc Init(InitRequest) returns (InitResponse) {
 		option (google.api.http) = {
 			get: "/api/Init"

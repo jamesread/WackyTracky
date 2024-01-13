@@ -12,7 +12,7 @@ type Dummy struct {
 	lists []dbconn.DBList
 }
 
-func (db Dummy) Connect() (error) {
+func (db Dummy) Connect() error {
 	db.setup()
 
 	return nil

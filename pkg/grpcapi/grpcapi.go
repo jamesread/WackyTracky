@@ -1,7 +1,10 @@
 package grpcapi
 
 import (
+	"github.com/prometheus/client_golang/prometheus"
+	"github.com/prometheus/client_golang/prometheus/promauto"
 	pb "github.com/wacky-tracky/wacky-tracky-server/gen/grpc"
+	"github.com/wacky-tracky/wacky-tracky-server/pkg/buildinfo"
 	db "github.com/wacky-tracky/wacky-tracky-server/pkg/db"
 	"google.golang.org/grpc"
 	"net"
@@ -14,6 +17,11 @@ import (
 )
 
 var dbconn db.DB
+
+var metricListTasksCount = promauto.NewCounter(prometheus.CounterOpts{
+	Name: "list_tasks_count",
+	Help: "The total number of ListTasks API calls",
+})
 
 type wackyTrackyClientApi struct {
 	// pb.UnimplementedWackyTrackyClientApiServer
@@ -43,6 +51,8 @@ func Start(newdb db.DB) {
 }
 
 func (api *wackyTrackyClientApi) ListTasks(ctx context.Context, req *pb.ListTasksRequest) (*pb.ListTasksResponse, error) {
+	metricListTasksCount.Inc()
+
 	items, err := dbconn.GetTasks(req.ListID)
 
 	ret := &pb.ListTasksResponse{}
@@ -91,6 +101,14 @@ func (api *wackyTrackyClientApi) GetLists(ctx context.Context, req *pb.GetListsR
 	}
 
 	return res, nil
+}
+
+func (api *wackyTrackyClientApi) Version(ctx context.Context, req *pb.VersionRequest) (*pb.VersionResponse, error) {
+	return &pb.VersionResponse{
+		Version: buildinfo.Version,
+		Commit:  buildinfo.Commit,
+		Date:    buildinfo.Date,
+	}, nil
 }
 
 func (api *wackyTrackyClientApi) GetTags(ctx context.Context, req *pb.GetTagsRequest) (*pb.GetTagsResponse, error) {

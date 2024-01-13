@@ -105,7 +105,6 @@ func readTx(cql string) []dbtype.Node {
 func readTxParams(cql string, params map[string]any) []dbtype.Node {
 	var ret []dbtype.Node
 
-
 	_, err := session.ReadTransaction(func(tx neo4j.Transaction) (any, error) {
 		res, err := tx.Run(cql, params)
 
@@ -134,16 +133,16 @@ func (self Neo4jDB) GetTags() ([]db.DBTag, error) {
 
 	//readTx(cql);
 	/*
-	for _, tag := range readTx(cql) {
-		log.Infof("tag props %+v", tag.Props)
+		for _, tag := range readTx(cql) {
+			log.Infof("tag props %+v", tag.Props)
 
-		dbtag := db.DBTag{
-			ID:    uint64(tag.Id),
-			Title: tag.Props["title"].(string),
+			dbtag := db.DBTag{
+				ID:    uint64(tag.Id),
+				Title: tag.Props["title"].(string),
+			}
+
+			ret = append(ret, dbtag)
 		}
-
-		ret = append(ret, dbtag)
-	}
 	*/
 
 	log.Infof("tags: %+v", ret)
