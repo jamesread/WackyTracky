@@ -47,6 +47,7 @@ archives: []
 dockers:
   - image_templates:
       - "ghcr.io/wacky-tracky/wacky-tracky-server:{{ .Tag }}-amd64"
+      - "ghcr.io/wacky-tracky/wacky-tracky-server:latest"
     dockerfile: Dockerfile
     goos: linux
     goarch: amd64
