@@ -26,6 +26,8 @@ jobs:
 
       - name: Build
         run: make -w grpc default webui
+        env:
+          GH_TOKEN: ${{ github.token }}
 
       - name: goreleaser
         uses: goreleaser/goreleaser-action@v4.2.0

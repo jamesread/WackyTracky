@@ -19,3 +19,5 @@ jobs:
 
       - name: Build
         run: make -w grpc default webui
+        env:
+          GH_TOKEN: ${{ github.token }}
