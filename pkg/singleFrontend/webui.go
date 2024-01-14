@@ -6,7 +6,7 @@ import (
 )
 
 func findWebuiDir() string {
-	return "../wacky-tracky-client-html5/src/"
+	return "./webui"
 }
 
 func findWallpaperDir() string {

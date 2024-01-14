@@ -1,5 +1,8 @@
 default: grpc
-	go build 
+	go build
+
+webui:
+	gh run download -R wacky-tracky/wacky-tracky-client-html5 --name 'wt-webui' -D webui
 
 go-tools:
 	go install "github.com/bufbuild/buf/cmd/buf"
