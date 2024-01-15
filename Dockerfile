@@ -4,7 +4,7 @@ LABEL org.opencontainers.image.source https://github.com/wacky-tracky/wacky-trac
 LABEL org.opencontainers.image.title wacky-tracky-server
 
 ADD wacky-tracky-server /server
-ADD webui /webui
+ADD webui /
 
 EXPOSE 8082/tcp
 
