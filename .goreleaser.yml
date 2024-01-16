@@ -56,6 +56,8 @@ dockers:
       - "--platform=linux/amd64"
       - "--label=org.opencontainers.image.revision={{.FullCommit}}"
       - "--label=org.opencontainers.image.version={{.Tag}}"
+    extra_files:
+      - webui
 
 release:
   footer: |
