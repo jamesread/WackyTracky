@@ -23,10 +23,12 @@ func startRestGateway() error {
 				return md
 			}
 		*/
-		runtime.WithMarshalerOption(runtime.MIMEWildcard, &runtime.HTTPBodyMarshaler{
+		runtime.WithMarshalerOption("application/json+pretty", &runtime.HTTPBodyMarshaler{
 			Marshaler: &runtime.JSONPb{
 				MarshalOptions: protojson.MarshalOptions{
-					UseProtoNames:   true,
+					UseProtoNames:   false,
+					Indent:          "\t",
+					Multiline:       true,
 					EmitUnpopulated: true,
 				},
 			},
@@ -35,13 +37,25 @@ func startRestGateway() error {
 
 	opts := []grpc.DialOption{grpc.WithInsecure()}
 
-	err := gw.RegisterWackyTrackyClientApiHandlerFromEndpoint(ctx, mux, "0.0.0.0:8083", opts)
+	err := gw.RegisterWackyTrackyClientServiceHandlerFromEndpoint(ctx, mux, "0.0.0.0:8083", opts)
 
 	if err != nil {
 		log.Errorf("Register REST: %v", err)
 	}
 
-	return http.ListenAndServe("0.0.0.0:8082", allowCors(mux))
+	return http.ListenAndServe("0.0.0.0:8082", prettier(allowCors(mux)))
+}
+
+// https://grpc-ecosystem.github.io/grpc-gateway/docs/mapping/customizing_your_gateway/#pretty-print-json-responses-when-queried-with-pretty
+func prettier(h http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		// checking Values as map[string][]string also catches ?pretty and ?pretty=
+		// r.URL.Query().Get("pretty") would not.
+		if _, ok := r.URL.Query()["pretty"]; ok {
+			r.Header.Set("Accept", "application/json+pretty")
+		}
+		h.ServeHTTP(w, r)
+	})
 }
 
 func allowCors(h http.Handler) http.Handler {

@@ -1,59 +1,62 @@
 syntax = "proto3";
 
+package wackytracky.v1;
+
 option go_package = "gen/grpc";
 
 import "google/api/annotations.proto";
 
 message List {
-	uint64 ID = 1;
-	string Title = 2;
-	uint64 CountTasks = 3;
+	int32 id = 1;
+	string title = 2;
+	int32 count_items = 3;
 }
 
 message GetListsRequest {}
 message GetListsResponse {
-	repeated List Lists = 1;
+	repeated List lists = 1;
 }
 
 message CreateListRequest {
-	string Title = 1;
+	string title = 1;
 }
 
 message CreateListResponse{}
 
 message CreateTaskRequest {
-	string Content = 1;
+	string content = 1;
 }
 
 message CreateTaskResponse {
 }
 
 message Tag {
-	uint64 ID = 1;
-	string Title = 2;
+	int32 id = 1;
+	string title = 2;
 }
 
 message TagRequest {}
-message TagResponse {} 
+message TagResponse {}
 
 message GetTagsRequest{}
 message GetTagsResponse{
-	repeated Tag Tags = 1;
+	repeated Tag tags = 1;
 }
 
 message Task {
-	uint64 ID = 1;
-	string Content = 2;
-	uint64 ParentId = 3;
-	string ParentType = 4;
+	int32 id = 1;
+	string content = 2;
+	int32 parent_id = 3;
+	string parent_type = 4;
+	int32 count_subitems = 5;
 }
 
 message ListTasksRequest {
-	uint64 ListID = 1;
+	int32 list_id = 1;
 }
 
 message ListTasksResponse {
-	repeated Task Tasks = 1;
+	repeated Task tasks = 1;
 }
 
 message UpdateList {}
@@ -62,7 +65,7 @@ message UpdateListResponse {}
 
 message InitRequest {}
 message InitResponse {
-	string Wallpaper = 1;
+	string wallpaper = 1;
 }
 
 message VersionRequest {}
@@ -72,7 +75,7 @@ message VersionResponse {
 	string date = 3;
 }
 
-service WackyTrackyClientApi {
+service WackyTrackyClientService {
 	rpc Version(VersionRequest) returns (VersionResponse) {
 		option (google.api.http) = {
 			get: "/api/Version"

@@ -3,10 +3,29 @@ package singleFrontend
 import (
 	log "github.com/sirupsen/logrus"
 	"net/http"
+	"os"
 )
 
 func findWebuiDir() string {
-	return "./webui"
+	directoriesToSearch := []string{
+		"../wacky-tracky-client-html5/dist/",
+		"./webui",
+		"/webui",
+	}
+
+	for _, dir := range directoriesToSearch {
+		if _, err := os.Stat(dir); !os.IsNotExist(err) {
+			log.WithFields(log.Fields{
+				"dir": dir,
+			}).Infof("Found the webui directory")
+
+			return dir
+		}
+	}
+
+	log.Warnf("Did not find the webui directory! You will get 404 errors")
+
+	return "./webui" // should not exist
 }
 
 func findWallpaperDir() string {

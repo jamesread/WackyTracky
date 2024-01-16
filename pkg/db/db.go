@@ -1,27 +1,28 @@
 package db
 
 type DBTag struct {
-	ID    uint64
+	ID    int32
 	Title string
 }
 
 type DBList struct {
-	ID         uint64
+	ID         int32
 	Title      string
-	CountTasks uint64
+	CountTasks int32
 }
 
 type DBTask struct {
-	ID         uint64
-	Content    string
-	ParentId   uint64
-	ParentType string
+	ID            int32
+	Content       string
+	ParentId      int32
+	ParentType    string
+	CountSubitems int32
 }
 
 type DB interface {
 	Connect() error
 	GetTags() ([]DBTag, error)
-	GetTasks(listId uint64) ([]DBTask, error)
+	GetTasks(listId int32) ([]DBTask, error)
 	GetLists() ([]DBList, error)
 	CreateTask(content string) error
 }

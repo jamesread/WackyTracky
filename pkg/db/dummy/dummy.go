@@ -51,7 +51,7 @@ func (db Dummy) setup() {
 	}
 }
 
-func (db Dummy) GetTasks(listId uint64) ([]dbconn.DBTask, error) {
+func (db Dummy) GetTasks(listId int32) ([]dbconn.DBTask, error) {
 	return db.tasks, nil
 }
 
@@ -65,7 +65,7 @@ func (db Dummy) GetLists() ([]dbconn.DBList, error) {
 
 func (db Dummy) CreateTask(content string) error {
 	db.tasks = append(db.tasks, dbconn.DBTask{
-		ID:      uint64(len(db.tasks) + 1),
+		ID:      int32(len(db.tasks) + 1),
 		Content: content,
 	})
 

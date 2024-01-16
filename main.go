@@ -19,6 +19,13 @@ func mainRoot(cmd *cobra.Command, args []string) {
 	singleFrontend.StartServers(runtimeconfig.RuntimeConfig.DB)
 }
 
+func disableLogTimestamps() {
+	log.SetFormatter(&log.TextFormatter{
+		DisableColors:    false,
+		DisableTimestamp: true,
+	})
+}
+
 func initViperConfig() {
 	viper.AutomaticEnv()
 	viper.SetConfigName("config.yaml")
@@ -28,17 +35,19 @@ func initViperConfig() {
 
 	if err := viper.ReadInConfig(); err != nil {
 		if _, ok := err.(viper.ConfigFileNotFoundError); ok {
-			// Config file not found; ignore error 
+			// Config file not found; ignore error
 		} else {
 			log.Errorf("Config file error at startup. %s", err)
 			os.Exit(1)
 		}
 	}
-	
+
 	viper.UnmarshalExact(&runtimeconfig.RuntimeConfig)
 }
 
 func main() {
+	disableLogTimestamps()
+
 	log.Info("wacky-tracky")
 
 	initViperConfig()
