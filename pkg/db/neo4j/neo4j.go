@@ -6,6 +6,8 @@ import (
 	db "github.com/wacky-tracky/wacky-tracky-server/pkg/db"
 
 	log "github.com/sirupsen/logrus"
+
+	"fmt"
 )
 
 var (
@@ -60,7 +62,6 @@ func (self Neo4jDB) Connect() error {
 
 func greeting() (string, error) {
 	greeting, err := session.WriteTransaction(func(transaction neo4j.Transaction) (any, error) {
-		log.Infof("Write TX")
 		cql := "CREATE (a:Greeting) SET a.message = $message RETURN a.message + ', from node ' + id(a)"
 		cql = "MATCH (n:List) RETURN (n.title)"
 		result, err := transaction.Run(
@@ -72,7 +73,6 @@ func greeting() (string, error) {
 			log.Errorf("err %v", err)
 			return nil, err
 		} else {
-			log.Infof("Wrote TX")
 			transaction.Commit()
 		}
 
@@ -98,12 +98,12 @@ func greeting() (string, error) {
 	return greeting.(string), nil
 }
 
-func readTx(cql string) []dbtype.Node {
+func readTx(cql string) []*neo4j.Record {
 	return readTxParams(cql, map[string]any{})
 }
 
-func readTxParams(cql string, params map[string]any) []dbtype.Node {
-	var ret []dbtype.Node
+func readTxParams(cql string, params map[string]any) []*neo4j.Record {
+	var ret []*neo4j.Record
 
 	_, err := session.ReadTransaction(func(tx neo4j.Transaction) (any, error) {
 		res, err := tx.Run(cql, params)
@@ -112,7 +112,7 @@ func readTxParams(cql string, params map[string]any) []dbtype.Node {
 			return nil, err
 		} else {
 			for res.Next() {
-				ret = append(ret, res.Record().Values[0].(dbtype.Node))
+				ret = append(ret, res.Record())
 			}
 
 			return nil, nil
@@ -137,7 +137,7 @@ func (self Neo4jDB) GetTags() ([]db.DBTag, error) {
 			log.Infof("tag props %+v", tag.Props)
 
 			dbtag := db.DBTag{
-				ID:    uint64(tag.Id),
+				ID:    int32(tag.Id),
 				Title: tag.Props["title"].(string),
 			}
 
@@ -155,12 +155,15 @@ func (self Neo4jDB) GetLists() ([]db.DBList, error) {
 
 	var ret []db.DBList
 
-	cql := "MATCH (n:List) RETURN n"
+	cql := "MATCH (l:List) OPTIONAL MATCH (l)-->(i:Item)  RETURN l, count(i) as countItems"
 
-	for _, lst := range readTx(cql) {
+	for _, row := range readTx(cql) {
+		lst := row.Values[0].(dbtype.Node)
+
 		ret = append(ret, db.DBList{
-			ID:    uint64(lst.Id),
-			Title: lst.Props["title"].(string),
+			ID:         int32(lst.Id),
+			Title:      lst.Props["title"].(string),
+			CountTasks: int32(row.Values[1].(int64)),
 		})
 	}
 
@@ -178,43 +181,45 @@ func GetSubItems(itemId int64) []db.DBTask {
 
 	var ret []db.DBTask
 
-	for _, subitem := range readTxParams(cql, params) {
+	for _, row := range readTxParams(cql, params) {
+		item := row.Values[0].(dbtype.Node)
+
 		ret = append(ret, db.DBTask{
-			ID: uint64(subitem.Id),
+			ID: int32(item.Id),
 		})
 	}
 
 	return ret
 }
 
-func (db Neo4jDB) GetTasks(listId uint64) ([]db.DBTask, error) {
-	cql := "MATCH (l:List)-[]->(i:Item) OPTIONAL MATCH (i)-->(tv:TagValue) OPTIONAL MATCH (i)-->(subItem:Item) OPTIONAL MATCH (externalItem:ExternalItem) WHERE i = externalItem WITH l, i, count(tv) AS countTagValues, count(subItem) AS countItems, externalItem WHERE id(l) = $listId WITH i, countTagValues, countItems, externalItem RETURN i, countTagValues, countItems, externalItem ORDER BY id(i)"
+func (api Neo4jDB) GetTasks(listId int32) ([]db.DBTask, error) {
+	var ret []db.DBTask
 
-	log.Infof("getting items from list %v", listId)
+	cql := "MATCH (l:List)-[]->(i:Item) OPTIONAL MATCH (i)-->(tv:TagValue) OPTIONAL MATCH (i)-->(subItem:Item) OPTIONAL MATCH (externalItem:ExternalItem) WHERE i = externalItem WITH l, i, count(tv) AS countTagValues, count(subItem) AS countItems, externalItem WHERE id(l) = $listId WITH i, l, countTagValues, countItems, externalItem RETURN i, l, countTagValues, countItems, externalItem ORDER BY id(i)"
 
-	ret, err := session.ReadTransaction(func(tx neo4j.Transaction) (any, error) {
-		res, err := tx.Run(cql, map[string]any{
-			"listId": listId,
+	params := map[string]any{
+		"listId": listId,
+	}
+
+	for _, row := range readTxParams(cql, params) {
+		task := row.Values[0].(dbtype.Node)
+		list := row.Values[1].(dbtype.Node)
+		countSubitems := int32(row.Values[3].(int64))
+
+		//GetSubItems(x.Id)
+		ret = append(ret, db.DBTask{
+			ID:            int32(task.Id),
+			Content:       fmt.Sprintf("%v", task.Props["content"]),
+			ParentId:      int32(list.Id),
+			ParentType:    "list",
+			CountSubitems: countSubitems,
 		})
+	}
 
-		var items []interface{}
+	log.WithFields(log.Fields{
+		"id":  listId,
+		"len": len(ret),
+	}).Infof("Got items from list")
 
-		if err != nil {
-			log.Errorf("%v", err)
-			return nil, err
-		} else {
-			for res.Next() {
-				x := res.Record().Values[0].(dbtype.Node)
-				log.Infof("Items %+v", x)
-				GetSubItems(x.Id)
-				items = append(items, res.Record().Values[0])
-			}
-		}
-
-		return items, nil
-	})
-
-	log.Infof("%v %v", ret, err)
-
-	return nil, nil
+	return ret, nil
 }

@@ -23,8 +23,8 @@ var metricListTasksCount = promauto.NewCounter(prometheus.CounterOpts{
 	Help: "The total number of ListTasks API calls",
 })
 
-type wackyTrackyClientApi struct {
-	// pb.UnimplementedWackyTrackyClientApiServer
+type wackyTrackyClientService struct {
+	// pb.UnimplementedWackyTrackyClientServiceServer
 }
 
 func Start(newdb db.DB) {
@@ -43,17 +43,17 @@ func Start(newdb db.DB) {
 	}
 
 	grpcServer := grpc.NewServer()
-	pb.RegisterWackyTrackyClientApiServer(grpcServer, newServer())
+	pb.RegisterWackyTrackyClientServiceServer(grpcServer, newServer())
 
 	go grpcServer.Serve(lis)
 
 	dbconn.GetTasks(418)
 }
 
-func (api *wackyTrackyClientApi) ListTasks(ctx context.Context, req *pb.ListTasksRequest) (*pb.ListTasksResponse, error) {
+func (api *wackyTrackyClientService) ListTasks(ctx context.Context, req *pb.ListTasksRequest) (*pb.ListTasksResponse, error) {
 	metricListTasksCount.Inc()
 
-	items, err := dbconn.GetTasks(req.ListID)
+	items, err := dbconn.GetTasks(req.ListId)
 
 	ret := &pb.ListTasksResponse{}
 
@@ -63,17 +63,18 @@ func (api *wackyTrackyClientApi) ListTasks(ctx context.Context, req *pb.ListTask
 
 	for _, item := range items {
 		ret.Tasks = append(ret.Tasks, &pb.Task{
-			ID:         item.ID,
-			Content:    item.Content,
-			ParentId:   item.ParentId,
-			ParentType: item.ParentType,
+			Id:            item.ID,
+			Content:       item.Content,
+			ParentId:      item.ParentId,
+			ParentType:    item.ParentType,
+			CountSubitems: item.CountSubitems,
 		})
 	}
 
 	return ret, nil
 }
 
-func (api *wackyTrackyClientApi) CreateTask(ctx context.Context, req *pb.CreateTaskRequest) (*pb.CreateTaskResponse, error) {
+func (api *wackyTrackyClientService) CreateTask(ctx context.Context, req *pb.CreateTaskRequest) (*pb.CreateTaskResponse, error) {
 	dbconn.CreateTask(req.Content)
 
 	res := &pb.CreateTaskResponse{}
@@ -81,11 +82,11 @@ func (api *wackyTrackyClientApi) CreateTask(ctx context.Context, req *pb.CreateT
 	return res, nil
 }
 
-func (api *wackyTrackyClientApi) CreateList(ctx context.Context, req *pb.CreateListRequest) (*pb.CreateListResponse, error) {
+func (api *wackyTrackyClientService) CreateList(ctx context.Context, req *pb.CreateListRequest) (*pb.CreateListResponse, error) {
 	return nil, nil
 }
 
-func (api *wackyTrackyClientApi) GetLists(ctx context.Context, req *pb.GetListsRequest) (*pb.GetListsResponse, error) {
+func (api *wackyTrackyClientService) GetLists(ctx context.Context, req *pb.GetListsRequest) (*pb.GetListsResponse, error) {
 	lists, _ := dbconn.GetLists()
 
 	res := &pb.GetListsResponse{}
@@ -93,8 +94,8 @@ func (api *wackyTrackyClientApi) GetLists(ctx context.Context, req *pb.GetListsR
 	for _, dblist := range lists {
 		l := &pb.List{
 			Title:      dblist.Title,
-			ID:         dblist.ID,
-			CountTasks: dblist.CountTasks,
+			Id:         dblist.ID,
+			CountItems: dblist.CountTasks,
 		}
 
 		res.Lists = append(res.Lists, l)
@@ -103,7 +104,7 @@ func (api *wackyTrackyClientApi) GetLists(ctx context.Context, req *pb.GetListsR
 	return res, nil
 }
 
-func (api *wackyTrackyClientApi) Version(ctx context.Context, req *pb.VersionRequest) (*pb.VersionResponse, error) {
+func (api *wackyTrackyClientService) Version(ctx context.Context, req *pb.VersionRequest) (*pb.VersionResponse, error) {
 	return &pb.VersionResponse{
 		Version: buildinfo.Version,
 		Commit:  buildinfo.Commit,
@@ -111,14 +112,14 @@ func (api *wackyTrackyClientApi) Version(ctx context.Context, req *pb.VersionReq
 	}, nil
 }
 
-func (api *wackyTrackyClientApi) GetTags(ctx context.Context, req *pb.GetTagsRequest) (*pb.GetTagsResponse, error) {
+func (api *wackyTrackyClientService) GetTags(ctx context.Context, req *pb.GetTagsRequest) (*pb.GetTagsResponse, error) {
 	tags, _ := dbconn.GetTags()
 
 	res := &pb.GetTagsResponse{}
 
 	for _, dbtag := range tags {
 		t := &pb.Tag{
-			ID:    dbtag.ID,
+			Id:    dbtag.ID,
 			Title: dbtag.Title,
 		}
 
@@ -128,15 +129,15 @@ func (api *wackyTrackyClientApi) GetTags(ctx context.Context, req *pb.GetTagsReq
 	return res, nil
 }
 
-func (api *wackyTrackyClientApi) Tag(ctx context.Context, req *pb.TagRequest) (*pb.TagResponse, error) {
+func (api *wackyTrackyClientService) Tag(ctx context.Context, req *pb.TagRequest) (*pb.TagResponse, error) {
 	return nil, nil
 }
 
-func (api *wackyTrackyClientApi) UpdateList(ctx context.Context, req *pb.UpdateListRequest) (*pb.UpdateListResponse, error) {
+func (api *wackyTrackyClientService) UpdateList(ctx context.Context, req *pb.UpdateListRequest) (*pb.UpdateListResponse, error) {
 	return nil, nil
 }
 
-func (api *wackyTrackyClientApi) Init(ctx context.Context, req *pb.InitRequest) (*pb.InitResponse, error) {
+func (api *wackyTrackyClientService) Init(ctx context.Context, req *pb.InitRequest) (*pb.InitResponse, error) {
 	res := &pb.InitResponse{
 		Wallpaper: "wallpaper.jpg",
 	}
@@ -144,7 +145,7 @@ func (api *wackyTrackyClientApi) Init(ctx context.Context, req *pb.InitRequest) 
 	return res, nil
 }
 
-func newServer() *wackyTrackyClientApi {
-	server := wackyTrackyClientApi{}
+func newServer() *wackyTrackyClientService {
+	server := wackyTrackyClientService{}
 	return &server
 }
