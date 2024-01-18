@@ -26,3 +26,4 @@ type DB interface {
 	GetLists() ([]DBList, error)
 	CreateTask(content string) error
 }
+

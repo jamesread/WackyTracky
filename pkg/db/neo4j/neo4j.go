@@ -8,6 +8,8 @@ import (
 	log "github.com/sirupsen/logrus"
 
 	"fmt"
+
+	. "github.com/wacky-tracky/wacky-tracky-server/pkg/runtimeconfig"
 )
 
 var (
@@ -26,9 +28,9 @@ func (self Neo4jDB) Connect() error {
 
 	log.Infof("Connecting to neo4j")
 
-	uri := "bolt://neo4j:7687"
-	username := "neo4j"
-	password := "password"
+	uri := fmt.Sprintf("bolt://%v:%v", RuntimeConfig.Database.Hostname, RuntimeConfig.Database.Port)
+	username := RuntimeConfig.Database.Username
+	password := RuntimeConfig.Database.Password
 
 	var err error
 

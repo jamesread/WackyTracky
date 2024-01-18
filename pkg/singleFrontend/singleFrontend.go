@@ -9,7 +9,22 @@ import (
 	"net/http"
 	"net/http/httputil"
 	"net/url"
+
+	"github.com/wacky-tracky/wacky-tracky-server/pkg/grpcapi"
+
+	"github.com/wacky-tracky/wacky-tracky-server/pkg/db/dummy"
+	"github.com/wacky-tracky/wacky-tracky-server/pkg/db/neo4j"
+	"github.com/wacky-tracky/wacky-tracky-server/pkg/db"
+
 )
+
+func StartServers() {
+	go grpcapi.Start(getNewDatabaseConnection())
+	go startRestGateway()
+	go startWebUIServer()
+
+	startSingleFrontend()
+}
 
 func startSingleFrontend() {
 	log.WithFields(log.Fields{
@@ -43,3 +58,17 @@ func startSingleFrontend() {
 
 	log.Panic(srv.ListenAndServe())
 }
+
+func getNewDatabaseConnection() db.DB {
+	log.WithFields(log.Fields{
+		"Driver": RuntimeConfig.Database.Driver,
+	}).Infof("DB Backend")
+
+	switch RuntimeConfig.Database.Driver {
+	case "neo4j":
+		return neo4j.Neo4jDB{}
+	default:
+		return dummy.Dummy{}
+	}
+}
+

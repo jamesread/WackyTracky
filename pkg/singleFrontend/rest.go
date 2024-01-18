@@ -18,11 +18,6 @@ func startRestGateway() error {
 	defer cancel()
 
 	mux := runtime.NewServeMux(
-		/*
-			runtime.WithMetadata(func(ctx, context.Context, request *http.Request) metadata.MD {
-				return md
-			}
-		*/
 		runtime.WithMarshalerOption("application/json+pretty", &runtime.HTTPBodyMarshaler{
 			Marshaler: &runtime.JSONPb{
 				MarshalOptions: protojson.MarshalOptions{

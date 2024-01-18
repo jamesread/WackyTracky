@@ -16,7 +16,7 @@ var root = &cobra.Command{
 }
 
 func mainRoot(cmd *cobra.Command, args []string) {
-	singleFrontend.StartServers(runtimeconfig.RuntimeConfig.DB)
+	singleFrontend.StartServers()
 }
 
 func disableLogTimestamps() {
@@ -35,14 +35,20 @@ func initViperConfig() {
 
 	if err := viper.ReadInConfig(); err != nil {
 		if _, ok := err.(viper.ConfigFileNotFoundError); ok {
-			// Config file not found; ignore error
+			log.Infof("Config file not found %v", err)
 		} else {
 			log.Errorf("Config file error at startup. %s", err)
 			os.Exit(1)
 		}
+	} else {
+		log.WithFields(log.Fields {
+			"file": viper.ConfigFileUsed(),
+		}).Infof("Starting to read a config")
 	}
 
-	viper.UnmarshalExact(&runtimeconfig.RuntimeConfig)
+	if err := viper.UnmarshalExact(&runtimeconfig.RuntimeConfig); err != nil {
+		log.Fatalf("Config unmarshal error %v", err)
+	}
 }
 
 func main() {
@@ -51,8 +57,6 @@ func main() {
 	log.Info("wacky-tracky")
 
 	initViperConfig()
-
-	root.PersistentFlags().StringVarP(&runtimeconfig.RuntimeConfig.DB, "db", "D", "neo4j", "The database to use")
 
 	root.Execute()
 }

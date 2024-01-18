@@ -5,11 +5,25 @@ type config struct {
 	ListenAddressRest               string
 	ListenAddressWebUI              string
 	ListenAddressSingleHTTPFrontend string
-	DB                              string
+	Database                        *databaseConfig
+}
+
+type databaseConfig struct {
+	Driver   string
+	Hostname string
+	Username string
+	Password string
+	Port     int
 }
 
 var RuntimeConfig = config{
-	DB:                              "",
+	Database: &databaseConfig{
+		Driver: "nodriver",
+		Hostname: "localhost",
+		Username: "user",
+		Password: "pass",
+		Port:     7474,
+	},
 	ListenAddressGrpc:               "0.0.0.0:8083",
 	ListenAddressRest:               "0.0.0.0:8082",
 	ListenAddressWebUI:              "0.0.0.0:8084",
