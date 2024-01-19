@@ -12,10 +12,9 @@ import (
 
 	"github.com/wacky-tracky/wacky-tracky-server/pkg/grpcapi"
 
+	"github.com/wacky-tracky/wacky-tracky-server/pkg/db"
 	"github.com/wacky-tracky/wacky-tracky-server/pkg/db/dummy"
 	"github.com/wacky-tracky/wacky-tracky-server/pkg/db/neo4j"
-	"github.com/wacky-tracky/wacky-tracky-server/pkg/db"
-
 )
 
 func StartServers() {
@@ -66,9 +65,8 @@ func getNewDatabaseConnection() db.DB {
 
 	switch RuntimeConfig.Database.Driver {
 	case "neo4j":
-		return neo4j.Neo4jDB{}
+		return &neo4j.Neo4jDB{}
 	default:
-		return dummy.Dummy{}
+		return &dummy.Dummy{}
 	}
 }
-

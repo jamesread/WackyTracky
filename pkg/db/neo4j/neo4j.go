@@ -152,6 +152,8 @@ func (self Neo4jDB) GetTags() ([]db.DBTag, error) {
 	return ret, nil
 }
 
+func (db Neo4jDB) Print() {}
+
 func (self Neo4jDB) GetLists() ([]db.DBList, error) {
 	log.Infof("getting lists")
 

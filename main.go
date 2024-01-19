@@ -41,7 +41,7 @@ func initViperConfig() {
 			os.Exit(1)
 		}
 	} else {
-		log.WithFields(log.Fields {
+		log.WithFields(log.Fields{
 			"file": viper.ConfigFileUsed(),
 		}).Infof("Starting to read a config")
 	}

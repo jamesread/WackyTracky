@@ -30,6 +30,7 @@ type wackyTrackyClientService struct {
 func Start(newdb db.DB) {
 	dbconn = newdb
 	dbconn.Connect()
+	dbconn.Print()
 
 	log.WithFields(log.Fields{
 		"address": RuntimeConfig.ListenAddressGrpc,

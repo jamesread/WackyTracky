@@ -6,6 +6,7 @@ type config struct {
 	ListenAddressWebUI              string
 	ListenAddressSingleHTTPFrontend string
 	Database                        *databaseConfig
+	WallpaperDirectory              string
 }
 
 type databaseConfig struct {
@@ -18,7 +19,7 @@ type databaseConfig struct {
 
 var RuntimeConfig = config{
 	Database: &databaseConfig{
-		Driver: "nodriver",
+		Driver:   "nodriver",
 		Hostname: "localhost",
 		Username: "user",
 		Password: "pass",
@@ -28,4 +29,5 @@ var RuntimeConfig = config{
 	ListenAddressRest:               "0.0.0.0:8082",
 	ListenAddressWebUI:              "0.0.0.0:8084",
 	ListenAddressSingleHTTPFrontend: "0.0.0.0:8080",
+	WallpaperDirectory:              "/opt/wallpaper/",
 }

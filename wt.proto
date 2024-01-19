@@ -96,7 +96,7 @@ service WackyTrackyClientService {
 
 	rpc ListTasks(ListTasksRequest) returns (ListTasksResponse) {
 		option (google.api.http) = {
-			get: "/api/Task/List"
+			get: "/api/Task/List/{list_id}"
 		};
 	}
 

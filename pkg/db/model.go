@@ -21,9 +21,9 @@ type DBTask struct {
 
 type DB interface {
 	Connect() error
+	Print()
 	GetTags() ([]DBTag, error)
 	GetTasks(listId int32) ([]DBTask, error)
 	GetLists() ([]DBList, error)
 	CreateTask(content string) error
 }
-

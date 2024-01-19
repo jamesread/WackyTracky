@@ -1,6 +1,7 @@
 package dummy
 
 import (
+	log "github.com/sirupsen/logrus"
 	dbconn "github.com/wacky-tracky/wacky-tracky-server/pkg/db"
 )
 
@@ -12,13 +13,13 @@ type Dummy struct {
 	lists []dbconn.DBList
 }
 
-func (db Dummy) Connect() error {
+func (db *Dummy) Connect() error {
 	db.setup()
 
 	return nil
 }
 
-func (db Dummy) setup() {
+func (db *Dummy) setup() {
 	db.tasks = []dbconn.DBTask{
 		dbconn.DBTask{
 			ID:      1,
@@ -51,19 +52,23 @@ func (db Dummy) setup() {
 	}
 }
 
-func (db Dummy) GetTasks(listId int32) ([]dbconn.DBTask, error) {
+func (db *Dummy) Print() {
+	log.Infof("foo %+v", db)
+}
+
+func (db *Dummy) GetTasks(listId int32) ([]dbconn.DBTask, error) {
 	return db.tasks, nil
 }
 
-func (db Dummy) GetTags() ([]dbconn.DBTag, error) {
+func (db *Dummy) GetTags() ([]dbconn.DBTag, error) {
 	return db.tags, nil
 }
 
-func (db Dummy) GetLists() ([]dbconn.DBList, error) {
+func (db *Dummy) GetLists() ([]dbconn.DBList, error) {
 	return db.lists, nil
 }
 
-func (db Dummy) CreateTask(content string) error {
+func (db *Dummy) CreateTask(content string) error {
 	db.tasks = append(db.tasks, dbconn.DBTask{
 		ID:      int32(len(db.tasks) + 1),
 		Content: content,
