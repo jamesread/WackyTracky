@@ -1,4 +1,4 @@
-package singleFrontend
+package http
 
 import (
 	log "github.com/sirupsen/logrus"

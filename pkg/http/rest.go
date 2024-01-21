@@ -1,4 +1,4 @@
-package singleFrontend
+package http
 
 import (
 	"context"
