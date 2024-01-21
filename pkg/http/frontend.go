@@ -1,4 +1,4 @@
-package singleFrontend
+package http
 
 import (
 	. "github.com/wacky-tracky/wacky-tracky-server/pkg/runtimeconfig"

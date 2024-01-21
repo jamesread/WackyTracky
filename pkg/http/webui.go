@@ -44,7 +44,13 @@ func startWebUIServer() {
 
 	mux := http.NewServeMux()
 	mux.Handle("/", http.FileServer(http.Dir(uidir)))
-	mux.Handle("/wallpapers/", http.FileServer(http.Dir(wallpaperDir)))
+
+	wallpaperHandler := http.FileServer(http.Dir(wallpaperDir))
+
+	mux.HandleFunc("/wallpapers/", func(w http.ResponseWriter, r *http.Request) {
+		log.Infof("wallpaper req")
+		wallpaperHandler.ServeHTTP(w, r)
+	})
 
 	srv := &http.Server{
 		Addr:    "0.0.0.0:8084",

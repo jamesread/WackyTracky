@@ -7,7 +7,7 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"github.com/wacky-tracky/wacky-tracky-server/pkg/runtimeconfig"
-	"github.com/wacky-tracky/wacky-tracky-server/pkg/singleFrontend"
+	"github.com/wacky-tracky/wacky-tracky-server/pkg/http"
 )
 
 var root = &cobra.Command{
@@ -16,7 +16,7 @@ var root = &cobra.Command{
 }
 
 func mainRoot(cmd *cobra.Command, args []string) {
-	singleFrontend.StartServers()
+	http.StartServers()
 }
 
 func disableLogTimestamps() {
