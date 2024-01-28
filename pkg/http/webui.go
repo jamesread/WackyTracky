@@ -45,7 +45,7 @@ func startWebUIServer() {
 	mux := http.NewServeMux()
 	mux.Handle("/", http.FileServer(http.Dir(uidir)))
 
-	wallpaperHandler := http.FileServer(http.Dir(wallpaperDir))
+	wallpaperHandler := http.StripPrefix("/wallpapers/", http.FileServer(http.Dir(wallpaperDir)))
 
 	mux.HandleFunc("/wallpapers/", func(w http.ResponseWriter, r *http.Request) {
 		log.Infof("wallpaper req")

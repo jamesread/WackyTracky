@@ -7,3 +7,5 @@ gen
 /wacky-tracky-server
 tmp
 webui
+/config.yaml
+dist/

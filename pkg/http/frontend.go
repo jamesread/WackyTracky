@@ -15,6 +15,7 @@ import (
 	"github.com/wacky-tracky/wacky-tracky-server/pkg/db"
 	"github.com/wacky-tracky/wacky-tracky-server/pkg/db/dummy"
 	"github.com/wacky-tracky/wacky-tracky-server/pkg/db/neo4j"
+	"github.com/wacky-tracky/wacky-tracky-server/pkg/db/yamlfiles"
 )
 
 func StartServers() {
@@ -66,6 +67,8 @@ func getNewDatabaseConnection() db.DB {
 	switch RuntimeConfig.Database.Driver {
 	case "neo4j":
 		return &neo4j.Neo4jDB{}
+	case "yamlfiles":
+		return &yamlfiles.YamlFileDriver{}
 	default:
 		return &dummy.Dummy{}
 	}

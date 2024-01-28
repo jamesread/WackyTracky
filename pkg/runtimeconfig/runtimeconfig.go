@@ -23,7 +23,7 @@ var RuntimeConfig = config{
 		Hostname: "localhost",
 		Username: "user",
 		Password: "pass",
-		Port:     7474,
+		Port:     7687,
 	},
 	ListenAddressGrpc:               "0.0.0.0:8083",
 	ListenAddressRest:               "0.0.0.0:8082",

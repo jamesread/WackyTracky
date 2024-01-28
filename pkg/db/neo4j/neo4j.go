@@ -8,6 +8,7 @@ import (
 	log "github.com/sirupsen/logrus"
 
 	"fmt"
+	"strconv"
 
 	. "github.com/wacky-tracky/wacky-tracky-server/pkg/runtimeconfig"
 )
@@ -26,9 +27,12 @@ func (self Neo4jDB) Connect() error {
 		return nil // FIXME driver might be initialized but stale/disconnected
 	}
 
-	log.Infof("Connecting to neo4j")
-
 	uri := fmt.Sprintf("bolt://%v:%v", RuntimeConfig.Database.Hostname, RuntimeConfig.Database.Port)
+
+	log.WithFields(log.Fields{
+		"uri": uri,
+	}).Infof("Connecting to neo4j")
+
 	username := RuntimeConfig.Database.Username
 	password := RuntimeConfig.Database.Password
 
@@ -57,7 +61,7 @@ func (self Neo4jDB) Connect() error {
 
 	greeting()
 
-	log.Infof("Connected")
+	log.Infof("Connected to neo4j")
 
 	return nil
 }
@@ -165,7 +169,7 @@ func (self Neo4jDB) GetLists() ([]db.DBList, error) {
 		lst := row.Values[0].(dbtype.Node)
 
 		ret = append(ret, db.DBList{
-			ID:         int32(lst.Id),
+			ID:         fmt.Sprintf("%v", lst.Id),
 			Title:      lst.Props["title"].(string),
 			CountTasks: int32(row.Values[1].(int64)),
 		})
@@ -189,20 +193,22 @@ func GetSubItems(itemId int64) []db.DBTask {
 		item := row.Values[0].(dbtype.Node)
 
 		ret = append(ret, db.DBTask{
-			ID: int32(item.Id),
+			ID: fmt.Sprintf("%v", item.Id),
 		})
 	}
 
 	return ret
 }
 
-func (api Neo4jDB) GetTasks(listId int32) ([]db.DBTask, error) {
+func (api Neo4jDB) GetTasks(listId string) ([]db.DBTask, error) {
 	var ret []db.DBTask
 
 	cql := "MATCH (l:List)-[]->(i:Item) OPTIONAL MATCH (i)-->(tv:TagValue) OPTIONAL MATCH (i)-->(subItem:Item) OPTIONAL MATCH (externalItem:ExternalItem) WHERE i = externalItem WITH l, i, count(tv) AS countTagValues, count(subItem) AS countItems, externalItem WHERE id(l) = $listId WITH i, l, countTagValues, countItems, externalItem RETURN i, l, countTagValues, countItems, externalItem ORDER BY id(i)"
 
+	listIdNum, _ := strconv.Atoi(listId)
+
 	params := map[string]any{
-		"listId": listId,
+		"listId": listIdNum,
 	}
 
 	for _, row := range readTxParams(cql, params) {
@@ -212,9 +218,9 @@ func (api Neo4jDB) GetTasks(listId int32) ([]db.DBTask, error) {
 
 		//GetSubItems(x.Id)
 		ret = append(ret, db.DBTask{
-			ID:            int32(task.Id),
+			ID:            fmt.Sprintf("%v", task.Id),
 			Content:       fmt.Sprintf("%v", task.Props["content"]),
-			ParentId:      int32(list.Id),
+			ParentId:      fmt.Sprintf("%v", list.Id),
 			ParentType:    "list",
 			CountSubitems: countSubitems,
 		})

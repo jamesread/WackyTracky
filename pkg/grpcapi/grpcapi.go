@@ -48,7 +48,7 @@ func Start(newdb db.DB) {
 
 	go grpcServer.Serve(lis)
 
-	dbconn.GetTasks(418)
+	dbconn.GetTasks("418")
 }
 
 func (api *wackyTrackyClientService) ListTasks(ctx context.Context, req *pb.ListTasksRequest) (*pb.ListTasksResponse, error) {
@@ -75,6 +75,12 @@ func (api *wackyTrackyClientService) ListTasks(ctx context.Context, req *pb.List
 	return ret, nil
 }
 
+func (api *wackyTrackyClientService) DeleteTask(ctx context.Context, req *pb.DeleteTaskRequest) (*pb.DeleteTaskResponse, error) {
+	ret := &pb.DeleteTaskResponse {}
+
+	return ret, nil
+}
+
 func (api *wackyTrackyClientService) CreateTask(ctx context.Context, req *pb.CreateTaskRequest) (*pb.CreateTaskResponse, error) {
 	dbconn.CreateTask(req.Content)
 
@@ -84,7 +90,11 @@ func (api *wackyTrackyClientService) CreateTask(ctx context.Context, req *pb.Cre
 }
 
 func (api *wackyTrackyClientService) CreateList(ctx context.Context, req *pb.CreateListRequest) (*pb.CreateListResponse, error) {
-	return nil, nil
+	dbconn.CreateList(req.Title)
+
+	res := &pb.CreateListResponse{}
+
+	return res, nil
 }
 
 func (api *wackyTrackyClientService) GetLists(ctx context.Context, req *pb.GetListsRequest) (*pb.GetListsResponse, error) {
