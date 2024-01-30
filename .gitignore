@@ -9,3 +9,5 @@ tmp
 webui
 /config.yaml
 dist/
+wt.crt
+wt.key

@@ -20,3 +20,5 @@ clean:
 	rm -rf ./wt
 	rm -rf gen
 
+certs:
+	openssl req -x509 -newkey rsa:4096 -nodes -keyout wt.key -out wt.crt -days 365

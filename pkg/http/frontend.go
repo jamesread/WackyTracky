@@ -56,7 +56,7 @@ func startSingleFrontend() {
 		Handler: mux,
 	}
 
-	log.Panic(srv.ListenAndServe())
+	log.Panic(srv.ListenAndServeTLS(RuntimeConfig.Cert, RuntimeConfig.Key))
 }
 
 func getNewDatabaseConnection() db.DB {
