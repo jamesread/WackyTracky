@@ -24,11 +24,21 @@ func (db *Dummy) setup() {
 	db.tasks = []dbconn.DBTask{
 		dbconn.DBTask{
 			ID:      "1",
-			Content: "First Task",
+			Content: "First List Task One",
+			ParentType: "list",
+			ParentId: "1",
 		},
 		dbconn.DBTask{
 			ID:      "2",
-			Content: "Second Task",
+			Content: "Second List Task One",
+			ParentType: "list",
+			ParentId: "2", 
+		},
+		dbconn.DBTask{
+			ID: "3",
+			Content: "Second List Task Two",
+			ParentType: "list",
+			ParentId: "2",
 		},
 	}
 
@@ -43,18 +53,28 @@ func (db *Dummy) setup() {
 		dbconn.DBList{
 			ID:         "1",
 			Title:      "First list",
-			CountTasks: 9,
+			CountTasks: 1,
 		},
 		dbconn.DBList{
 			ID:         "2",
 			Title:      "Second list",
-			CountTasks: 4,
+			CountTasks: 2,
 		},
 	}
 }
 
 func (db *Dummy) Print() {
 	log.Infof("foo %+v", db)
+}
+
+func (db *Dummy) GetTask(taskId string) (*dbconn.DBTask, error) {
+	for _, task := range db.tasks {
+		if task.ID == taskId {
+			return &task, nil
+		}
+	}
+
+	return nil, nil
 }
 
 func (db *Dummy) GetTasks(listId string) ([]dbconn.DBTask, error) {
@@ -69,11 +89,22 @@ func (db *Dummy) GetLists() ([]dbconn.DBList, error) {
 	return db.lists, nil
 }
 
-func (db *Dummy) CreateTask(content string) error {
-	db.tasks = append(db.tasks, dbconn.DBTask{
-		ID:      uuid.New().String(),
-		Content: content,
+func (db *Dummy) CreateList(content string) error {
+	db.lists = append(db.lists, dbconn.DBList{
+		ID: uuid.New().String(),
+		Title: content,
 	})
 
 	return nil
+}
+
+func (db *Dummy) CreateTask(content string) (string, error) {
+	id := uuid.New().String()
+
+	db.tasks = append(db.tasks, dbconn.DBTask{
+		ID:      id,
+		Content: content,
+	})
+
+	return id, nil
 }

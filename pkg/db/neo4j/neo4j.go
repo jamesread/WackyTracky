@@ -5,6 +5,8 @@ import (
 	"github.com/neo4j/neo4j-go-driver/v5/neo4j/dbtype"
 	db "github.com/wacky-tracky/wacky-tracky-server/pkg/db"
 
+	"github.com/google/uuid"
+
 	log "github.com/sirupsen/logrus"
 
 	"fmt"
@@ -200,6 +202,10 @@ func GetSubItems(itemId int64) []db.DBTask {
 	return ret
 }
 
+func (api Neo4jDB) GetTask(listId string) (*db.DBTask, error) {
+	return nil, nil
+}
+
 func (api Neo4jDB) GetTasks(listId string) ([]db.DBTask, error) {
 	var ret []db.DBTask
 
@@ -232,4 +238,10 @@ func (api Neo4jDB) GetTasks(listId string) ([]db.DBTask, error) {
 	}).Infof("Got items from list")
 
 	return ret, nil
+}
+
+func (api Neo4jDB) CreateTask(title string) (string, error) {
+	id := uuid.New().String()
+
+	return id, nil
 }

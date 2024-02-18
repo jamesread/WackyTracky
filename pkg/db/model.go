@@ -23,8 +23,9 @@ type DB interface {
 	Connect() error
 	Print()
 	GetTags() ([]DBTag, error)
+	GetTask(id string) (*DBTask, error)
 	GetTasks(listId string) ([]DBTask, error)
 	GetLists() ([]DBList, error)
-	CreateTask(content string) error
+	CreateTask(content string) (string, error)
 	CreateList(content string) error
 }

@@ -84,7 +84,11 @@ func (api *wackyTrackyClientService) DeleteTask(ctx context.Context, req *pb.Del
 func (api *wackyTrackyClientService) CreateTask(ctx context.Context, req *pb.CreateTaskRequest) (*pb.CreateTaskResponse, error) {
 	dbconn.CreateTask(req.Content)
 
-	res := &pb.CreateTaskResponse{}
+
+
+	res := &pb.CreateTaskResponse{
+
+	}
 
 	return res, nil
 }

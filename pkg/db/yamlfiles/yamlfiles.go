@@ -63,16 +63,19 @@ func (drv *YamlFileDriver) Connect() error {
 func (drv *YamlFileDriver) Print() {
 }
 
-func (drv *YamlFileDriver) CreateTask(content string) error {
+func (drv *YamlFileDriver) CreateTask(content string) (string, error) {
+	id := uuid.New().String()
+
 	task := db.DBTask {
 		Content: content,
+		ID: id,
 	}
 
 	tasks = append(tasks, task)
 
 	save(filenameTasks, tasks)
 
-	return nil
+	return id, nil
 }
 
 func (drv *YamlFileDriver) GetLists() ([]db.DBList, error) {
@@ -81,6 +84,14 @@ func (drv *YamlFileDriver) GetLists() ([]db.DBList, error) {
 
 func (drv *YamlFileDriver) GetTags() ([]db.DBTag, error) {
 	return tags, nil
+}
+
+func (drv *YamlFileDriver) GetTask(taskId string) (*db.DBTask, error) {
+	task := &db.DBTask {
+
+	}
+
+	return task, nil
 }
 
 func (drv *YamlFileDriver) GetTasks(listId string) ([]db.DBTask, error) {

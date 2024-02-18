@@ -28,6 +28,7 @@ message CreateTaskRequest {
 }
 
 message CreateTaskResponse {
+	Task task = 1;
 }
 
 message DeleteTaskRequest {
