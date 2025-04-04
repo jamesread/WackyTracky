@@ -18,6 +18,6 @@ jobs:
           go-version: '1.22'
 
       - name: Build
-        run: make -w grpc default webui
+        run: make -w default webui
         env:
           GH_TOKEN: ${{ github.token }}
