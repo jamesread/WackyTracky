@@ -1,8 +1,10 @@
+default: service frontend
+
 service:
 	$(MAKE) -wC service
 
-webui:
-	gh run download -R wacky-tracky/wacky-tracky-client-html5 --name 'wt-webui' -D webui
+frontend:
+	$(MAKE) -wC frontend
 
 go-tools:
 	go install "github.com/bufbuild/buf/cmd/buf"
@@ -13,12 +15,7 @@ go-tools:
 	go install "google.golang.org/grpc/cmd/protoc-gen-go-grpc"
 	go install "google.golang.org/protobuf/cmd/protoc-gen-go"
 
-grpc: go-tools
-	buf generate
-
-clean:
-	rm -rf ./wt
-	rm -rf gen
-
 certs:
 	openssl req -x509 -newkey rsa:4096 -nodes -keyout wt.key -out wt.crt -days 365
+
+.PHONY: default service frontend go-tools certs
