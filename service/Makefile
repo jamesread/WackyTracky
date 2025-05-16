@@ -1,4 +1,7 @@
-default:
+cicd: build
+        rm wacky-tracky-server
+
+build:
 	go build
 
 codestyle:
