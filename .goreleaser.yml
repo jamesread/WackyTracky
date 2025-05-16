@@ -4,8 +4,7 @@ before:
   hooks:
     - go mod download
 builds:
-  - env:
-      - CGO_ENABLED=0
+  - env: [CGO_ENABLED=0]
     goos:
       - linux
 
@@ -15,7 +14,11 @@ builds:
     main: main.go
 
     ldflags:
-      - -s -w -X buildinfo.Version={{.Version}} -X buildinfo.Commit={{.ShortCommit}} -X buildinfo.Date={{ .CommitDate }}
+      - >
+        -s -w
+        -X buildinfo.Version={{.Version}}
+        -X buildinfo.Commit={{.ShortCommit}}
+        -X buildinfo.Date={{ .CommitDate }}
 
 checksum:
   name_template: 'checksums.txt'
@@ -57,7 +60,7 @@ dockers:
       - "--label=org.opencontainers.image.revision={{.FullCommit}}"
       - "--label=org.opencontainers.image.version={{.Tag}}"
     extra_files:
-      - webui
+      - frontend/dist
 
 release:
   footer: |

@@ -1,5 +1,5 @@
-default: grpc
-	go build
+service:
+	$(MAKE) -wC service
 
 webui:
 	gh run download -R wacky-tracky/wacky-tracky-client-html5 --name 'wt-webui' -D webui
