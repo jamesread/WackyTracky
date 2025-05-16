@@ -1,31 +1,77 @@
 ---
-project_name: wacky-tracky-server
-before:
-  hooks:
-    - go mod download
+# yaml-language-server: $schema=https://goreleaser.com/static/schema.json
+# vim: set ts=2 sw=2 tw=0 fo=cnqoj
+
+version: 2
+
+project_name: wacky-tracky
 builds:
-  - env: [CGO_ENABLED=0]
-    goos:
-      - linux
-
-    goarch:
-      - amd64
-
+  - id: wacky-tracky
+    dir: service
     main: main.go
-
+    binary: wacky-tracky
+    env: [CGO_ENABLED=0]
+    goos: [linux]
+    goarch: [amd64, arm64]
     ldflags:
       - >
         -s -w
-        -X buildinfo.Version={{.Version}}
-        -X buildinfo.Commit={{.ShortCommit}}
-        -X buildinfo.Date={{ .CommitDate }}
+        -X 'github.com/wacky-tracky/wacky-tracky-server/internal/buildinfo.Commit={{.Commit}}'
+        -X 'github.com/wacky-tracky/wacky-tracky-server/internal/buildinfo.BuildDate={{.Date}}'
+        -X 'github.com/wacky-tracky/wacky-tracky-server/internal/buildinfo.Version={{.Version}}'
+
+dockers:
+  - dockerfile: Dockerfile
+    image_templates:
+      - "ghcr.io/wacky-tracky/wacky-tracky-server:{{ .Tag }}-arm64"
+    goarch: arm64
+    use: buildx
+    build_flag_templates:
+      - "--platform=linux/amd64"
+      - "--label=org.opencontainers.image.revision={{.FullCommit}}"
+      - "--label=org.opencontainers.image.version={{.Tag}}"
+    extra_files:
+      - README.md
+      - frontend/dist
+
+  - dockerfile: Dockerfile
+    image_templates:
+      - "ghcr.io/wacky-tracky/wacky-tracky-server:{{ .Tag }}-amd64"
+    goarch: amd64
+    use: buildx
+    build_flag_templates:
+      - "--platform=linux/amd64"
+      - "--label=org.opencontainers.image.revision={{.FullCommit}}"
+      - "--label=org.opencontainers.image.version={{.Tag}}"
+    extra_files:
+      - README.md
+      - frontend/dist
+
+docker_manifests:
+  - name_template: ghcr.io/wacky-tracky/wacky-tracky-server:{{ .Version }}
+    image_templates:
+      - ghcr.io/wacky-tracky/wacky-tracky-server:{{ .Version }}-amd64
+      - ghcr.io/wacky-tracky/wacky-tracky-server:{{ .Version }}-arm64
+
+  - name_template: ghcr.io/wacky-tracky/wacky-tracky-server:latest
+    image_templates:
+      - ghcr.io/wacky-tracky/wacky-tracky-server:{{ .Version }}-amd64
+      - ghcr.io/wacky-tracky/wacky-tracky-server:{{ .Version }}-arm64
+
 
 checksum:
   name_template: 'checksums.txt'
 snapshot:
   name_template: "{{ .Branch }}-{{ .ShortCommit }}"
+
 changelog:
   sort: asc
+  filters:
+    exclude:
+      - '^docs:'
+      - '^test:'
+      - '^cicd:'
+      - '^refactor:'
   groups:
     - title: 'Security'
       regexp: '^.*?security(\([[:word:]]+\))??!?:.+$'
@@ -38,29 +84,6 @@ changelog:
       order: 2
     - title: Others
       order: 999
-  filters:
-    exclude:
-      - '^docs:'
-      - '^test:'
-      - '^cicd:'
-      - '^refactor:'
-
-archives: []
-
-dockers:
-  - image_templates:
-      - "ghcr.io/wacky-tracky/wacky-tracky-server:{{ .Tag }}-amd64"
-      - "ghcr.io/wacky-tracky/wacky-tracky-server:latest"
-    dockerfile: Dockerfile
-    goos: linux
-    goarch: amd64
-    skip_push: false
-    build_flag_templates:
-      - "--platform=linux/amd64"
-      - "--label=org.opencontainers.image.revision={{.FullCommit}}"
-      - "--label=org.opencontainers.image.version={{.Tag}}"
-    extra_files:
-      - frontend/dist
 
 release:
   footer: |
