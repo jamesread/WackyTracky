@@ -21,7 +21,7 @@
   },
   "homepage": "https://github.com/wacky-tracky/wacky-tracky-client-html5#readme",
   "devDependencies": {
-    "eslint": "^9.26.0",
+    "eslint": "^9.27.0",
     "vite": "^6.3.5"
   },
   "browserslist": [
