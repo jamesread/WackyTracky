@@ -12,3 +12,5 @@ Track things.
 ## TODO
 
 This project is a work in progress.
+
+This version requires a neo4j database. 
