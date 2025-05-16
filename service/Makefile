@@ -1,5 +1,5 @@
 cicd: build
-        rm wacky-tracky-server
+	rm wacky-tracky-server
 
 build:
 	go build
