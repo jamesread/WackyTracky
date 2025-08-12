@@ -6,7 +6,7 @@ export class UiManager {
   constructor () {
     window.selectedItem = null
 
-    setupDefaultContextMenuAction()
+//    setupDefaultContextMenuAction()
   }
 
   loadListFromHash () {
@@ -45,6 +45,7 @@ export class UiManager {
   }
 
   onBootloaderSuccess (init) {
+    /*
     document.querySelector('#initMessages').remove()
 
     if (init.wallpaper !== null) {
@@ -60,6 +61,7 @@ export class UiManager {
     } else {
       window.loginForm.show()
     }
+    */
   }
 
   onBootloaderOffline () {
@@ -77,13 +79,17 @@ export class UiManager {
   }
 
   setupMainView () {
+    this.taskInput = document.createElement('task-input-box')
+    this.taskInput.setupComponents()
+    document.getElementById('slot-task-input').appendChild(this.taskInput)
+
     window.sidepanel = document.createElement('side-panel')
     window.sidepanel.setupElements()
-    document.body.appendChild(window.sidepanel)
+    document.getElementById('slot-side-panel').appendChild(window.sidepanel)
 
     window.content = document.createElement('content-panel')
     window.content.setupComponents()
-    document.body.appendChild(window.content)
+    document.getElementById('slot-content').appendChild(window.content)
 
     // Fetch tags, then lists, because List->Tasks need Tags to be available.
     this.refreshTags(false)

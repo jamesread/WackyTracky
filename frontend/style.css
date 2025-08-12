@@ -126,6 +126,8 @@ aside {
 	min-width: 200px;
 	resize: horizontal;
 	user-select: none;
+	display: flex;
+	flex-direction: column;
 }
 
 aside #sidepanelMenuButton, .sidePanelToggleButton {
@@ -337,6 +339,7 @@ ul#taskList {
 *[role="toolbar"] {
 	display: flex;
 	align-items: center;
+	padding: .2em;
 }
 
 button {
@@ -445,9 +448,10 @@ div#listContainer {
 	margin-top: 3em;
 }
 
-#tagList ul.tagList {
+#tagList {
 	margin: 0;
 	padding: 0;
+	flex-grow: 1;
 }
 
 #tagList ul.tagList li {
@@ -750,6 +754,12 @@ div.subListItems {
 	padding: .3em;
 	font-weight: bold;
 	cursor: pointer;
+	display: flex;
+	flex-direction: row;
+}
+
+.subListTitle span:nth-child(2) {
+	flex-grow: 1;
 }
 
 .subListTitle:hover {

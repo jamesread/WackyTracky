@@ -6,7 +6,7 @@ export class TaskInputBox extends HTMLElement {
 
     this.setAttribute("role", "none");
 
-    this.dom = document.createElement("header");
+    this.dom = document.createElement("div");
     this.dom.title = "Task Input Header";
     this.appendChild(this.dom);
 
@@ -25,8 +25,6 @@ export class TaskInputBox extends HTMLElement {
     this.domInput.value = ""
     this.domInput.disabled = true;
     this.dom.appendChild(this.domInput);
-
-    this.dom.prepend(window.sidepanel.getToggleButton());
 
     this.domInput.onkeypress = (e) => {
       var key = e.keyCode ? e.keyCode : e.which;

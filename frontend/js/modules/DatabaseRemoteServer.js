@@ -21,6 +21,8 @@ export class DatabaseRemoteServer {
     window.sidepanel.clearTags() // FIXME
 
     let json = await window.client.getTags({})
+    
+    console.log("fetchTags", json)
 
     window.dbal.local.addTagsFromServer(json)
   }

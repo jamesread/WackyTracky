@@ -10,11 +10,12 @@
 
 	<link rel="manifest" href = "wt.webmanifest" />
 	<link rel="canonical" href = "https://web.wacky-tracky.com" />
-	<link rel="stylesheet" href = "style.css" />
 	<link rel="shortcut icon" href = "resources/images/logos/wacky-tracky.png" type = "image/png" />
 </head>
 
 <body>
+	<slot id = "slot-app" />
+
 	<div id = "initMessages" style = "text-align: center; flex: 1 1 auto;">
 		<noscript>Javascript is needed.</noscript>
 		<div id = "bootMessage" style = "background-color: white; padding: 1em; font-weight: bold; margin-top: 1em;">

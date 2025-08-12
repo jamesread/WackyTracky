@@ -92,6 +92,10 @@ export class DatabaseIndexedDB {
     req.put(jsonList)
   }
 
+  addTagsFromServer (res) {
+    res.tags.map(x => this.addTagFromServer(x))
+  }
+
   addTagFromServer (jsonTag) {
     const [, req] = this.dbTx('tags')
 

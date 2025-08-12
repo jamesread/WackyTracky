@@ -137,21 +137,20 @@ func readTxParams(cql string, params map[string]any) []*neo4j.Record {
 func (self Neo4jDB) GetTags() ([]db.DBTag, error) {
 	var ret []db.DBTag
 
-	//cql := "MATCH (t:Tag) RETURN t"
+	cql := "MATCH (t:Tag) RETURN t"
 
-	//readTx(cql);
-	/*
-		for _, tag := range readTx(cql) {
-			log.Infof("tag props %+v", tag.Props)
+	for _, tagrow := range readTx(cql) {
+		tag := tagrow.Values[0].(dbtype.Node)
 
-			dbtag := db.DBTag{
-				ID:    int32(tag.Id),
-				Title: tag.Props["title"].(string),
-			}
+		log.Infof("tag props %+v", tag.Props)
 
-			ret = append(ret, dbtag)
+		dbtag := db.DBTag{
+			ID:    tag.ElementId,
+			Title: tag.Props["title"].(string),
 		}
-	*/
+
+		ret = append(ret, dbtag)
+	}
 
 	log.Infof("tags: %+v", ret)
 
@@ -165,7 +164,7 @@ func (self Neo4jDB) GetLists() ([]db.DBList, error) {
 
 	var ret []db.DBList
 
-	cql := "MATCH (l:List) OPTIONAL MATCH (l)-->(i:Item)  RETURN l, count(i) as countItems"
+	cql := "MATCH (l:List) OPTIONAL MATCH (l)-->(i:Item)  RETURN l, count(i) as countItems ORDER BY l.title"
 
 	for _, row := range readTx(cql) {
 		lst := row.Values[0].(dbtype.Node)
