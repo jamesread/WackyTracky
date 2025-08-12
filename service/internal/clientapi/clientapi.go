@@ -50,14 +50,8 @@ func (api *wackyTrackyClientService) ListTasks(ctx context.Context, req *connect
 	var err error
 
 	if req.Msg.ParentType == "task" {
-		parentId := req.Msg.ParentId
-
-		log.Infof("ListTasks item: %+v", api.dbconn)
-
-		items, err = api.dbconn.GetSubtasks(parentId)
+		items, err = api.dbconn.GetSubtasks(req.Msg.ParentId)
 	} else if req.Msg.ParentType == "list" {
-		log.Infof("ListTasks list: %+v", api.dbconn)
-
 		items, err = api.dbconn.GetTasks(req.Msg.ParentId)
 	} else {
 		log.Infof("Unknown parent type: %s", req.Msg.ParentType)

@@ -8,10 +8,11 @@ import (
 
 func findWebUIDir() string {
 	directoriesToSearch := []string{
-		"../webui/",
+		"../frontend/dist/",
+		"/app/webui/",
 		"../../wacky-tracky-client-html5/src/dist/",
 		"../../../wacky-tracky-client-html5/src/dist/",
-		"/usr/share/wacky-tracky/webui/",
+		"/usr/share/wacky-tracky/frontend/",
 	}
 
 	for i := 0; i < len(directoriesToSearch); i++ {
@@ -19,6 +20,8 @@ func findWebUIDir() string {
 			return directoriesToSearch[i]
 		}
 	}
+
+	log.Warnf("WebUI directory not found in any of the expected locations. Defaulting to ./webui")
 
 	return "./webui"
 }

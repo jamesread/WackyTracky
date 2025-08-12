@@ -1,5 +1,5 @@
 <div align = "center">
-  <img alt = "project logo" src = "logo.png" width = "128" />
+  <img alt = "project logo" src = "var/logo.png" width = "128" />
   <h1>wacky-tracky-server</h1>
 
 Track things.
@@ -12,3 +12,5 @@ Track things.
 ## TODO
 
 This project is a work in progress.
+
+This version requires a neo4j database. 

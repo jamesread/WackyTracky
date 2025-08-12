@@ -9,7 +9,7 @@ builds:
   - id: wacky-tracky
     dir: service
     main: main.go
-    binary: wacky-tracky
+    binary: wacky-tracky-server
     env: [CGO_ENABLED=0]
     goos: [linux]
     goarch: [amd64, arm64]
