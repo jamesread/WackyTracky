@@ -66,7 +66,7 @@ export class PopupMenu extends HTMLElement {
 			return false;
 		};
 
-		owner.addEventListener('click', clickCallback);
+//		owner.addEventListener('click', clickCallback);
 		//owner.attr('oncontextmenu', 'return false;');
 	}
 

@@ -1,5 +1,3 @@
-import { isNarrowScreen } from '../../firmware/util.js'
-
 export class SidePanelListButton extends window.HTMLElement {
   setFields (list) {
     this.list = list
@@ -30,10 +28,6 @@ export class SidePanelListButton extends window.HTMLElement {
     this.setCallback(() => {
       if (window.selectedItem != null) {
         window.selectedItem.deselect()
-      }
-
-      if (isNarrowScreen()) {
-        window.sidepanel.toggle()
       }
 
       document.title = mdlList.getTitle()

@@ -11,6 +11,8 @@ const iconTag = '&nbsp&nbsp&#x1F4D1&nbsp'
 export class SidePanel extends HTMLElement {
   setupElements () {
     this.dom = document.createElement('aside')
+    this.dom.classList.add('shown');
+    this.dom.classList.add('stuck');
     this.dom.setAttribute('title', 'Side Panel')
     this.appendChild(this.dom)
 
@@ -51,7 +53,10 @@ export class SidePanel extends HTMLElement {
     this.domButtonNewList.onclick = () => { this.createList() }
 
     this.domButtonRefresh = this.querySelector('button#refresh')
-    this.domButtonRefresh.onclick = () => { window.uimanager.refreshLists(true) }
+    this.domButtonRefresh.onclick = () => { 
+      window.uimanager.refreshLists(true) 
+      window.uimanager.refreshTags(true)
+    }
 
     this.domButtonIssue = this.querySelector('button#raiseIssue')
     this.domButtonIssue.onclick = () => { window.open('http://github.com/wacky-tracky/wacky-tracky-client-html5/issues/new') }
@@ -155,6 +160,11 @@ export class SidePanel extends HTMLElement {
 
         sublist.appendChild(title)
         sublist.appendChild(sublistItems)
+
+        const subitemCount = document.createElement('span')
+        subitemCount.classList.add('subtle')
+        subitemCount.innerText = menuItem.list.getCountItems()
+        title.appendChild(subitemCount)
 
         owner = sublistItems
       } else {

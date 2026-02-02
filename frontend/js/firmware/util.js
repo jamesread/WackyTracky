@@ -8,10 +8,6 @@ HTMLElement.prototype.onEnter = function(callback) {
   })
 }
 
-export function isNarrowScreen() {
-  return window.innerWidth < 1000
-}
-
 export function registerSuccess() {
   notification('good', 'Thanks for registering, you can now login!')
 
@@ -267,6 +263,8 @@ export function setupDefaultContextMenuAction() {
 }
 
 
+/*
 document.addEventListener("click", () => {
   closePopupMenus()
 })
+*/

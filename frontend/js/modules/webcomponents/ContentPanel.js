@@ -4,11 +4,8 @@ import './ListControls.js'
 export class ContentPanel extends window.HTMLElement {
   setupComponents () {
     this.title = 'Content Panel'
+    this.id = 'layout'
     this.setAttribute('role', 'region')
-
-    this.taskInput = document.createElement('task-input-box')
-    this.taskInput.setupComponents()
-    this.appendChild(this.taskInput)
 
     this.domView = document.createElement('main')
     this.domView.title = 'Currently selected list contents'
@@ -39,14 +36,14 @@ export class ContentPanel extends window.HTMLElement {
 
     this.domView.appendChild(listControls)
 
-    this.taskInput.enable()
+//    this.taskInput.enable()
   }
 
   setTab (tab) {
     this.clear()
 
     this.domView.appendChild(tab)
-    this.taskInput.disable()
+//    this.taskInput.disable()
   }
 
   clear () {

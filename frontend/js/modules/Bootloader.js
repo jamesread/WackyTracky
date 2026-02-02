@@ -28,10 +28,6 @@ export class Bootloader {
   setupClient() {
     let baseUrl = '/api/'
 
-    if (window.location.port === '5173') {
-      baseUrl = 'http://localhost:8080/api'
-    }
-
     window.transport = createConnectTransport({
       baseUrl: baseUrl,
     })
