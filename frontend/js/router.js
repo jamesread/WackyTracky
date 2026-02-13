@@ -5,18 +5,20 @@ import ListView from '../resources/vue/views/ListView.vue';
 
 const routes = [
   {
+    name: 'Welcome',
     path: '/',
     component: Welcome,
   },
   {
+    name: 'List',
     path: '/lists/:listId',
     component: ListView,
     props: true,
     meta: {
       breadcrumbs: (route) => {
         return [
-          { name: 'Home', to: '/' },
-          { name: 'List: ' + String(route.params.listId), to: '/lists/:listId' }
+          { name: 'Home', href: '/' },
+          { name: 'List: ' + String(route.params.listId), href: '/lists/' + route.params.listId }
         ];
       }
     }
