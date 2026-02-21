@@ -5,7 +5,9 @@ import { Settings01Icon } from '@hugeicons/core-free-icons';
 
 import Welcome from '../resources/vue/views/Welcome.vue';
 import ListView from '../resources/vue/views/ListView.vue';
+import NavOptions from '../resources/vue/components/NavOptions.vue';
 import Options from '../resources/vue/views/Options.vue';
+import Diagnostics from '../resources/vue/views/Diagnostics.vue';
 
 const routes = [
   {
@@ -50,11 +52,29 @@ const routes = [
     }
   },
   {
-    name: 'Options',
+    name: 'NavOptions',
     path: '/options',
-    component: Options,
+    component: NavOptions,
     meta: {
       title: 'Options',
+      icon: Settings01Icon,
+    }
+  },
+  {
+    name: 'Settings',
+    path: '/settings',
+    component: Options,
+    meta: {
+      title: 'Settings',
+      icon: Settings01Icon,
+    }
+  },
+  {
+    name: 'Diagnostics',
+    path: '/diagnostics',
+    component: Diagnostics,
+    meta: {
+      title: 'Diagnostics',
       icon: Settings01Icon,
     }
   }

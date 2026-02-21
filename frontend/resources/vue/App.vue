@@ -61,6 +61,9 @@
 			</div>
 		</template>
 	</Header>
+	<div v-if="navOptionsOpen" class="nav-options-overlay" @click.self="navOptionsOpen = false">
+		<NavOptions @close="navOptionsOpen = false" />
+	</div>
 	<div v-if="repoStatusModal" class="repo-status-overlay" @click.self="repoStatusModal = null">
 		<div class="repo-status-dialog" role="dialog" aria-labelledby="repo-status-title" aria-modal="true">
 			<h2 id="repo-status-title" class="repo-status-title">Repo status (todotxt directory)</h2>
@@ -540,8 +543,12 @@ async function getLists() {
 			path: `/lists/${list.id}`,
 			to: `/lists/${list.id}`,
 			icon: PinIcon,
+			type: 'route',
 		});
 	}
+	navigation.value.addSeparator('nav-settings');
+	navigation.value.addRouterLink('Settings', 'Settings');
+	navigation.value.addRouterLink('Diagnostics', 'Diagnostics');
 }
 
 function goToOptions() {
