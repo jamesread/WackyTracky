@@ -17,6 +17,7 @@ WORKDIR /app
 ENV DATABASE_DRIVER=todotxt
 ENV DATABASE_DATABASE=/app/data
 
+RUN microdnf install -y git && microdnf clean all
 RUN mkdir -p /config /app/data
 VOLUME ["/config", "/app/data"]
 
