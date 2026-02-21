@@ -46,6 +46,13 @@ message DoneTaskRequest {
 
 message DoneTaskResponse {}
 
+message MoveTaskRequest {
+	string task_id = 1;
+	string target_list_id = 2;
+}
+
+message MoveTaskResponse {}
+
 // Task metadata (e.g. notes) — optional per driver
 message GetTaskMetadataRequest {
 	string task_id = 1;
@@ -213,6 +220,8 @@ service WackyTrackyClientService {
 	rpc UpdateTask(UpdateTaskRequest) returns (UpdateTaskResponse) {}
 
 	rpc DoneTask(DoneTaskRequest) returns (DoneTaskResponse) {}
+
+	rpc MoveTask(MoveTaskRequest) returns (MoveTaskResponse) {}
 
 	rpc CreateList(CreateListRequest) returns (CreateListResponse) {}
 

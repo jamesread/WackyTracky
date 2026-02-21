@@ -42,3 +42,12 @@ func TestRuleTest_CompilesAndResult(t *testing.T) {
 	require.NoError(t, err)
 	assert.True(t, result)
 }
+
+func TestRun_NonBoolReturnsFalse(t *testing.T) {
+	program, err := Compile("H")
+	require.NoError(t, err)
+	env := RuleEnv{D: "Sat", H: 14, M: 30}
+	result, err := Run(program, env)
+	require.NoError(t, err)
+	assert.False(t, result)
+}

@@ -1,6 +1,5 @@
 <template>
-	<section class="options-view">
-		<h2>Options</h2>
+	<Section title="Settings">
 		<div class="options-section">
 			<h3 class="options-subheading">Keyboard shortcuts</h3>
 			<p class="options-hint">View and use keyboard shortcuts from the list view.</p>
@@ -26,11 +25,12 @@
 				How due dates and "wait until" times are shown in the task list and details.
 			</p>
 		</div>
-	</section>
+	</Section>
 </template>
 
 <script setup>
 import { inject } from 'vue';
+import Section from 'picocrank/vue/components/Section.vue';
 import { useSettings } from '../composables/useSettings.js';
 
 const openShortcutsDialog = inject('openShortcutsDialog', () => {});
@@ -41,13 +41,6 @@ const {
 </script>
 
 <style scoped>
-.options-view {
-	padding: 1.5rem;
-}
-.options-view h2 {
-	margin: 0 0 1rem 0;
-	font-size: 1.25rem;
-}
 .options-section {
 	margin-bottom: 1.25rem;
 }

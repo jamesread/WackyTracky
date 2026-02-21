@@ -1,4 +1,7 @@
 <template>
+	<div v-if="!isOnline" class="offline-banner" role="status" aria-live="polite">
+		You are offline. Editing and adding tasks (inbox only) are saved locally and will sync when you reconnect.
+	</div>
 	<Header
 		ref="headerRef"
 		title="WackyTracky"
@@ -20,31 +23,39 @@
 					@keydown.enter="onToolbarKeydownEnter"
 					@keydown.escape="onToolbarKeydownEscape"
 				/>
-				<button
-					v-if="!searchMode && !editingTaskId"
-					type="button"
-					class="toolbar-submit-btn"
-					:disabled="submittingTask"
-					@click="submitTask"
-				>
-					<span v-if="submittingTask" class="toolbar-submit-spinner" aria-hidden="true"></span>
-					<span v-else>Add</span>
-				</button>
 			</div>
-			<div v-if="searchMode" class="toolbar-saved-searches">
-				<button
-					v-for="s in savedSearches"
-					:key="s.id"
-					type="button"
-					class="saved-search-btn"
-					@click="runSavedSearch(s.query)"
-					@contextmenu.prevent="onSavedSearchContextMenu(s)"
-				>
-					{{ s.name }}
-				</button>
-				<button type="button" class="toolbar-submit-btn" @click="saveCurrentSearch">
-					Save this search
-				</button>
+			<div v-if="searchMode && isOnline" ref="savedSearchSelectRef" class="toolbar-saved-searches toolbar-saved-searches-select">
+				<div class="saved-search-select-trigger" tabindex="0" :class="{ open: savedSearchDropdownOpen }" @click="savedSearchDropdownOpen = !savedSearchDropdownOpen" @keydown.enter.prevent="savedSearchDropdownOpen = !savedSearchDropdownOpen" @keydown.space.prevent="savedSearchDropdownOpen = !savedSearchDropdownOpen" @keydown.down.prevent="openSavedSearchDropdownAndFocusFilter" role="combobox" :aria-expanded="savedSearchDropdownOpen" aria-haspopup="listbox" :aria-label="selectedSavedSearch ? selectedSavedSearch.name : 'Saved searches'">
+					<span class="saved-search-select-value">{{ selectedSavedSearch ? selectedSavedSearch.name : 'Saved searches…' }}</span>
+				</div>
+				<div v-if="savedSearchDropdownOpen" class="saved-search-select-dropdown" role="listbox">
+					<input
+						ref="savedSearchFilterInputRef"
+						v-model="savedSearchFilter"
+						type="text"
+						class="saved-search-select-filter"
+						placeholder="Filter saved searches…"
+						@keydown.escape="savedSearchDropdownOpen = false"
+						@keydown.stop
+					/>
+					<ul class="saved-search-select-list">
+						<li
+							v-for="s in filteredSavedSearches"
+							:key="s.id"
+							role="option"
+							:aria-selected="currentSearchQuery === s.query"
+							class="saved-search-select-option"
+							@click="selectSavedSearch(s)"
+							@contextmenu.prevent="onSavedSearchContextMenu(s)"
+						>
+							{{ s.name }}
+						</li>
+						<li v-if="filteredSavedSearches.length === 0" class="saved-search-select-empty">No saved searches match</li>
+					</ul>
+					<button type="button" class="saved-search-select-save-btn" @click="saveCurrentSearchFromSelect">
+						Save this search
+					</button>
+				</div>
 			</div>
 		</template>
 		<template #user-info>
@@ -53,7 +64,7 @@
 					<HugeiconsIcon :icon="displayModeIcon" width="1.1em" height="1.1em" />
 					<span class="display-mode-label">{{ displayModeLabel }}</span>
 				</button>
-				<button type="button" class="options-btn repo-status-btn" @click="showRepoStatus" title="Git status of todotxt directory" aria-label="Repo status">
+				<button type="button" class="options-btn repo-status-btn" :disabled="!isOnline" @click="showRepoStatus" title="Git status of todotxt directory (requires network)" aria-label="Repo status">
 					<HugeiconsIcon :icon="GitBranchIcon" width="1.1em" height="1.1em" />
 				</button>
 				<button type="button" class="options-btn options-settings-btn" @click="goToOptions" title="Options" aria-label="Options">
@@ -114,6 +125,8 @@
 				<section class="shortcuts-section">
 					<h3 class="shortcuts-section-title">Search</h3>
 					<dl class="shortcuts-list">
+						<dt><kbd>Ctrl</kbd> + <kbd>K</kbd></dt>
+						<dd>Focus toolbar input, or cycle mode (add task ↔ search) when already focused</dd>
 						<dt><kbd>Ctrl</kbd> + <kbd>F</kbd></dt>
 						<dd>Focus search</dd>
 					</dl>
@@ -203,9 +216,23 @@ import { HugeiconsIcon } from '@hugeicons/vue';
 import Header from 'picocrank/vue/components/Header.vue';
 import Navigation from 'picocrank/vue/components/Navigation.vue';
 import { GitBranchIcon, PinIcon, Settings01Icon, Folder01Icon, PlayIcon, AlarmClockIcon } from '@hugeicons/core-free-icons';
+import { useOffline } from './composables/useOffline.js';
+import {
+	addOfflineTask,
+	setOfflineEdit,
+	removeOfflineTask,
+	removeOfflineEdit,
+	getOfflineTasks,
+	getOfflineEdits,
+	setCachedInbox,
+	getCachedInbox,
+	generateOfflineTaskId,
+	INBOX_LIST_ID,
+} from '../../js/modules/offlineStorage.js';
 
 const router = useRouter();
 const route = useRoute();
+const { isOnline } = useOffline();
 const navigation = ref(null);
 const headerRef = ref(null);
 const taskInputRef = ref(null);
@@ -284,6 +311,10 @@ const focusFirstListItemTrigger = ref(0);
 
 const SAVED_SEARCHES_KEY = 'wackytracky_saved_searches';
 const savedSearches = ref([]);
+const savedSearchDropdownOpen = ref(false);
+const savedSearchFilter = ref('');
+const savedSearchSelectRef = ref(null);
+const savedSearchFilterInputRef = ref(null);
 
 const taskPropertyProperties = ref({ tagProperties: {}, contextProperties: {} });
 async function loadTaskPropertyProperties() {
@@ -350,6 +381,36 @@ function runSavedSearch(query) {
 		searchInputValue.value = q;
 		router.push({ path: '/search', query: { q } });
 	}
+}
+
+const currentSearchQuery = computed(() => (route.query.q || '').trim());
+const selectedSavedSearch = computed(() => {
+	const q = currentSearchQuery.value;
+	if (!q) return null;
+	return savedSearches.value.find((s) => s.query === q) || null;
+});
+const filteredSavedSearches = computed(() => {
+	const f = (savedSearchFilter.value || '').trim().toLowerCase();
+	if (!f) return savedSearches.value;
+	return savedSearches.value.filter(
+		(s) => s.name.toLowerCase().includes(f) || (s.query || '').toLowerCase().includes(f)
+	);
+});
+
+function selectSavedSearch(s) {
+	runSavedSearch(s.query);
+	savedSearchDropdownOpen.value = false;
+	savedSearchFilter.value = '';
+}
+
+function saveCurrentSearchFromSelect() {
+	saveCurrentSearch();
+	savedSearchDropdownOpen.value = false;
+}
+
+function openSavedSearchDropdownAndFocusFilter() {
+	savedSearchDropdownOpen.value = true;
+	nextTick(() => savedSearchFilterInputRef.value?.focus());
 }
 function saveCurrentSearch() {
 	const q = (route.query.q || searchInputValue.value || '').trim();
@@ -423,7 +484,18 @@ function cancelEdit() {
 
 async function submitEdit() {
 	const content = (editingDraft.value || '').trim();
-	if (!editingTaskId.value || !content || !window.client) {
+	if (!editingTaskId.value || !content) {
+		cancelEdit();
+		return;
+	}
+	if (!isOnline.value) {
+		setOfflineEdit(editingTaskId.value, content);
+		cancelEdit();
+		refreshTrigger.value++;
+		showToast('Saved locally (will sync when online)');
+		return;
+	}
+	if (!window.client) {
 		cancelEdit();
 		return;
 	}
@@ -434,7 +506,6 @@ async function submitEdit() {
 		showToast('Task updated');
 	} catch (e) {
 		showToast('Could not save: ' + toastErrorReason(e), 'error');
-		// keep editing and draft
 	}
 }
 
@@ -496,6 +567,29 @@ function onCtrlN(e) {
 	}
 }
 
+function onCtrlK(e) {
+	if (!(e.ctrlKey || e.metaKey) || e.key !== 'k') return;
+	e.preventDefault();
+	if (editingTaskId.value) return;
+	const inputFocused = document.activeElement === taskInputRef.value;
+	if (inputFocused) {
+		if (searchMode.value) {
+			searchMode.value = false;
+			searchInputValue.value = '';
+			if (route.path === '/search') router.replace('/');
+		} else {
+			searchMode.value = true;
+			searchInputValue.value = route.query.q || '';
+			if (isOnline.value) {
+				const q = (searchInputValue.value || '').trim();
+				if (q) router.replace({ path: '/search', query: { q } });
+			}
+		}
+	} else {
+		nextTick(() => taskInputRef.value?.focus());
+	}
+}
+
 function onKeyM(e) {
 	if (e.key === 'm' && !e.ctrlKey && !e.metaKey && !e.altKey) {
 		const tag = document.activeElement?.tagName?.toLowerCase();
@@ -507,13 +601,39 @@ function onKeyM(e) {
 
 async function submitTask() {
 	const content = (taskDraft.value || '').trim();
-	if (!content || !window.client) return;
+	if (!content) return;
+	const listId = route.params.listId || '';
+	const parentTaskId = pendingParentTaskId.value || '';
+	if (!isOnline.value) {
+		const cached = getCachedInbox();
+		const inboxId = cached?.listId ?? INBOX_LIST_ID;
+		if (listId !== inboxId) {
+			showToast('Offline: you can only add tasks to Inbox.', 'error');
+			return;
+		}
+		const id = generateOfflineTaskId();
+		addOfflineTask({
+			id,
+			content,
+			parentId: parentTaskId || INBOX_LIST_ID,
+			parentType: parentTaskId ? 'task' : 'list',
+			tags: [],
+			contexts: [],
+			createdAt: new Date().toISOString(),
+		});
+		taskDraft.value = '';
+		pendingParentTaskId.value = null;
+		refreshTrigger.value++;
+		showToast('Saved locally (will sync when online)');
+		return;
+	}
+	if (!window.client) return;
 	submittingTask.value = true;
 	try {
 		await window.client.createTask({
 			content,
-			parentListId: route.params.listId || '',
-			parentTaskId: pendingParentTaskId.value || '',
+			parentListId: listId,
+			parentTaskId,
 		});
 		taskDraft.value = '';
 		pendingParentTaskId.value = null;
@@ -521,7 +641,6 @@ async function submitTask() {
 		showToast('Task added');
 	} catch (e) {
 		showToast('Could not save: ' + toastErrorReason(e), 'error');
-		// keep draft
 	} finally {
 		submittingTask.value = false;
 	}
@@ -557,23 +676,85 @@ provide('showToast', showToast);
 provide('openShortcutsDialog', openShortcutsDialog);
 provide('taskPropertyProperties', taskPropertyProperties);
 provide('refreshTaskPropertyProperties', loadTaskPropertyProperties);
+provide('isOnline', isOnline);
+provide('cacheInbox', cacheList);
+
+function cacheList(listId, listTitle, data) {
+	setCachedInbox({ listId, listTitle, ...data });
+}
+
+async function syncOfflineChanges() {
+	const tasks = getOfflineTasks();
+	const edits = getOfflineEdits();
+	if (tasks.length === 0 && Object.keys(edits).length === 0) return;
+	if (!window.client) return;
+	let synced = 0;
+	for (const t of tasks) {
+		try {
+			await window.client.createTask({
+				content: t.content,
+				parentListId: INBOX_LIST_ID,
+				parentTaskId: t.parentType === 'task' ? t.parentId : '',
+			});
+			removeOfflineTask(t.id);
+			synced++;
+		} catch (e) {
+			showToast('Could not sync task: ' + (e?.message || String(e)), 'error');
+		}
+	}
+	for (const [taskId, { content }] of Object.entries(edits)) {
+		try {
+			await window.client.updateTask({ id: taskId, content });
+			removeOfflineEdit(taskId);
+			synced++;
+		} catch (e) {
+			showToast('Could not sync edit: ' + (e?.message || String(e)), 'error');
+		}
+	}
+	if (synced > 0) {
+		refreshTrigger.value++;
+		showToast('Offline changes synced');
+	}
+}
 
 async function getLists() {
 	if (!navigation.value) return;
 	navigation.value.clearNavigationLinks();
 	navigation.value.addRouterLink('Welcome');
 	navigation.value.addSeparator('nav-lists');
-	if (!window.client) return;
-	const ret = await window.client.getLists();
-	for (const list of ret.lists) {
-		navigation.value.addNavigationLink({
-			name: list.id,
-			title: list.title,
-			path: `/lists/${list.id}`,
-			to: `/lists/${list.id}`,
-			icon: PinIcon,
-			type: 'route',
-		});
+	if (!isOnline.value) {
+		const cached = getCachedInbox();
+		if (cached) {
+			navigation.value.addNavigationLink({
+				name: cached.listId,
+				title: cached.listTitle,
+				path: `/lists/${cached.listId}`,
+				to: `/lists/${cached.listId}`,
+				icon: PinIcon,
+				type: 'route',
+			});
+		} else {
+			navigation.value.addNavigationLink({
+				name: INBOX_LIST_ID,
+				title: 'Inbox',
+				path: `/lists/${INBOX_LIST_ID}`,
+				to: `/lists/${INBOX_LIST_ID}`,
+				icon: PinIcon,
+				type: 'route',
+			});
+		}
+	} else if (window.client) {
+		const ret = await window.client.getLists();
+		for (const list of ret.lists) {
+			navigation.value.addNavigationLink({
+				name: list.id,
+				title: list.title,
+				path: `/lists/${list.id}`,
+				to: `/lists/${list.id}`,
+				icon: PinIcon,
+				type: 'route',
+			});
+		}
 	}
 	navigation.value.addSeparator('nav-settings');
 	navigation.value.addRouterLink('TaskPropertyProperties', 'TPPs');
@@ -647,10 +828,32 @@ watch(
 watch(() => route.path, (path) => {
 	if (path !== '/options') navOptionsOpen.value = false;
 });
+watch(isOnline, (online) => {
+	if (!online) {
+		searchMode.value = false;
+		if (route.path === '/' || route.path === '/search') {
+			const cached = getCachedInbox();
+			const targetId = cached?.listId ?? INBOX_LIST_ID;
+			router.replace('/lists/' + targetId);
+		} else if (route.params.listId) {
+			const cached = getCachedInbox();
+			const inboxId = cached?.listId ?? INBOX_LIST_ID;
+			if (route.params.listId !== inboxId) {
+				router.replace('/lists/' + inboxId);
+			}
+		}
+	}
+});
 
 let headerLogoClickCleanup = null;
 
 watch(refreshTrigger, () => { getLists(); });
+watch(savedSearchDropdownOpen, (open) => {
+	if (open) {
+		savedSearchFilter.value = '';
+		nextTick(() => savedSearchFilterInputRef.value?.focus());
+	}
+});
 watch(shortcutsModal, (open) => {
 	if (open) {
 		document.addEventListener('keydown', onShortcutsKeydown);
@@ -667,8 +870,10 @@ onMounted(() => {
 	loadSavedSearches();
 	loadTaskPropertyProperties();
 	getLists();
+	window.addEventListener('online', syncOfflineChanges);
 	document.addEventListener('keydown', onCtrlF);
 	document.addEventListener('keydown', onCtrlN);
+	document.addEventListener('keydown', onCtrlK);
 	document.addEventListener('keydown', onKeyM);
 	document.addEventListener('keydown', onShortcutsOpenKeydown);
 	// Clicking header logo/title navigates to index
@@ -683,36 +888,65 @@ onMounted(() => {
 			};
 		}
 	});
+	document.addEventListener('click', onSavedSearchSelectClickOutside);
 });
 onUnmounted(() => {
 	if (displayModeMqStandalone) displayModeMqStandalone.removeEventListener('change', updatePwaDisplayMode);
 	if (displayModeMqWco) displayModeMqWco.removeEventListener('change', updatePwaDisplayMode);
+	window.removeEventListener('online', syncOfflineChanges);
 	document.removeEventListener('keydown', onCtrlF);
 	document.removeEventListener('keydown', onCtrlN);
+	document.removeEventListener('keydown', onCtrlK);
 	document.removeEventListener('keydown', onKeyM);
 	document.removeEventListener('keydown', onShortcutsOpenKeydown);
+	document.removeEventListener('click', onSavedSearchSelectClickOutside);
 	headerLogoClickCleanup?.();
 });
+
+function onSavedSearchSelectClickOutside(e) {
+	if (!savedSearchDropdownOpen.value) return;
+	const el = savedSearchSelectRef.value;
+	if (el && !el.contains(e.target)) savedSearchDropdownOpen.value = false;
+}
 </script>
 
 <style scoped>
+.offline-banner {
+	background: #f59e0b;
+	color: #fff;
+	text-align: center;
+	padding: 0.4rem 1rem;
+	font-size: 0.875rem;
+}
 .toolbar-row {
 	display: flex;
 	align-items: center;
 	gap: 0.5rem;
-	flex: 1;
+	flex-grow: 2;
 	min-width: 0;
 }
+
+/* Shared height, padding, margin for header controls */
+.toolbar-input,
+.saved-search-select-trigger,
+.options-btn {
+	box-sizing: border-box;
+	height: 2rem;
+	padding: 0.35rem 0.6rem;
+	margin: 0;
+	line-height: 1.25;
+	font-size: 0.875rem;
+	border-radius: 4px;
+	border-width: 1px;
+	border-style: solid;
+}
+
 .toolbar-input {
 	flex: 1;
 	min-width: 0;
-	max-width: 24rem;
-	padding: 0.35rem 0.6rem;
-	border-radius: 4px;
-	border: 1px solid rgba(255, 255, 255, 0.3);
+	border-color: rgba(255, 255, 255, 0.3);
 	background: rgba(255, 255, 255, 0.15);
 	color: #fff;
-	font-size: 0.9rem;
 }
 .toolbar-input::placeholder {
 	color: rgba(255, 255, 255, 0.6);
@@ -723,12 +957,16 @@ onUnmounted(() => {
 	background: rgba(255, 255, 255, 0.2);
 }
 .toolbar-submit-btn {
-	padding: 0.35rem 0.6rem;
+	height: 2rem;
+	padding: 0 0.6rem;
+	margin: 0;
+	box-sizing: border-box;
 	border-radius: 4px;
 	border: 1px solid rgba(255, 255, 255, 0.5);
 	background: transparent;
 	color: #fff;
 	font-size: 0.875rem;
+	line-height: 1.25;
 	cursor: pointer;
 }
 .toolbar-submit-btn:hover {
@@ -738,19 +976,91 @@ onUnmounted(() => {
 	display: flex;
 	flex-wrap: wrap;
 	align-items: center;
-	gap: 0.35rem;
+	gap: 0.5rem;
 }
-.saved-search-btn {
-	padding: 0.25rem 0.5rem;
-	border: 1px solid rgba(255, 255, 255, 0.5);
-	border-radius: 4px;
+.toolbar-saved-searches-select {
+	position: relative;
+}
+.saved-search-select-trigger {
+	display: flex;
+	align-items: center;
+	min-width: 8rem;
+	border-color: rgba(255, 255, 255, 0.5);
 	background: rgba(255, 255, 255, 0.1);
 	color: #fff;
+	cursor: pointer;
+}
+.saved-search-select-trigger:hover,
+.saved-search-select-trigger.open {
+	background: rgba(255, 255, 255, 0.2);
+}
+.saved-search-select-value {
+	display: block;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+.saved-search-select-dropdown {
+	position: absolute;
+	top: 100%;
+	left: 0;
+	margin-top: 0.25rem;
+	min-width: 100%;
+	max-width: 20rem;
+	max-height: 16rem;
+	display: flex;
+	flex-direction: column;
+	background: #fff;
+	border-radius: 4px;
+	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+	z-index: 100;
+}
+.saved-search-select-filter {
+	width: 100%;
+	padding: 0.4rem 0.6rem;
+	border: none;
+	border-bottom: 1px solid #e0e0e0;
+	border-radius: 4px 4px 0 0;
+	font-size: 0.875rem;
+	box-sizing: border-box;
+}
+.saved-search-select-filter:focus {
+	outline: none;
+	border-color: #666;
+}
+.saved-search-select-list {
+	margin: 0;
+	padding: 0.25rem 0;
+	list-style: none;
+	overflow-y: auto;
+	flex: 1;
+	min-height: 0;
+}
+.saved-search-select-option {
+	padding: 0.35rem 0.6rem;
+	font-size: 0.875rem;
+	color: #333;
+	cursor: pointer;
+}
+.saved-search-select-option:hover {
+	background: #f0f0f0;
+}
+.saved-search-select-empty {
+	padding: 0.5rem 0.6rem;
+	font-size: 0.875rem;
+	color: #666;
+}
+.saved-search-select-save-btn {
+	margin: 0.25rem;
+	padding: 0.35rem 0.6rem;
+	border: 1px solid #ccc;
+	border-radius: 4px;
+	background: #f8f8f8;
 	font-size: 0.8rem;
 	cursor: pointer;
 }
-.saved-search-btn:hover {
-	background: rgba(255, 255, 255, 0.2);
+.saved-search-select-save-btn:hover {
+	background: #eee;
 }
 .save-search-btn {
 	padding: 0.25rem 0.5rem;
@@ -782,20 +1092,17 @@ onUnmounted(() => {
 	display: inline-flex;
 	align-items: center;
 	gap: 0.35rem;
-	padding: 0.35rem 0.6rem;
-	border-radius: 4px;
-	border: 1px solid rgba(255, 255, 255, 0.5);
+	border-color: rgba(255, 255, 255, 0.5);
 	background: transparent;
 	color: #fff;
-	font-size: 0.875rem;
 	cursor: pointer;
 }
 .options-btn:hover {
 	background: rgba(255, 255, 255, 0.15);
 }
 .display-mode-label {
-	margin-left: 0.35rem;
-	font-size: 0.85em;
+	margin-left: 0;
+	font-size: inherit;
 }
 .repo-status-overlay {
 	position: fixed;
@@ -885,13 +1192,26 @@ onUnmounted(() => {
 	to { transform: rotate(360deg); }
 }
 
+#layout {
+	display: flex;
+	flex-direction: column;
+	min-height: 100vh;
+}
+#content {
+	display: flex;
+	flex-direction: column;
+	flex: 1;
+}
+#content main {
+	flex: 1;
+}
 .app-footer {
 	display: flex;
 	align-items: center;
 	justify-content: center;
 	gap: 0.75rem;
 	padding: 0.5rem 1rem;
-	font-size: 0.875rem;
+	font-size: 0.75rem;
 	color: #666;
 }
 .app-footer .footer-brand {

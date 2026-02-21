@@ -1,10 +1,13 @@
 <template>
 	<Section :title="sectionTitle">
 		<template #toolbar>
-			<button v-if="listId && !searchQuery" type="button" class="list-options-btn" @click="openListOptions">List options</button>
+			<button v-if="listId && !searchQuery && isOnline" type="button" class="list-options-btn list-options-btn-icon" aria-label="List options" @click="openListOptions">
+				<HugeiconsIcon :icon="MoreVerticalIcon" width="1.1em" height="1.1em" />
+			</button>
 		</template>
 		<div v-if="searchQuery" class="search-heading">
-			<p>Search results for “{{ searchQuery }}”</p>
+			<p v-if="isOnline">Search results for "{{ searchQuery }}"</p>
+			<p v-else class="search-offline-msg">Search unavailable offline. Switch to Inbox to view and edit tasks.</p>
 		</div>
 		<div v-if="loading" class="list-loading" aria-live="polite">
 			<span class="list-loading-spinner" aria-hidden="true"></span>
@@ -23,7 +26,7 @@
 					v-for="(row, index) in items"
 					:key="row.task.id"
 					class="task-row"
-					:class="{ 'task-row-editing': currentEditingId === row.task.id, 'task-row-focused': !currentEditingId && focusedIndex === index, 'task-row-subtask': displayMode === 'hierarchy' && row.depth > 0, 'task-row-project': displayMode === 'hierarchy' && row.task.countSubitems > 0, 'task-row-yanked': yankedTask && row.task.id === yankedTask.id, 'task-row-waiting': isFutureWait(row.task) }"
+					:class="{ 'task-row-editing': currentEditingId === row.task.id, 'task-row-focused': !currentEditingId && focusedIndex === index, 'task-row-subtask': displayMode === 'hierarchy' && row.depth > 0, 'task-row-project': displayMode === 'hierarchy' && row.task.countSubitems > 0, 'task-row-yanked': yankedTask && row.task.id === yankedTask.id, 'task-row-waiting': isFutureWait(row.task), 'task-row-offline-only': isOfflineTask(row.task) }"
 					:style="displayMode === 'hierarchy' && row.depth > 0 ? { marginLeft: row.depth * 2.25 + 'rem' } : {}"
 					@dblclick="currentEditingId !== row.task.id && injectedStartEdit(row.task)"
 					@contextmenu.prevent="onTaskContextMenu(row.task)"
@@ -56,6 +59,7 @@
 							<HugeiconsIcon :icon="ClockIcon" width="1.1em" height="1.1em" />
 						</span>
 						<span class="task-content" :class="{ 'task-content-waiting': isFutureWait(row.task) }">{{ row.task.content }}</span>
+						<span v-if="isOfflineTask(row.task)" class="task-offline-badge" title="Saved locally, will sync when online">offline only</span>
 						<span v-if="(row.task.priority || row.task.tags?.length || row.task.contexts?.length || row.task.dueDate)" class="task-meta">
 							<span v-if="row.task.priority" class="task-priority" :title="'Priority ' + row.task.priority">{{ row.task.priority }}</span>
 							<span v-for="tag in (row.task.tags || [])" :key="'tag-' + tag" class="tag task-meta-clickable" :style="tagStyle(tag)" title="Search for #{{ tag }}" @click.stop="setSearchQuery('#' + tag)">#{{ tag }}</span>
@@ -83,13 +87,13 @@
 				<div class="task-details-due" v-if="taskDetailsTask?.dueDate">
 					<label>Due date</label>
 					<span class="task-details-due-value">{{ formatDateDisplay(taskDetailsTask.dueDate) }}</span>
-					<button type="button" class="list-options-btn" @click="openDueDialogFromDetails">Change</button>
+					<button v-if="isOnline" type="button" class="list-options-btn" @click="openDueDialogFromDetails">Change</button>
 				</div>
 				<div class="task-details-due" v-else>
 					<label>Due date</label>
-					<button type="button" class="list-options-btn" @click="openDueDialogFromDetails">Set due date</button>
+					<button v-if="isOnline" type="button" class="list-options-btn" @click="openDueDialogFromDetails">Set due date</button>
 				</div>
-				<div class="task-details-priority">
+				<div v-if="isOnline" class="task-details-priority">
 					<label for="task-details-priority-slider">Priority: {{ prioritySliderLabel }}</label>
 					<input
 						id="task-details-priority-slider"
@@ -100,13 +104,22 @@
 						class="task-details-priority-slider"
 					/>
 				</div>
-				<div class="task-details-notes">
+				<div v-if="isOnline" class="task-details-notes">
 					<label for="task-details-notes-input">Notes</label>
 					<p v-if="taskNotesLoadError" class="task-details-notes-error" role="alert">Could not load notes.</p>
 					<textarea id="task-details-notes-input" v-model="notesDraft" class="task-details-notes-textarea" rows="6" placeholder="Notes…"></textarea>
 				</div>
+				<div v-if="isOnline && allLists.length > 1" class="task-details-move">
+					<label for="task-details-move-select">Move to list</label>
+					<select id="task-details-move-select" v-model="moveTargetListId" class="task-details-move-select">
+						<option v-for="list in allLists" :key="list.id" :value="list.id">{{ list.title }}</option>
+					</select>
+					<button type="button" class="list-options-btn" :disabled="moveTargetListId === taskDetailsTask?.parent_id && taskDetailsTask?.parent_type === 'list'" @click="moveTaskToSelectedList">
+						Move
+					</button>
+				</div>
 				<div class="task-details-actions">
-					<button type="button" class="task-details-done-btn good" title="Mark task done" aria-label="Mark task done" @click="openDoneConfirmFromDetails">
+					<button v-if="isOnline" type="button" class="task-details-done-btn good" title="Mark task done" aria-label="Mark task done" @click="openDoneConfirmFromDetails">
 						<HugeiconsIcon :icon="CheckmarkBadge01Icon" width="1.25em" height="1.25em" />
 					</button>
 					<button type="button" class="task-details-close-btn" @click="closeTaskDetails">Close</button>
@@ -191,9 +204,10 @@
 	import { ref } from 'vue';
 	import { useRouter } from 'vue-router';
 	import { HugeiconsIcon } from '@hugeicons/vue';
-	import { Folder01Icon, FolderOpenIcon, CheckmarkBadge01Icon, PlayIcon, ClockIcon, Calendar03Icon } from '@hugeicons/core-free-icons';
+	import { Folder01Icon, FolderOpenIcon, CheckmarkBadge01Icon, PlayIcon, ClockIcon, Calendar03Icon, MoreVerticalIcon } from '@hugeicons/core-free-icons';
 	import Section from 'picocrank/vue/components/Section.vue';
 	import { useSettings } from '../composables/useSettings.js';
+	import { getCachedList, getOfflineTasks, getOfflineEdits, INBOX_LIST_ID } from '../../../js/modules/offlineStorage.js';
 
 	const router = useRouter();
 	const { formatDateDisplay } = useSettings();
@@ -224,6 +238,8 @@
 	const listRenameTitle = ref('');
 	const listTitle = ref('');
 	const deleteListConfirm = ref(false);
+	const allLists = ref([]);
+	const moveTargetListId = ref('');
 	const inlineEditInputRef = ref(null);
 	const injectedStartEdit = inject('startEdit', () => {});
 	const editingTaskId = inject('editingTaskId', ref(null));
@@ -237,6 +253,8 @@
 	const focusAddTaskInput = inject('focusAddTaskInput', () => {});
 	const showToast = inject('showToast', () => {});
 	const taskPropertyProperties = inject('taskPropertyProperties', ref({ tagProperties: {}, contextProperties: {} }));
+	const isOnline = inject('isOnline', ref(true));
+	const cacheInbox = inject('cacheInbox', () => {});
 
 	const focusedIndex = ref(0);
 	const ddLastKey = ref(null);
@@ -316,6 +334,10 @@
 		return !isNaN(t.getTime()) && t > new Date();
 	}
 
+	function isOfflineTask(task) {
+		return task?.id?.startsWith?.('offline-') ?? false;
+	}
+
 	function getFilteredByCollapsed() {
 		const full = allItems.value;
 		const collapsed = collapsedParentIds.value;
@@ -388,16 +410,99 @@
 	}
 
 	async function loadListTasks() {
-		if (!props.listId || !window.client) return;
-		const ret = await window.client.listTasks({
-			parentType: 'list',
-			parentId: props.listId,
-		});
-		const tasks = ret.tasks || [];
-		const tree = ret.tree || {};
-		hiddenTagNames.value = ret.hiddenTagNames || [];
-		hiddenContextNames.value = ret.hiddenContextNames || [];
-		const idToTask = new Map(tasks.map((t) => [t.id, t]));
+		if (!props.listId) return;
+		if (!isOnline.value) {
+			loadListTasksFromCache();
+			return;
+		}
+		if (!window.client) return;
+		try {
+			const ret = await window.client.listTasks({
+				parentType: 'list',
+				parentId: props.listId,
+			});
+			const tasks = ret.tasks || [];
+			const tree = ret.tree || {};
+			hiddenTagNames.value = ret.hiddenTagNames || [];
+			hiddenContextNames.value = ret.hiddenContextNames || [];
+			cacheInbox(props.listId, listTitle.value || 'Inbox', {
+					tasks,
+					tree,
+					hiddenTagNames: ret.hiddenTagNames || [],
+					hiddenContextNames: ret.hiddenContextNames || [],
+			});
+			const idToTask = new Map(tasks.map((t) => [t.id, t]));
+			const flat = [];
+			function walk(parentId, depth) {
+				const childIds = tree[parentId]?.ids ?? [];
+				for (const childId of childIds) {
+					const task = idToTask.get(childId);
+					if (task) {
+						flat.push({ task, depth });
+						walk(childId, depth + 1);
+					}
+				}
+			}
+			walk(props.listId, 0);
+			allItems.value = flat;
+			updateItems();
+		} catch (e) {
+			loadListTasksFromCache();
+		}
+	}
+
+	function loadListTasksFromCache() {
+		const cached = getCachedList(props.listId);
+		const edits = getOfflineEdits();
+		const offlineTasks = getOfflineTasks();
+		if (!cached) {
+			allItems.value = [];
+			hiddenTagNames.value = [];
+			hiddenContextNames.value = [];
+			listTitle.value = listTitle.value || 'Inbox';
+			updateItems();
+			return;
+		}
+		listTitle.value = cached.listTitle || 'Inbox';
+		hiddenTagNames.value = cached.hiddenTagNames || [];
+		hiddenContextNames.value = cached.hiddenContextNames || [];
+		const idToTask = new Map((cached.tasks || []).map((t) => [t.id, { ...t }]));
+		const inboxId = cached.listId;
+		for (const ot of offlineTasks) {
+			const isRootInList = ot.parentType === 'list' && (ot.parentId === props.listId || ot.parentId === INBOX_LIST_ID);
+			const isSubtask = ot.parentType === 'task' && ot.parentId;
+			if (isRootInList || isSubtask) {
+				const task = {
+					id: ot.id,
+					content: ot.content,
+					parentId: ot.parentId || props.listId,
+					parentType: ot.parentType || 'list',
+					countSubitems: 0,
+					tags: ot.tags || [],
+					contexts: ot.contexts || [],
+					waitUntil: '',
+					priority: '',
+					dueDate: '',
+				};
+				idToTask.set(ot.id, task);
+			}
+		}
+		for (const [taskId, { content }] of Object.entries(edits)) {
+			const t = idToTask.get(taskId);
+			if (t) t.content = content;
+		}
+		const tree = { ...(cached.tree || {}) };
+		const rootIds = [...(tree[props.listId]?.ids ?? [])];
+		for (const ot of offlineTasks) {
+			if (ot.parentType === 'list' && (ot.parentId === props.listId || ot.parentId === INBOX_LIST_ID)) {
+				rootIds.push(ot.id);
+			} else if (ot.parentType === 'task' && ot.parentId) {
+				const parentIds = tree[ot.parentId]?.ids ?? [];
+				parentIds.push(ot.id);
+				tree[ot.parentId] = { ids: parentIds };
+			}
+		}
+		tree[props.listId] = { ids: [...new Set(rootIds)] };
 		const flat = [];
 		function walk(parentId, depth) {
 			const childIds = tree[parentId]?.ids ?? [];
@@ -525,7 +630,7 @@
 			return;
 		}
 		if (e.key === 'd') {
-			if (ddLastKey.value === 'd' && Date.now() - ddLastTime.value < DD_TIMEOUT_MS) {
+			if (isOnline.value && ddLastKey.value === 'd' && Date.now() - ddLastTime.value < DD_TIMEOUT_MS) {
 				e.preventDefault();
 				ddLastKey.value = null;
 				const row = items.value[focusedIndex.value];
@@ -538,7 +643,7 @@
 			ddLastTime.value = Date.now();
 			return;
 		}
-		if (e.key === 'Delete' && focusedIndex.value >= 0) {
+		if (e.key === 'Delete' && focusedIndex.value >= 0 && isOnline.value) {
 			e.preventDefault();
 			ddLastKey.value = null;
 			const row = items.value[focusedIndex.value];
@@ -557,14 +662,14 @@
 			ddLastTime.value = Date.now();
 			return;
 		}
-		if ((e.key === 'w' || e.key === 'W') && focusedIndex.value >= 0) {
+		if ((e.key === 'w' || e.key === 'W') && focusedIndex.value >= 0 && isOnline.value) {
 			e.preventDefault();
 			ddLastKey.value = null;
 			const row = items.value[focusedIndex.value];
 			if (row) openWaitDialog(row.task);
 			return;
 		}
-		if ((e.key === 'u' || e.key === 'U') && focusedIndex.value >= 0) {
+		if ((e.key === 'u' || e.key === 'U') && focusedIndex.value >= 0 && isOnline.value) {
 			e.preventDefault();
 			ddLastKey.value = null;
 			const row = items.value[focusedIndex.value];
@@ -574,7 +679,7 @@
 		if (e.key === 'p') {
 			e.preventDefault();
 			ddLastKey.value = null;
-			if (yankedTask.value && window.client) {
+			if (yankedTask.value && isOnline.value && window.client) {
 				const row = items.value[focusedIndex.value];
 				const parentTaskId = row ? row.task.id : '';
 				window.client.createTask({
@@ -938,9 +1043,43 @@
 	watch(refreshTrigger, load);
 	watch(displayMode, () => { if (!props.searchQuery) updateItems(); });
 	watch([allItems, collapsedParentIds], () => { if (!props.searchQuery && allItems.value.length) updateItems(); });
+	async function loadAllListsForMove() {
+		if (!window.client) return;
+		try {
+			const res = await window.client.getLists({});
+			allLists.value = res.lists || [];
+			const task = taskDetailsTask.value;
+			const currentListId = task?.parent_type === 'list' ? task?.parent_id : null;
+			moveTargetListId.value = currentListId && allLists.value.some((l) => l.id === currentListId)
+				? currentListId
+				: (allLists.value[0]?.id ?? '');
+		} catch {
+			allLists.value = [];
+			moveTargetListId.value = '';
+		}
+	}
+
+	async function moveTaskToSelectedList() {
+		const task = taskDetailsTask.value;
+		const targetId = moveTargetListId.value;
+		if (!task?.id || !targetId || !window.client) return;
+		try {
+			await window.client.moveTask({ taskId: task.id, targetListId: targetId });
+			showToast('Task moved');
+			closeTaskDetails();
+			load();
+			if (refreshTrigger) refreshTrigger.value++;
+		} catch (e) {
+			const reason = e?.message || String(e);
+			showToast('Could not move task: ' + reason, 'error');
+		}
+	}
+
 	watch(taskDetailsTask, (task) => {
-		if (task) loadTaskNotes();
-		else {
+		if (task) {
+			loadTaskNotes();
+			loadAllListsForMove();
+		} else {
 			notesDraft.value = '';
 			taskNotesLoadError.value = false;
 			priorityDraft.value = '';
@@ -1016,6 +1155,21 @@
 		margin: 0;
 		font-size: 0.95rem;
 		color: #555;
+	}
+	.search-offline-msg {
+		color: #b45309;
+		font-weight: 500;
+	}
+	.task-offline-badge {
+		font-size: 0.75rem;
+		color: #b45309;
+		background: #fef3c7;
+		padding: 0.15rem 0.4rem;
+		border-radius: 0.25rem;
+		margin-left: 0.35rem;
+	}
+	li.task-row-offline-only {
+		border-left: 3px solid #f59e0b;
 	}
 
 	li.task-row {
@@ -1191,6 +1345,32 @@
 	}
 	.task-details-due .list-options-btn {
 		margin-top: 0.25rem;
+	}
+	.task-details-move {
+		margin-bottom: 0.5rem;
+	}
+	.task-details-move label {
+		display: block;
+		margin-bottom: 0.35rem;
+		font-size: 0.9rem;
+		color: #555;
+	}
+	.task-details-move-select {
+		display: block;
+		width: 100%;
+		max-width: 20rem;
+		margin-bottom: 0.35rem;
+		padding: 0.35rem 0.5rem;
+		border: 1px solid #ccc;
+		border-radius: 0.35rem;
+		font-size: 0.9rem;
+	}
+	.task-details-move .list-options-btn {
+		margin-top: 0.25rem;
+	}
+	.list-options-btn:disabled {
+		opacity: 0.6;
+		cursor: not-allowed;
 	}
 
 	ul {
@@ -1384,6 +1564,9 @@
 		background: #fff;
 		font-size: 0.9rem;
 		cursor: pointer;
+	}
+	.list-options-btn-icon {
+		padding: 0.4rem;
 	}
 	.list-options-btn:hover {
 		background: #f5f5f5;

@@ -25,10 +25,11 @@ type DBTask struct {
 }
 
 // SavedSearch is used by backends that support saved searches (e.g. todotxt).
+// JSON keys are id, name, query to match the API; when reading, "Title" is also accepted for backward compatibility.
 type SavedSearch struct {
-	ID    string
-	Title string
-	Query string
+	ID    string `json:"id"`
+	Title string `json:"name"`
+	Query string `json:"query"`
 }
 
 type DB interface {
@@ -49,6 +50,11 @@ type DB interface {
 type Updatable interface {
 	UpdateTask(id string, content string) error
 	DoneTask(id string) error
+}
+
+// TaskMover is optionally implemented by backends that support moving a task to another list.
+type TaskMover interface {
+	MoveTask(taskId string, targetListId string) error
 }
 
 // Searchable is optionally implemented by backends that support task search.

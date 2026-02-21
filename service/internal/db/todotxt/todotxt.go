@@ -709,21 +709,6 @@ func parseSearchQuery(query string) (include, exclude []string) {
 	return include, exclude
 }
 
-func buildSearchableText(t *Task) string {
-	var parts []string
-	parts = append(parts, t.Description)
-	for _, p := range t.Projects {
-		parts = append(parts, "+"+p)
-	}
-	for _, c := range t.Contexts {
-		parts = append(parts, "@"+c)
-	}
-	for _, tag := range t.Tags {
-		parts = append(parts, "#"+tag)
-	}
-	return strings.Join(parts, " ")
-}
-
 func addUniquePrefixed(parts *[]string, seen map[string]struct{}, prefix string, items []string) {
 	for _, p := range items {
 		key := prefix + p
@@ -811,6 +796,57 @@ func (d *TodoTxt) DoneTask(id string) error {
 	return nil
 }
 
+// MoveTask implements db.TaskMover: move a task to another list (root tasks: change listid; subtasks: make root in target list).
+func (d *TodoTxt) MoveTask(taskId string, targetListId string) error {
+	if targetListId == "" {
+		targetListId = defaultListID
+	}
+	d.mu.Lock()
+	defer d.mu.Unlock()
+	for _, t := range d.tasks {
+		if t.Metadata["id"] != taskId {
+			continue
+		}
+		if t.Completed {
+			return nil
+		}
+		t.Metadata["listid"] = targetListId
+		t.Metadata["parent"] = ""
+		return d.saveTasks()
+	}
+	return nil
+}
+
+// savedSearchWire reads searches.txt; accepts both old keys (ID, Title, Query) and new (id, name, query).
+type savedSearchWire struct {
+	ID    string
+	Title string
+	Query string
+}
+
+func (w *savedSearchWire) UnmarshalJSON(data []byte) error {
+	var raw map[string]interface{}
+	if err := json.Unmarshal(data, &raw); err != nil {
+		return err
+	}
+	getStr := func(keys ...string) string {
+		for _, k := range keys {
+			if v, ok := raw[k].(string); ok && v != "" {
+				return v
+			}
+		}
+		return ""
+	}
+	w.ID = getStr("id", "ID")
+	w.Title = getStr("name", "Title")
+	w.Query = getStr("query", "Query")
+	return nil
+}
+
+func (w savedSearchWire) toSavedSearch() db.SavedSearch {
+	return db.SavedSearch{ID: w.ID, Title: w.Title, Query: w.Query}
+}
+
 // GetSavedSearches implements db.SavedSearchesStore: read saved searches from searches.txt.
 func (d *TodoTxt) GetSavedSearches() ([]db.SavedSearch, error) {
 	d.mu.RLock()
@@ -823,9 +859,13 @@ func (d *TodoTxt) GetSavedSearches() ([]db.SavedSearch, error) {
 		}
 		return nil, err
 	}
-	var list []db.SavedSearch
-	if err := json.Unmarshal(b, &list); err != nil {
+	var wire []savedSearchWire
+	if err := json.Unmarshal(b, &wire); err != nil {
 		return nil, err
+	}
+	list := make([]db.SavedSearch, len(wire))
+	for i := range wire {
+		list[i] = wire[i].toSavedSearch()
 	}
 	return list, nil
 }

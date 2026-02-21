@@ -275,6 +275,13 @@ func (api *wackyTrackyClientService) DoneTask(ctx context.Context, req *connect.
 	return connect.NewResponse(&pb.DoneTaskResponse{}), nil
 }
 
+func (api *wackyTrackyClientService) MoveTask(ctx context.Context, req *connect.Request[pb.MoveTaskRequest]) (*connect.Response[pb.MoveTaskResponse], error) {
+	if mover, ok := api.dbconn.(dbmdl.TaskMover); ok && req.Msg.TaskId != "" && req.Msg.TargetListId != "" {
+		_ = mover.MoveTask(req.Msg.TaskId, req.Msg.TargetListId)
+	}
+	return connect.NewResponse(&pb.MoveTaskResponse{}), nil
+}
+
 func (api *wackyTrackyClientService) CreateTask(ctx context.Context, req *connect.Request[pb.CreateTaskRequest]) (*connect.Response[pb.CreateTaskResponse], error) {
 	id, err := api.dbconn.CreateTask(req.Msg.Content, req.Msg.ParentListId, req.Msg.ParentTaskId)
 	if err != nil {

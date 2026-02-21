@@ -20,7 +20,7 @@
 		<p v-else-if="!loading" class="welcome-empty">No lists yet.</p>
 		<p v-else class="welcome-loading">Loading…</p>
 		<div class="welcome-actions">
-			<button type="button" class="new-list-btn" @click="showCreateDialog = true">
+			<button type="button" class="new-list-btn" :disabled="!isOnline" @click="showCreateDialog = true">
 				New list
 			</button>
 		</div>
@@ -32,8 +32,9 @@
 </template>
 
 <script setup>
-	import { ref, onMounted, inject } from 'vue';
+	import { ref, onMounted, watch, inject } from 'vue';
 	import CreateListDialog from '../components/CreateListDialog.vue';
+	import { getCachedInbox, INBOX_LIST_ID } from '../../../js/modules/offlineStorage.js';
 
 	const lists = ref([]);
 	const loading = ref(true);
@@ -41,11 +42,20 @@
 	const showCreateDialog = ref(false);
 	const refreshTrigger = inject('refreshTrigger', null);
 	const showToast = inject('showToast', () => {});
+	const isOnline = inject('isOnline', ref(true));
 
 	async function loadLists() {
 		loading.value = true;
 		loadError.value = null;
 		lists.value = [];
+		if (!isOnline.value) {
+			const cached = getCachedInbox();
+			lists.value = cached
+				? [{ id: cached.listId, title: cached.listTitle, countItems: cached.tasks?.length ?? null }]
+				: [{ id: INBOX_LIST_ID, title: 'Inbox', countItems: null }];
+			loading.value = false;
+			return;
+		}
 		if (!window.client) {
 			loading.value = false;
 			return;
@@ -67,6 +77,7 @@
 		if (refreshTrigger) refreshTrigger.value++;
 	}
 
+	watch(isOnline, loadLists);
 	onMounted(loadLists);
 </script>
 
@@ -131,18 +142,5 @@
 	}
 	.welcome-actions {
 		margin-top: 1.5rem;
-	}
-	.new-list-btn {
-		padding: 0.5rem 1rem;
-		border-radius: 0.5rem;
-		border: 1px solid var(--femtocrank-border, #ccc);
-		background: var(--femtocrank-bg, #fff);
-		color: inherit;
-		font-size: 1rem;
-		cursor: pointer;
-		transition: background 0.15s;
-	}
-	.new-list-btn:hover {
-		background: var(--femtocrank-hover, #f0f0f0);
 	}
 </style>

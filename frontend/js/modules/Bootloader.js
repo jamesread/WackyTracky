@@ -5,6 +5,7 @@ import { WackyTrackyClientService } from '../gen/wacky-tracky/clientapi/v1/wt_pb
 /**
  * Sets up the Connect RPC client (window.client) and removes the boot overlay.
  * The Vue app uses window.client for all API calls.
+ * When offline, the client still exists; API calls will fail and components handle that via useOffline.
  */
 export class Bootloader {
   init() {

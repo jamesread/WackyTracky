@@ -162,6 +162,44 @@ func TestTodoTxt_UpdateTaskAndDoneTask(t *testing.T) {
 	}
 }
 
+func TestTodoTxt_MoveTask(t *testing.T) {
+	_, cleanup := setTodotxtDir(t)
+	defer cleanup()
+
+	d := &TodoTxt{}
+	if err := d.Connect(); err != nil {
+		t.Fatal(err)
+	}
+
+	require.NoError(t, d.CreateList("Other"))
+	lists, err := d.GetLists()
+	require.NoError(t, err)
+	var otherListID string
+	for _, l := range lists {
+		if l.Title == "Other" {
+			otherListID = l.ID
+			break
+		}
+	}
+	require.NotEmpty(t, otherListID, "expected Other list")
+
+	id, err := d.CreateTask("move me", "inbox", "")
+	require.NoError(t, err)
+
+	inboxBefore, _ := d.GetTasks("inbox")
+	otherBefore, _ := d.GetTasks(otherListID)
+	require.Len(t, inboxBefore, 1)
+	require.Len(t, otherBefore, 0)
+
+	require.NoError(t, d.MoveTask(id, otherListID))
+
+	inboxAfter, _ := d.GetTasks("inbox")
+	otherAfter, _ := d.GetTasks(otherListID)
+	require.Len(t, inboxAfter, 0, "task should no longer be in inbox")
+	require.Len(t, otherAfter, 1, "task should appear in Other list")
+	assert.Equal(t, "move me", otherAfter[0].Content)
+}
+
 func TestTodoTxt_GetSetTaskPropertyProperties(t *testing.T) {
 	dir, cleanup := setTodotxtDir(t)
 	defer cleanup()
@@ -203,4 +241,188 @@ func TestTodoTxt_GetSetTaskPropertyProperties(t *testing.T) {
 	tagProps, _, _ = store.GetTaskPropertyProperties()
 	_, hasWork := tagProps["work"]
 	assert.False(t, hasWork)
+}
+
+func TestTodoTxt_GetTags(t *testing.T) {
+	dir, cleanup := setTodotxtDir(t)
+	defer cleanup()
+
+	todoPath := filepath.Join(dir, "todo.txt")
+	if err := os.WriteFile(todoPath, []byte("task @ctx #tag\nother +proj @work\n"), 0644); err != nil {
+		t.Fatal(err)
+	}
+
+	d := &TodoTxt{}
+	require.NoError(t, d.Connect())
+
+	tags, err := d.GetTags()
+	require.NoError(t, err)
+	assert.GreaterOrEqual(t, len(tags), 2)
+	var tagIDs []string
+	for _, tag := range tags {
+		tagIDs = append(tagIDs, tag.ID)
+	}
+	assert.Contains(t, tagIDs, "tag")
+	assert.Contains(t, tagIDs, "ctx")
+	assert.Contains(t, tagIDs, "work")
+}
+
+func TestTodoTxt_GetSubtasks(t *testing.T) {
+	_, cleanup := setTodotxtDir(t)
+	defer cleanup()
+
+	d := &TodoTxt{}
+	require.NoError(t, d.Connect())
+
+	parentID, err := d.CreateTask("parent task", "inbox", "")
+	require.NoError(t, err)
+
+	subID, err := d.CreateTask("subtask", "inbox", parentID)
+	require.NoError(t, err)
+
+	subtasks, err := d.GetSubtasks(parentID)
+	require.NoError(t, err)
+	require.Len(t, subtasks, 1)
+	assert.Equal(t, subID, subtasks[0].ID)
+	assert.Equal(t, "subtask", subtasks[0].Content)
+}
+
+func TestTodoTxt_Dir(t *testing.T) {
+	dir, cleanup := setTodotxtDir(t)
+	defer cleanup()
+
+	d := &TodoTxt{}
+	require.NoError(t, d.Connect())
+
+	assert.Equal(t, dir, d.Dir())
+}
+
+func TestTodoTxt_UpdateList(t *testing.T) {
+	_, cleanup := setTodotxtDir(t)
+	defer cleanup()
+
+	d := &TodoTxt{}
+	require.NoError(t, d.Connect())
+
+	require.NoError(t, d.CreateList("Original"))
+	lists, _ := d.GetLists()
+	var listID string
+	for _, l := range lists {
+		if l.Title == "Original" {
+			listID = l.ID
+			break
+		}
+	}
+	require.NotEmpty(t, listID)
+
+	require.NoError(t, d.UpdateList(listID, "Updated"))
+	lists, _ = d.GetLists()
+	for _, l := range lists {
+		if l.ID == listID {
+			assert.Equal(t, "Updated", l.Title)
+			return
+		}
+	}
+	t.Error("list not found after update")
+}
+
+func TestTodoTxt_DeleteList(t *testing.T) {
+	_, cleanup := setTodotxtDir(t)
+	defer cleanup()
+
+	d := &TodoTxt{}
+	require.NoError(t, d.Connect())
+
+	require.NoError(t, d.CreateList("ToDelete"))
+	lists, _ := d.GetLists()
+	var listID string
+	for _, l := range lists {
+		if l.Title == "ToDelete" {
+			listID = l.ID
+			break
+		}
+	}
+	require.NotEmpty(t, listID)
+
+	id, _ := d.CreateTask("task in list", listID, "")
+	require.NotEmpty(t, id)
+
+	require.NoError(t, d.DeleteList(listID))
+	lists, _ = d.GetLists()
+	for _, l := range lists {
+		assert.NotEqual(t, listID, l.ID)
+	}
+	task, _ := d.GetTask(id)
+	require.NotNil(t, task)
+	assert.Equal(t, "inbox", task.ParentId)
+}
+
+func TestTodoTxt_GetSetSavedSearches(t *testing.T) {
+	_, cleanup := setTodotxtDir(t)
+	defer cleanup()
+
+	d := &TodoTxt{}
+	require.NoError(t, d.Connect())
+
+	searches, err := d.GetSavedSearches()
+	require.NoError(t, err)
+	assert.Empty(t, searches)
+
+	newSearches := []db.SavedSearch{
+		{ID: "s1", Title: "Work", Query: "+work"},
+		{ID: "s2", Title: "Home", Query: "@home"},
+	}
+	require.NoError(t, d.SetSavedSearches(newSearches))
+
+	searches, err = d.GetSavedSearches()
+	require.NoError(t, err)
+	require.Len(t, searches, 2)
+	assert.Equal(t, "Work", searches[0].Title)
+	assert.Equal(t, "+work", searches[0].Query)
+	assert.Equal(t, "Home", searches[1].Title)
+}
+
+func TestTodoTxt_GetSetTaskMetadata(t *testing.T) {
+	_, cleanup := setTodotxtDir(t)
+	defer cleanup()
+
+	d := &TodoTxt{}
+	require.NoError(t, d.Connect())
+
+	id, err := d.CreateTask("task with metadata", "inbox", "")
+	require.NoError(t, err)
+
+	meta, err := d.GetTaskMetadata(id)
+	require.NoError(t, err)
+	assert.NotNil(t, meta)
+
+	require.NoError(t, d.SetTaskMetadata(id, "notes", "my note"))
+	require.NoError(t, d.SetTaskMetadata(id, "wait", "2025-01-01"))
+	require.NoError(t, d.SetTaskMetadata(id, "due", "2025-12-31"))
+	require.NoError(t, d.SetTaskMetadata(id, "priority", "A"))
+
+	meta, err = d.GetTaskMetadata(id)
+	require.NoError(t, err)
+	assert.Equal(t, "my note", meta["notes"])
+	assert.Equal(t, "2025-01-01", meta["wait"])
+	assert.Equal(t, "2025-12-31", meta["due"])
+	assert.Equal(t, "A", meta["priority"])
+}
+
+func TestParseSearchQuery(t *testing.T) {
+	inc, exc := parseSearchQuery("")
+	assert.Nil(t, inc)
+	assert.Nil(t, exc)
+
+	inc, exc = parseSearchQuery("  hello world  ")
+	assert.Equal(t, []string{"hello", "world"}, inc)
+	assert.Empty(t, exc)
+
+	inc, exc = parseSearchQuery("a -b c -d")
+	assert.Equal(t, []string{"a", "c"}, inc)
+	assert.Equal(t, []string{"b", "d"}, exc)
+
+	inc, exc = parseSearchQuery("-only")
+	assert.Empty(t, inc)
+	assert.Equal(t, []string{"only"}, exc)
 }

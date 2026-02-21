@@ -57,6 +57,9 @@ const (
 	// WackyTrackyClientServiceDoneTaskProcedure is the fully-qualified name of the
 	// WackyTrackyClientService's DoneTask RPC.
 	WackyTrackyClientServiceDoneTaskProcedure = "/wackytracky.clientapi.v1.WackyTrackyClientService/DoneTask"
+	// WackyTrackyClientServiceMoveTaskProcedure is the fully-qualified name of the
+	// WackyTrackyClientService's MoveTask RPC.
+	WackyTrackyClientServiceMoveTaskProcedure = "/wackytracky.clientapi.v1.WackyTrackyClientService/MoveTask"
 	// WackyTrackyClientServiceCreateListProcedure is the fully-qualified name of the
 	// WackyTrackyClientService's CreateList RPC.
 	WackyTrackyClientServiceCreateListProcedure = "/wackytracky.clientapi.v1.WackyTrackyClientService/CreateList"
@@ -112,6 +115,7 @@ type WackyTrackyClientServiceClient interface {
 	CreateTask(context.Context, *connect.Request[v1.CreateTaskRequest]) (*connect.Response[v1.CreateTaskResponse], error)
 	UpdateTask(context.Context, *connect.Request[v1.UpdateTaskRequest]) (*connect.Response[v1.UpdateTaskResponse], error)
 	DoneTask(context.Context, *connect.Request[v1.DoneTaskRequest]) (*connect.Response[v1.DoneTaskResponse], error)
+	MoveTask(context.Context, *connect.Request[v1.MoveTaskRequest]) (*connect.Response[v1.MoveTaskResponse], error)
 	CreateList(context.Context, *connect.Request[v1.CreateListRequest]) (*connect.Response[v1.CreateListResponse], error)
 	Tag(context.Context, *connect.Request[v1.TagRequest]) (*connect.Response[v1.TagResponse], error)
 	UpdateList(context.Context, *connect.Request[v1.UpdateListRequest]) (*connect.Response[v1.UpdateListResponse], error)
@@ -186,6 +190,12 @@ func NewWackyTrackyClientServiceClient(httpClient connect.HTTPClient, baseURL st
 			httpClient,
 			baseURL+WackyTrackyClientServiceDoneTaskProcedure,
 			connect.WithSchema(wackyTrackyClientServiceMethods.ByName("DoneTask")),
+			connect.WithClientOptions(opts...),
+		),
+		moveTask: connect.NewClient[v1.MoveTaskRequest, v1.MoveTaskResponse](
+			httpClient,
+			baseURL+WackyTrackyClientServiceMoveTaskProcedure,
+			connect.WithSchema(wackyTrackyClientServiceMethods.ByName("MoveTask")),
 			connect.WithClientOptions(opts...),
 		),
 		createList: connect.NewClient[v1.CreateListRequest, v1.CreateListResponse](
@@ -285,6 +295,7 @@ type wackyTrackyClientServiceClient struct {
 	createTask                *connect.Client[v1.CreateTaskRequest, v1.CreateTaskResponse]
 	updateTask                *connect.Client[v1.UpdateTaskRequest, v1.UpdateTaskResponse]
 	doneTask                  *connect.Client[v1.DoneTaskRequest, v1.DoneTaskResponse]
+	moveTask                  *connect.Client[v1.MoveTaskRequest, v1.MoveTaskResponse]
 	createList                *connect.Client[v1.CreateListRequest, v1.CreateListResponse]
 	tag                       *connect.Client[v1.TagRequest, v1.TagResponse]
 	updateList                *connect.Client[v1.UpdateListRequest, v1.UpdateListResponse]
@@ -339,6 +350,11 @@ func (c *wackyTrackyClientServiceClient) UpdateTask(ctx context.Context, req *co
 // DoneTask calls wackytracky.clientapi.v1.WackyTrackyClientService.DoneTask.
 func (c *wackyTrackyClientServiceClient) DoneTask(ctx context.Context, req *connect.Request[v1.DoneTaskRequest]) (*connect.Response[v1.DoneTaskResponse], error) {
 	return c.doneTask.CallUnary(ctx, req)
+}
+
+// MoveTask calls wackytracky.clientapi.v1.WackyTrackyClientService.MoveTask.
+func (c *wackyTrackyClientServiceClient) MoveTask(ctx context.Context, req *connect.Request[v1.MoveTaskRequest]) (*connect.Response[v1.MoveTaskResponse], error) {
+	return c.moveTask.CallUnary(ctx, req)
 }
 
 // CreateList calls wackytracky.clientapi.v1.WackyTrackyClientService.CreateList.
@@ -424,6 +440,7 @@ type WackyTrackyClientServiceHandler interface {
 	CreateTask(context.Context, *connect.Request[v1.CreateTaskRequest]) (*connect.Response[v1.CreateTaskResponse], error)
 	UpdateTask(context.Context, *connect.Request[v1.UpdateTaskRequest]) (*connect.Response[v1.UpdateTaskResponse], error)
 	DoneTask(context.Context, *connect.Request[v1.DoneTaskRequest]) (*connect.Response[v1.DoneTaskResponse], error)
+	MoveTask(context.Context, *connect.Request[v1.MoveTaskRequest]) (*connect.Response[v1.MoveTaskResponse], error)
 	CreateList(context.Context, *connect.Request[v1.CreateListRequest]) (*connect.Response[v1.CreateListResponse], error)
 	Tag(context.Context, *connect.Request[v1.TagRequest]) (*connect.Response[v1.TagResponse], error)
 	UpdateList(context.Context, *connect.Request[v1.UpdateListRequest]) (*connect.Response[v1.UpdateListResponse], error)
@@ -493,6 +510,12 @@ func NewWackyTrackyClientServiceHandler(svc WackyTrackyClientServiceHandler, opt
 		WackyTrackyClientServiceDoneTaskProcedure,
 		svc.DoneTask,
 		connect.WithSchema(wackyTrackyClientServiceMethods.ByName("DoneTask")),
+		connect.WithHandlerOptions(opts...),
+	)
+	wackyTrackyClientServiceMoveTaskHandler := connect.NewUnaryHandler(
+		WackyTrackyClientServiceMoveTaskProcedure,
+		svc.MoveTask,
+		connect.WithSchema(wackyTrackyClientServiceMethods.ByName("MoveTask")),
 		connect.WithHandlerOptions(opts...),
 	)
 	wackyTrackyClientServiceCreateListHandler := connect.NewUnaryHandler(
@@ -597,6 +620,8 @@ func NewWackyTrackyClientServiceHandler(svc WackyTrackyClientServiceHandler, opt
 			wackyTrackyClientServiceUpdateTaskHandler.ServeHTTP(w, r)
 		case WackyTrackyClientServiceDoneTaskProcedure:
 			wackyTrackyClientServiceDoneTaskHandler.ServeHTTP(w, r)
+		case WackyTrackyClientServiceMoveTaskProcedure:
+			wackyTrackyClientServiceMoveTaskHandler.ServeHTTP(w, r)
 		case WackyTrackyClientServiceCreateListProcedure:
 			wackyTrackyClientServiceCreateListHandler.ServeHTTP(w, r)
 		case WackyTrackyClientServiceTagProcedure:
@@ -664,6 +689,10 @@ func (UnimplementedWackyTrackyClientServiceHandler) UpdateTask(context.Context, 
 
 func (UnimplementedWackyTrackyClientServiceHandler) DoneTask(context.Context, *connect.Request[v1.DoneTaskRequest]) (*connect.Response[v1.DoneTaskResponse], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("wackytracky.clientapi.v1.WackyTrackyClientService.DoneTask is not implemented"))
+}
+
+func (UnimplementedWackyTrackyClientServiceHandler) MoveTask(context.Context, *connect.Request[v1.MoveTaskRequest]) (*connect.Response[v1.MoveTaskResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("wackytracky.clientapi.v1.WackyTrackyClientService.MoveTask is not implemented"))
 }
 
 func (UnimplementedWackyTrackyClientServiceHandler) CreateList(context.Context, *connect.Request[v1.CreateListRequest]) (*connect.Response[v1.CreateListResponse], error) {
