@@ -18,11 +18,7 @@ const routes = [
     },
   },
   {
-<<<<<<< HEAD
     name: 'ListView',
-=======
-    name: 'List',
->>>>>>> 71b59258622895210856dfda62060a71fc0bc8dc
     path: '/lists/:listId',
     component: ListView,
     props: true,

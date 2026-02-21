@@ -21,14 +21,9 @@
   },
   "homepage": "https://github.com/wacky-tracky/wacky-tracky-client-html5#readme",
   "devDependencies": {
-<<<<<<< HEAD
     "eslint": "^10.0.0",
     "vite": "^7.3.1",
     "vite-plugin-pwa": "^1.2.0"
-=======
-    "eslint": "^9.39.2",
-    "vite": "^7.3.1"
->>>>>>> 71b59258622895210856dfda62060a71fc0bc8dc
   },
   "browserslist": [
     "since 2019-01"
@@ -38,12 +33,7 @@
     "@connectrpc/connect": "^2.1.1",
     "@connectrpc/connect-web": "^2.1.1",
     "@vitejs/plugin-vue": "^6.0.4",
-<<<<<<< HEAD
     "picocrank": "^1.14.0",
-=======
-    "femtocrank": "^2.5.0",
-    "picocrank": "^1.13.1",
->>>>>>> 71b59258622895210856dfda62060a71fc0bc8dc
     "vue-router": "^5.0.2"
   }
 }
