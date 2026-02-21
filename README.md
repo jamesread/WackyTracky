@@ -13,7 +13,7 @@
 
 ## Documentation
 
-Full documentation (MkDocs) is published to **GitHub Pages**: [https://wacky-tracky.github.io/WackyTracky/](https://wacky-tracky.github.io/WackyTracky/). The site is built from `docs/` and deployed automatically on push to `main` (see `.github/workflows/docs.yml`).
+Full documentation (MkDocs) is published to **GitHub Pages**: [https://jamesread.github.io/WackyTracky/](https://jamesread.github.io/WackyTracky/). The site is built from `docs/` and deployed automatically on push to `main` (see `.github/workflows/docs.yml`).
 
 ## Deploy with Docker Compose
 
@@ -35,7 +35,7 @@ volumes:
   todotxt-data:
 ```
 
-Then run: `docker compose up -d`. The web UI and API are served on port 8080 by default (adjust the image’s listen port in your config if needed). Place a `config.yaml` in the same directory as your `docker-compose.yml` if you mount it; see the [documentation](https://wacky-tracky.github.io/WackyTracky/) for config options.
+Then run: `docker compose up -d`. The web UI and API are served on port 8080 by default (adjust the image’s listen port in your config if needed). Place a `config.yaml` in the same directory as your `docker-compose.yml` if you mount it; see the [documentation](https://jamesread.github.io/WackyTracky/) for config options.
 
 ## Misc
 

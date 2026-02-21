@@ -182,7 +182,7 @@
 				</main>
 				<footer class="app-footer">
 					<span>
-						<a href="https://github.com/wacky-tracky/WackyTracky" target="_blank" rel="noopener noreferrer" class="footer-brand">WackyTracky</a>
+						<a href="https://jamesread.github.io/WackyTracky/" target="_blank" rel="noopener noreferrer" class="footer-brand">WackyTracky</a>
 					</span>
 					<span>
 						<button type="button" class="footer-shortcuts-btn" @click="openShortcutsDialog" aria-label="Keyboard shortcuts">
