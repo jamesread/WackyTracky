@@ -1,10 +1,16 @@
 package frontend
 
 import (
-	log "github.com/sirupsen/logrus"
+	"mime"
 	"net/http"
 	"os"
+
+	log "github.com/sirupsen/logrus"
 )
+
+func init() {
+	_ = mime.AddExtensionType(".webmanifest", "application/manifest+json")
+}
 
 func findWebUIDir() string {
 	directoriesToSearch := []string{
