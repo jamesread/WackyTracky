@@ -67,3 +67,10 @@ type TaskMetadataStore interface {
 	GetTaskMetadata(taskId string) (map[string]string, error)
 	SetTaskMetadata(taskId string, field string, value string) error
 }
+
+// TaskPropertyPropertiesStore is optionally implemented by backends that store key/value props on task properties (tags, contexts).
+// PropertyType is "tag" or "context"; propertyName is the tag name (e.g. "work") or context name (e.g. "home").
+type TaskPropertyPropertiesStore interface {
+	GetTaskPropertyProperties() (tagProperties map[string]map[string]string, contextProperties map[string]map[string]string, err error)
+	SetTaskPropertyProperty(propertyType, propertyName, key, value string) error
+}

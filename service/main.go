@@ -29,6 +29,9 @@ func disableLogTimestamps() {
 
 func initViperConfig() {
 	viper.AutomaticEnv()
+	viper.SetDefault("listenAddress", runtimeconfig.RuntimeConfig.ListenAddress)
+	viper.SetDefault("database.driver", runtimeconfig.RuntimeConfig.Database.Driver)
+	viper.SetDefault("database.database", runtimeconfig.RuntimeConfig.Database.Database)
 	viper.SetConfigName("config.yaml")
 	viper.SetConfigType("yaml")
 	viper.AddConfigPath(".")

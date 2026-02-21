@@ -87,6 +87,18 @@ const (
 	// WackyTrackyClientServiceSetTaskMetadataProcedure is the fully-qualified name of the
 	// WackyTrackyClientService's SetTaskMetadata RPC.
 	WackyTrackyClientServiceSetTaskMetadataProcedure = "/wackytracky.clientapi.v1.WackyTrackyClientService/SetTaskMetadata"
+	// WackyTrackyClientServiceGetTaskPropertyPropertiesProcedure is the fully-qualified name of the
+	// WackyTrackyClientService's GetTaskPropertyProperties RPC.
+	WackyTrackyClientServiceGetTaskPropertyPropertiesProcedure = "/wackytracky.clientapi.v1.WackyTrackyClientService/GetTaskPropertyProperties"
+	// WackyTrackyClientServiceSetTaskPropertyPropertyProcedure is the fully-qualified name of the
+	// WackyTrackyClientService's SetTaskPropertyProperty RPC.
+	WackyTrackyClientServiceSetTaskPropertyPropertyProcedure = "/wackytracky.clientapi.v1.WackyTrackyClientService/SetTaskPropertyProperty"
+	// WackyTrackyClientServiceRuleStatusProcedure is the fully-qualified name of the
+	// WackyTrackyClientService's RuleStatus RPC.
+	WackyTrackyClientServiceRuleStatusProcedure = "/wackytracky.clientapi.v1.WackyTrackyClientService/RuleStatus"
+	// WackyTrackyClientServiceRuleTestProcedure is the fully-qualified name of the
+	// WackyTrackyClientService's RuleTest RPC.
+	WackyTrackyClientServiceRuleTestProcedure = "/wackytracky.clientapi.v1.WackyTrackyClientService/RuleTest"
 )
 
 // WackyTrackyClientServiceClient is a client for the
@@ -110,6 +122,10 @@ type WackyTrackyClientServiceClient interface {
 	SetSavedSearches(context.Context, *connect.Request[v1.SetSavedSearchesRequest]) (*connect.Response[v1.SetSavedSearchesResponse], error)
 	GetTaskMetadata(context.Context, *connect.Request[v1.GetTaskMetadataRequest]) (*connect.Response[v1.GetTaskMetadataResponse], error)
 	SetTaskMetadata(context.Context, *connect.Request[v1.SetTaskMetadataRequest]) (*connect.Response[v1.SetTaskMetadataResponse], error)
+	GetTaskPropertyProperties(context.Context, *connect.Request[v1.GetTaskPropertyPropertiesRequest]) (*connect.Response[v1.GetTaskPropertyPropertiesResponse], error)
+	SetTaskPropertyProperty(context.Context, *connect.Request[v1.SetTaskPropertyPropertyRequest]) (*connect.Response[v1.SetTaskPropertyPropertyResponse], error)
+	RuleStatus(context.Context, *connect.Request[v1.RuleStatusRequest]) (*connect.Response[v1.RuleStatusResponse], error)
+	RuleTest(context.Context, *connect.Request[v1.RuleTestRequest]) (*connect.Response[v1.RuleTestResponse], error)
 }
 
 // NewWackyTrackyClientServiceClient constructs a client for the
@@ -232,29 +248,57 @@ func NewWackyTrackyClientServiceClient(httpClient connect.HTTPClient, baseURL st
 			connect.WithSchema(wackyTrackyClientServiceMethods.ByName("SetTaskMetadata")),
 			connect.WithClientOptions(opts...),
 		),
+		getTaskPropertyProperties: connect.NewClient[v1.GetTaskPropertyPropertiesRequest, v1.GetTaskPropertyPropertiesResponse](
+			httpClient,
+			baseURL+WackyTrackyClientServiceGetTaskPropertyPropertiesProcedure,
+			connect.WithSchema(wackyTrackyClientServiceMethods.ByName("GetTaskPropertyProperties")),
+			connect.WithClientOptions(opts...),
+		),
+		setTaskPropertyProperty: connect.NewClient[v1.SetTaskPropertyPropertyRequest, v1.SetTaskPropertyPropertyResponse](
+			httpClient,
+			baseURL+WackyTrackyClientServiceSetTaskPropertyPropertyProcedure,
+			connect.WithSchema(wackyTrackyClientServiceMethods.ByName("SetTaskPropertyProperty")),
+			connect.WithClientOptions(opts...),
+		),
+		ruleStatus: connect.NewClient[v1.RuleStatusRequest, v1.RuleStatusResponse](
+			httpClient,
+			baseURL+WackyTrackyClientServiceRuleStatusProcedure,
+			connect.WithSchema(wackyTrackyClientServiceMethods.ByName("RuleStatus")),
+			connect.WithClientOptions(opts...),
+		),
+		ruleTest: connect.NewClient[v1.RuleTestRequest, v1.RuleTestResponse](
+			httpClient,
+			baseURL+WackyTrackyClientServiceRuleTestProcedure,
+			connect.WithSchema(wackyTrackyClientServiceMethods.ByName("RuleTest")),
+			connect.WithClientOptions(opts...),
+		),
 	}
 }
 
 // wackyTrackyClientServiceClient implements WackyTrackyClientServiceClient.
 type wackyTrackyClientServiceClient struct {
-	version          *connect.Client[v1.VersionRequest, v1.VersionResponse]
-	init             *connect.Client[v1.InitRequest, v1.InitResponse]
-	getLists         *connect.Client[v1.GetListsRequest, v1.GetListsResponse]
-	listTasks        *connect.Client[v1.ListTasksRequest, v1.ListTasksResponse]
-	searchTasks      *connect.Client[v1.SearchTasksRequest, v1.SearchTasksResponse]
-	createTask       *connect.Client[v1.CreateTaskRequest, v1.CreateTaskResponse]
-	updateTask       *connect.Client[v1.UpdateTaskRequest, v1.UpdateTaskResponse]
-	doneTask         *connect.Client[v1.DoneTaskRequest, v1.DoneTaskResponse]
-	createList       *connect.Client[v1.CreateListRequest, v1.CreateListResponse]
-	tag              *connect.Client[v1.TagRequest, v1.TagResponse]
-	updateList       *connect.Client[v1.UpdateListRequest, v1.UpdateListResponse]
-	deleteList       *connect.Client[v1.DeleteListRequest, v1.DeleteListResponse]
-	getTags          *connect.Client[v1.GetTagsRequest, v1.GetTagsResponse]
-	repoStatus       *connect.Client[v1.RepoStatusRequest, v1.RepoStatusResponse]
-	getSavedSearches *connect.Client[v1.GetSavedSearchesRequest, v1.GetSavedSearchesResponse]
-	setSavedSearches *connect.Client[v1.SetSavedSearchesRequest, v1.SetSavedSearchesResponse]
-	getTaskMetadata  *connect.Client[v1.GetTaskMetadataRequest, v1.GetTaskMetadataResponse]
-	setTaskMetadata  *connect.Client[v1.SetTaskMetadataRequest, v1.SetTaskMetadataResponse]
+	version                   *connect.Client[v1.VersionRequest, v1.VersionResponse]
+	init                      *connect.Client[v1.InitRequest, v1.InitResponse]
+	getLists                  *connect.Client[v1.GetListsRequest, v1.GetListsResponse]
+	listTasks                 *connect.Client[v1.ListTasksRequest, v1.ListTasksResponse]
+	searchTasks               *connect.Client[v1.SearchTasksRequest, v1.SearchTasksResponse]
+	createTask                *connect.Client[v1.CreateTaskRequest, v1.CreateTaskResponse]
+	updateTask                *connect.Client[v1.UpdateTaskRequest, v1.UpdateTaskResponse]
+	doneTask                  *connect.Client[v1.DoneTaskRequest, v1.DoneTaskResponse]
+	createList                *connect.Client[v1.CreateListRequest, v1.CreateListResponse]
+	tag                       *connect.Client[v1.TagRequest, v1.TagResponse]
+	updateList                *connect.Client[v1.UpdateListRequest, v1.UpdateListResponse]
+	deleteList                *connect.Client[v1.DeleteListRequest, v1.DeleteListResponse]
+	getTags                   *connect.Client[v1.GetTagsRequest, v1.GetTagsResponse]
+	repoStatus                *connect.Client[v1.RepoStatusRequest, v1.RepoStatusResponse]
+	getSavedSearches          *connect.Client[v1.GetSavedSearchesRequest, v1.GetSavedSearchesResponse]
+	setSavedSearches          *connect.Client[v1.SetSavedSearchesRequest, v1.SetSavedSearchesResponse]
+	getTaskMetadata           *connect.Client[v1.GetTaskMetadataRequest, v1.GetTaskMetadataResponse]
+	setTaskMetadata           *connect.Client[v1.SetTaskMetadataRequest, v1.SetTaskMetadataResponse]
+	getTaskPropertyProperties *connect.Client[v1.GetTaskPropertyPropertiesRequest, v1.GetTaskPropertyPropertiesResponse]
+	setTaskPropertyProperty   *connect.Client[v1.SetTaskPropertyPropertyRequest, v1.SetTaskPropertyPropertyResponse]
+	ruleStatus                *connect.Client[v1.RuleStatusRequest, v1.RuleStatusResponse]
+	ruleTest                  *connect.Client[v1.RuleTestRequest, v1.RuleTestResponse]
 }
 
 // Version calls wackytracky.clientapi.v1.WackyTrackyClientService.Version.
@@ -347,6 +391,28 @@ func (c *wackyTrackyClientServiceClient) SetTaskMetadata(ctx context.Context, re
 	return c.setTaskMetadata.CallUnary(ctx, req)
 }
 
+// GetTaskPropertyProperties calls
+// wackytracky.clientapi.v1.WackyTrackyClientService.GetTaskPropertyProperties.
+func (c *wackyTrackyClientServiceClient) GetTaskPropertyProperties(ctx context.Context, req *connect.Request[v1.GetTaskPropertyPropertiesRequest]) (*connect.Response[v1.GetTaskPropertyPropertiesResponse], error) {
+	return c.getTaskPropertyProperties.CallUnary(ctx, req)
+}
+
+// SetTaskPropertyProperty calls
+// wackytracky.clientapi.v1.WackyTrackyClientService.SetTaskPropertyProperty.
+func (c *wackyTrackyClientServiceClient) SetTaskPropertyProperty(ctx context.Context, req *connect.Request[v1.SetTaskPropertyPropertyRequest]) (*connect.Response[v1.SetTaskPropertyPropertyResponse], error) {
+	return c.setTaskPropertyProperty.CallUnary(ctx, req)
+}
+
+// RuleStatus calls wackytracky.clientapi.v1.WackyTrackyClientService.RuleStatus.
+func (c *wackyTrackyClientServiceClient) RuleStatus(ctx context.Context, req *connect.Request[v1.RuleStatusRequest]) (*connect.Response[v1.RuleStatusResponse], error) {
+	return c.ruleStatus.CallUnary(ctx, req)
+}
+
+// RuleTest calls wackytracky.clientapi.v1.WackyTrackyClientService.RuleTest.
+func (c *wackyTrackyClientServiceClient) RuleTest(ctx context.Context, req *connect.Request[v1.RuleTestRequest]) (*connect.Response[v1.RuleTestResponse], error) {
+	return c.ruleTest.CallUnary(ctx, req)
+}
+
 // WackyTrackyClientServiceHandler is an implementation of the
 // wackytracky.clientapi.v1.WackyTrackyClientService service.
 type WackyTrackyClientServiceHandler interface {
@@ -368,6 +434,10 @@ type WackyTrackyClientServiceHandler interface {
 	SetSavedSearches(context.Context, *connect.Request[v1.SetSavedSearchesRequest]) (*connect.Response[v1.SetSavedSearchesResponse], error)
 	GetTaskMetadata(context.Context, *connect.Request[v1.GetTaskMetadataRequest]) (*connect.Response[v1.GetTaskMetadataResponse], error)
 	SetTaskMetadata(context.Context, *connect.Request[v1.SetTaskMetadataRequest]) (*connect.Response[v1.SetTaskMetadataResponse], error)
+	GetTaskPropertyProperties(context.Context, *connect.Request[v1.GetTaskPropertyPropertiesRequest]) (*connect.Response[v1.GetTaskPropertyPropertiesResponse], error)
+	SetTaskPropertyProperty(context.Context, *connect.Request[v1.SetTaskPropertyPropertyRequest]) (*connect.Response[v1.SetTaskPropertyPropertyResponse], error)
+	RuleStatus(context.Context, *connect.Request[v1.RuleStatusRequest]) (*connect.Response[v1.RuleStatusResponse], error)
+	RuleTest(context.Context, *connect.Request[v1.RuleTestRequest]) (*connect.Response[v1.RuleTestResponse], error)
 }
 
 // NewWackyTrackyClientServiceHandler builds an HTTP handler from the service implementation. It
@@ -485,6 +555,30 @@ func NewWackyTrackyClientServiceHandler(svc WackyTrackyClientServiceHandler, opt
 		connect.WithSchema(wackyTrackyClientServiceMethods.ByName("SetTaskMetadata")),
 		connect.WithHandlerOptions(opts...),
 	)
+	wackyTrackyClientServiceGetTaskPropertyPropertiesHandler := connect.NewUnaryHandler(
+		WackyTrackyClientServiceGetTaskPropertyPropertiesProcedure,
+		svc.GetTaskPropertyProperties,
+		connect.WithSchema(wackyTrackyClientServiceMethods.ByName("GetTaskPropertyProperties")),
+		connect.WithHandlerOptions(opts...),
+	)
+	wackyTrackyClientServiceSetTaskPropertyPropertyHandler := connect.NewUnaryHandler(
+		WackyTrackyClientServiceSetTaskPropertyPropertyProcedure,
+		svc.SetTaskPropertyProperty,
+		connect.WithSchema(wackyTrackyClientServiceMethods.ByName("SetTaskPropertyProperty")),
+		connect.WithHandlerOptions(opts...),
+	)
+	wackyTrackyClientServiceRuleStatusHandler := connect.NewUnaryHandler(
+		WackyTrackyClientServiceRuleStatusProcedure,
+		svc.RuleStatus,
+		connect.WithSchema(wackyTrackyClientServiceMethods.ByName("RuleStatus")),
+		connect.WithHandlerOptions(opts...),
+	)
+	wackyTrackyClientServiceRuleTestHandler := connect.NewUnaryHandler(
+		WackyTrackyClientServiceRuleTestProcedure,
+		svc.RuleTest,
+		connect.WithSchema(wackyTrackyClientServiceMethods.ByName("RuleTest")),
+		connect.WithHandlerOptions(opts...),
+	)
 	return "/wackytracky.clientapi.v1.WackyTrackyClientService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
 		case WackyTrackyClientServiceVersionProcedure:
@@ -523,6 +617,14 @@ func NewWackyTrackyClientServiceHandler(svc WackyTrackyClientServiceHandler, opt
 			wackyTrackyClientServiceGetTaskMetadataHandler.ServeHTTP(w, r)
 		case WackyTrackyClientServiceSetTaskMetadataProcedure:
 			wackyTrackyClientServiceSetTaskMetadataHandler.ServeHTTP(w, r)
+		case WackyTrackyClientServiceGetTaskPropertyPropertiesProcedure:
+			wackyTrackyClientServiceGetTaskPropertyPropertiesHandler.ServeHTTP(w, r)
+		case WackyTrackyClientServiceSetTaskPropertyPropertyProcedure:
+			wackyTrackyClientServiceSetTaskPropertyPropertyHandler.ServeHTTP(w, r)
+		case WackyTrackyClientServiceRuleStatusProcedure:
+			wackyTrackyClientServiceRuleStatusHandler.ServeHTTP(w, r)
+		case WackyTrackyClientServiceRuleTestProcedure:
+			wackyTrackyClientServiceRuleTestHandler.ServeHTTP(w, r)
 		default:
 			http.NotFound(w, r)
 		}
@@ -602,4 +704,20 @@ func (UnimplementedWackyTrackyClientServiceHandler) GetTaskMetadata(context.Cont
 
 func (UnimplementedWackyTrackyClientServiceHandler) SetTaskMetadata(context.Context, *connect.Request[v1.SetTaskMetadataRequest]) (*connect.Response[v1.SetTaskMetadataResponse], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("wackytracky.clientapi.v1.WackyTrackyClientService.SetTaskMetadata is not implemented"))
+}
+
+func (UnimplementedWackyTrackyClientServiceHandler) GetTaskPropertyProperties(context.Context, *connect.Request[v1.GetTaskPropertyPropertiesRequest]) (*connect.Response[v1.GetTaskPropertyPropertiesResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("wackytracky.clientapi.v1.WackyTrackyClientService.GetTaskPropertyProperties is not implemented"))
+}
+
+func (UnimplementedWackyTrackyClientServiceHandler) SetTaskPropertyProperty(context.Context, *connect.Request[v1.SetTaskPropertyPropertyRequest]) (*connect.Response[v1.SetTaskPropertyPropertyResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("wackytracky.clientapi.v1.WackyTrackyClientService.SetTaskPropertyProperty is not implemented"))
+}
+
+func (UnimplementedWackyTrackyClientServiceHandler) RuleStatus(context.Context, *connect.Request[v1.RuleStatusRequest]) (*connect.Response[v1.RuleStatusResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("wackytracky.clientapi.v1.WackyTrackyClientService.RuleStatus is not implemented"))
+}
+
+func (UnimplementedWackyTrackyClientServiceHandler) RuleTest(context.Context, *connect.Request[v1.RuleTestRequest]) (*connect.Response[v1.RuleTestResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("wackytracky.clientapi.v1.WackyTrackyClientService.RuleTest is not implemented"))
 }

@@ -4,6 +4,7 @@ import (
 	"context"
 	"net/http"
 	"os/exec"
+	"time"
 
 	"connectrpc.com/connect"
 	"github.com/prometheus/client_golang/prometheus"
@@ -14,6 +15,7 @@ import (
 	"github.com/wacky-tracky/wacky-tracky-server/internal/buildinfo"
 	dbmdl "github.com/wacky-tracky/wacky-tracky-server/internal/db/model"
 	"github.com/wacky-tracky/wacky-tracky-server/internal/db/todotxt"
+	"github.com/wacky-tracky/wacky-tracky-server/internal/ruleeval"
 )
 
 var metricListTasksCount = promauto.NewCounter(prometheus.CounterOpts{
@@ -104,6 +106,143 @@ func (api *wackyTrackyClientService) appendSubtrees(tasks []*pb.Task, tree map[s
 	return tasks, subTree, nil
 }
 
+const hideAtTimesKey = "hide-at-times"
+
+func collectHiddenNamesFromProps(props map[string]map[string]string, env ruleeval.RuleEnv) []string {
+	var out []string
+	for name, m := range props {
+		if e := m[hideAtTimesKey]; e != "" {
+			ok, _ := ruleeval.Eval(e, env)
+			if ok {
+				out = append(out, name)
+			}
+		}
+	}
+	return out
+}
+
+func hideAtTimesExprForProp(props map[string]map[string]string, name string) string {
+	m := props[name]
+	if m == nil {
+		return ""
+	}
+	return m[hideAtTimesKey]
+}
+
+func collectHideAtTimesExprs(task *pb.Task, tagProps, ctxProps map[string]map[string]string) []string {
+	var exprs []string
+	for _, tag := range task.Tags {
+		if e := hideAtTimesExprForProp(tagProps, tag); e != "" {
+			exprs = append(exprs, e)
+		}
+	}
+	for _, ctx := range task.Contexts {
+		if e := hideAtTimesExprForProp(ctxProps, ctx); e != "" {
+			exprs = append(exprs, e)
+		}
+	}
+	return exprs
+}
+
+func taskIsHiddenByExprs(exprs []string, env ruleeval.RuleEnv) bool {
+	for _, e := range exprs {
+		ok, err := ruleeval.Eval(e, env)
+		if err != nil {
+			continue
+		}
+		if ok {
+			return true
+		}
+	}
+	return false
+}
+
+func ensureTppMaps(tagProps, ctxProps map[string]map[string]string) (map[string]map[string]string, map[string]map[string]string) {
+	if tagProps == nil {
+		tagProps = make(map[string]map[string]string)
+	}
+	if ctxProps == nil {
+		ctxProps = make(map[string]map[string]string)
+	}
+	return tagProps, ctxProps
+}
+
+func getTaskPropertyMaps(store dbmdl.TaskPropertyPropertiesStore) (tagProps, ctxProps map[string]map[string]string, ok bool) {
+	tagProps, ctxProps, err := store.GetTaskPropertyProperties()
+	if err != nil || (tagProps == nil && ctxProps == nil) {
+		return nil, nil, false
+	}
+	tagProps, ctxProps = ensureTppMaps(tagProps, ctxProps)
+	return tagProps, ctxProps, true
+}
+
+func buildHiddenSet(tasks []*pb.Task, tagProps, ctxProps map[string]map[string]string, env ruleeval.RuleEnv) map[string]bool {
+	hiddenSet := make(map[string]bool)
+	for _, t := range tasks {
+		exprs := collectHideAtTimesExprs(t, tagProps, ctxProps)
+		if taskIsHiddenByExprs(exprs, env) {
+			hiddenSet[t.Id] = true
+		}
+	}
+	return hiddenSet
+}
+
+func (api *wackyTrackyClientService) listTasksFilterHideAtTimes(tasks []*pb.Task, tree map[string]*pb.TaskIdList) ([]*pb.Task, map[string]*pb.TaskIdList, []string, []string) {
+	store, ok := api.dbconn.(dbmdl.TaskPropertyPropertiesStore)
+	if !ok {
+		return tasks, tree, nil, nil
+	}
+	tagProps, ctxProps, ok := getTaskPropertyMaps(store)
+	if !ok {
+		return tasks, tree, nil, nil
+	}
+	env := ruleeval.NewRuleEnv(time.Now())
+	hiddenTagNames := collectHiddenNamesFromProps(tagProps, env)
+	hiddenContextNames := collectHiddenNamesFromProps(ctxProps, env)
+	hiddenSet := buildHiddenSet(tasks, tagProps, ctxProps, env)
+	for id := range hiddenSet {
+		api.addDescendantsToHidden(id, tree, hiddenSet)
+	}
+	filteredTasks := filterTasksByHidden(tasks, hiddenSet)
+	filteredTree := filterTreeByHidden(tree, hiddenSet)
+	return filteredTasks, filteredTree, hiddenTagNames, hiddenContextNames
+}
+
+func filterTasksByHidden(tasks []*pb.Task, hiddenSet map[string]bool) []*pb.Task {
+	var out []*pb.Task
+	for _, t := range tasks {
+		if !hiddenSet[t.Id] {
+			out = append(out, t)
+		}
+	}
+	return out
+}
+
+func filterTreeByHidden(tree map[string]*pb.TaskIdList, hiddenSet map[string]bool) map[string]*pb.TaskIdList {
+	out := make(map[string]*pb.TaskIdList)
+	for parentID, idList := range tree {
+		var ids []string
+		for _, id := range idList.Ids {
+			if !hiddenSet[id] {
+				ids = append(ids, id)
+			}
+		}
+		out[parentID] = &pb.TaskIdList{Ids: ids}
+	}
+	return out
+}
+
+func (api *wackyTrackyClientService) addDescendantsToHidden(id string, tree map[string]*pb.TaskIdList, hiddenSet map[string]bool) {
+	idList := tree[id]
+	if idList == nil {
+		return
+	}
+	for _, childID := range idList.Ids {
+		hiddenSet[childID] = true
+		api.addDescendantsToHidden(childID, tree, hiddenSet)
+	}
+}
+
 func (api *wackyTrackyClientService) ListTasks(ctx context.Context, req *connect.Request[pb.ListTasksRequest]) (*connect.Response[pb.ListTasksResponse], error) {
 	metricListTasksCount.Inc()
 
@@ -120,9 +259,12 @@ func (api *wackyTrackyClientService) ListTasks(ctx context.Context, req *connect
 	if err != nil {
 		return connect.NewResponse(&pb.ListTasksResponse{}), err
 	}
+	tasks, tree, hiddenTags, hiddenContexts := api.listTasksFilterHideAtTimes(tasks, tree)
 	return connect.NewResponse(&pb.ListTasksResponse{
-		Tasks: tasks,
-		Tree:  tree,
+		Tasks:              tasks,
+		Tree:               tree,
+		HiddenTagNames:     hiddenTags,
+		HiddenContextNames: hiddenContexts,
 	}), nil
 }
 
@@ -295,6 +437,82 @@ func (api *wackyTrackyClientService) SetTaskMetadata(ctx context.Context, req *c
 		_ = s.SetTaskMetadata(req.Msg.TaskId, req.Msg.Field, req.Msg.Value)
 	}
 	return connect.NewResponse(&pb.SetTaskMetadataResponse{}), nil
+}
+
+func mapToTaskPropertyProps(m map[string]string) *pb.TaskPropertyProps {
+	if m == nil {
+		return nil
+	}
+	props := make(map[string]string, len(m))
+	for k, v := range m {
+		props[k] = v
+	}
+	return &pb.TaskPropertyProps{Props: props}
+}
+
+func (api *wackyTrackyClientService) GetTaskPropertyProperties(ctx context.Context, req *connect.Request[pb.GetTaskPropertyPropertiesRequest]) (*connect.Response[pb.GetTaskPropertyPropertiesResponse], error) {
+	_ = req
+	res := &pb.GetTaskPropertyPropertiesResponse{
+		TagProperties:     make(map[string]*pb.TaskPropertyProps),
+		ContextProperties: make(map[string]*pb.TaskPropertyProps),
+	}
+	if s, ok := api.dbconn.(dbmdl.TaskPropertyPropertiesStore); ok {
+		tagProps, ctxProps, err := s.GetTaskPropertyProperties()
+		if err != nil {
+			return nil, err
+		}
+		for name, props := range tagProps {
+			res.TagProperties[name] = mapToTaskPropertyProps(props)
+		}
+		for name, props := range ctxProps {
+			res.ContextProperties[name] = mapToTaskPropertyProps(props)
+		}
+	}
+	return connect.NewResponse(res), nil
+}
+
+func (api *wackyTrackyClientService) SetTaskPropertyProperty(ctx context.Context, req *connect.Request[pb.SetTaskPropertyPropertyRequest]) (*connect.Response[pb.SetTaskPropertyPropertyResponse], error) {
+	if s, ok := api.dbconn.(dbmdl.TaskPropertyPropertiesStore); ok && req.Msg.PropertyType != "" && req.Msg.PropertyName != "" && req.Msg.Key != "" {
+		_ = s.SetTaskPropertyProperty(req.Msg.PropertyType, req.Msg.PropertyName, req.Msg.Key, req.Msg.Value)
+	}
+	return connect.NewResponse(&pb.SetTaskPropertyPropertyResponse{}), nil
+}
+
+func (api *wackyTrackyClientService) RuleStatus(ctx context.Context, req *connect.Request[pb.RuleStatusRequest]) (*connect.Response[pb.RuleStatusResponse], error) {
+	_ = req
+	env := ruleeval.NewRuleEnv(time.Now())
+	return connect.NewResponse(&pb.RuleStatusResponse{
+		D: env.D,
+		H: int32(env.H),
+		M: int32(env.M),
+	}), nil
+}
+
+func (api *wackyTrackyClientService) RuleTest(ctx context.Context, req *connect.Request[pb.RuleTestRequest]) (*connect.Response[pb.RuleTestResponse], error) {
+	exprStr := req.Msg.Expression
+	if exprStr == "" {
+		return connect.NewResponse(&pb.RuleTestResponse{Compiles: false, CompileError: "expression is empty"}), nil
+	}
+	program, err := ruleeval.Compile(exprStr)
+	if err != nil {
+		return connect.NewResponse(&pb.RuleTestResponse{
+			Compiles:     false,
+			CompileError: err.Error(),
+		}), nil
+	}
+	env := ruleeval.NewRuleEnv(time.Now())
+	result, err := ruleeval.Run(program, env)
+	if err != nil {
+		return connect.NewResponse(&pb.RuleTestResponse{
+			Compiles:  true,
+			Result:    false,
+			EvalError: err.Error(),
+		}), nil
+	}
+	return connect.NewResponse(&pb.RuleTestResponse{
+		Compiles: true,
+		Result:   result,
+	}), nil
 }
 
 func (api *wackyTrackyClientService) Init(ctx context.Context, req *connect.Request[pb.InitRequest]) (*connect.Response[pb.InitResponse], error) {

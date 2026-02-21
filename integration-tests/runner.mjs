@@ -17,7 +17,7 @@ export default function getRunner () {
 }
 
 class WackyTrackyTestRunner {
-  BASE_URL = 'http://localhost:8443/'
+  BASE_URL = 'http://localhost:8080/'
   serverProcess = null
 
   baseUrl () {

@@ -31,7 +31,7 @@ The runner builds the frontend and service, starts the server (with config from 
 - `configs/default/config.yaml` — config used when starting the server (copied to service/ for the run).
 - `lib/elements.js` — shared helpers (e.g. getRootAndWait, takeScreenshotOnFailure).
 - `mochaSetup.mjs` — global setup: headless Chrome WebDriver and runner.
-- `runner.mjs` — starts/stops the WackyTracky server (build frontend, build service, spawn server, wait-on port 8443).
+- `runner.mjs` — starts/stops the WackyTracky server (build frontend, build service, spawn server, wait-on port 8080).
 - `tests/` — Mocha test files (e.g. `tests/pageTitle/pageTitle.mjs`).
 
 ## Single test

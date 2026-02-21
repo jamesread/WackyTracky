@@ -25,7 +25,7 @@ services:
   wackytracky:
     image: ghcr.io/jamesread/wacky-tracky:latest
     ports:
-      - "8443:8443"
+      - "8080:8080"
     volumes:
       # Config: mount a file at /app/config.yaml or a directory at /config (with config.yaml inside)
       - ./config.yaml:/app/config.yaml
@@ -35,7 +35,7 @@ volumes:
   todotxt-data:
 ```
 
-Then run: `docker compose up -d`. The web UI and API are served on port 8443 by default (adjust the image’s listen port in your config if needed). Place a `config.yaml` in the same directory as your `docker-compose.yml` if you mount it; see the [documentation](https://wacky-tracky.github.io/WackyTracky/) for config options.
+Then run: `docker compose up -d`. The web UI and API are served on port 8080 by default (adjust the image’s listen port in your config if needed). Place a `config.yaml` in the same directory as your `docker-compose.yml` if you mount it; see the [documentation](https://wacky-tracky.github.io/WackyTracky/) for config options.
 
 ## Misc
 

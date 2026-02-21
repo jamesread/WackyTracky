@@ -12,6 +12,8 @@ generate:
 docs:
 	$(MAKE) -C docs
 
+it: integration-tests
+
 integration-tests:
 	$(MAKE) -C integration-tests
 

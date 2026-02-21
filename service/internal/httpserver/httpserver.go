@@ -13,6 +13,7 @@ import (
 	log "github.com/sirupsen/logrus"
 
 	"github.com/wacky-tracky/wacky-tracky-server/internal/db"
+	"github.com/wacky-tracky/wacky-tracky-server/internal/runtimeconfig"
 )
 
 func StartServer() {
@@ -33,10 +34,10 @@ func StartServer() {
 	mux.Handle("/metrics", promhttp.Handler())
 	mux.Handle("/wallpapers", getWallpapersHandler())
 
-	endpoint := "0.0.0.0:8080"
+	endpoint := runtimeconfig.RuntimeConfig.ListenAddress
 
-	log.Infof("Starting HTTP server on %s", endpoint)
-	log.Infof("API available at %s", endpoint+"/api"+apiPath)
+	log.WithField("endpoint", endpoint).Info("Starting HTTP server")
+	log.WithField("url", endpoint+"/api"+apiPath).Info("API available")
 
 	if err := http.ListenAndServe(
 		endpoint,

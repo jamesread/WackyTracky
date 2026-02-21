@@ -5,6 +5,9 @@ import (
 	"path/filepath"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+	db "github.com/wacky-tracky/wacky-tracky-server/internal/db/model"
 	. "github.com/wacky-tracky/wacky-tracky-server/internal/runtimeconfig"
 )
 
@@ -157,4 +160,47 @@ func TestTodoTxt_UpdateTaskAndDoneTask(t *testing.T) {
 	if len(roots) != 0 {
 		t.Errorf("done task should not appear in GetTasks, got %d", len(roots))
 	}
+}
+
+func TestTodoTxt_GetSetTaskPropertyProperties(t *testing.T) {
+	dir, cleanup := setTodotxtDir(t)
+	defer cleanup()
+
+	todoPath := filepath.Join(dir, "todo.txt")
+	if err := os.WriteFile(todoPath, []byte("task #work @home\n"), 0644); err != nil {
+		t.Fatal(err)
+	}
+
+	d := &TodoTxt{}
+	if err := d.Connect(); err != nil {
+		t.Fatal(err)
+	}
+
+	var store db.TaskPropertyPropertiesStore = d
+
+	tagProps, ctxProps, err := store.GetTaskPropertyProperties()
+	require.NoError(t, err)
+	assert.Empty(t, tagProps)
+	assert.Empty(t, ctxProps)
+
+	require.NoError(t, store.SetTaskPropertyProperty("tag", "work", "bgcolor", "#ff0000"))
+	require.NoError(t, store.SetTaskPropertyProperty("context", "home", "bgcolor", "#00ff00"))
+
+	tagProps, ctxProps, err = store.GetTaskPropertyProperties()
+	require.NoError(t, err)
+	assert.Equal(t, "#ff0000", tagProps["work"]["bgcolor"])
+	assert.Equal(t, "#00ff00", ctxProps["home"]["bgcolor"])
+
+	tppPath := filepath.Join(dir, tppFilename)
+	b, err := os.ReadFile(tppPath)
+	require.NoError(t, err)
+	assert.Contains(t, string(b), "work")
+	assert.Contains(t, string(b), "#ff0000")
+	assert.Contains(t, string(b), "home")
+	assert.Contains(t, string(b), "#00ff00")
+
+	require.NoError(t, store.SetTaskPropertyProperty("tag", "work", "bgcolor", ""))
+	tagProps, _, _ = store.GetTaskPropertyProperties()
+	_, hasWork := tagProps["work"]
+	assert.False(t, hasWork)
 }

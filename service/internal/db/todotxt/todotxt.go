@@ -15,6 +15,7 @@ import (
 	log "github.com/sirupsen/logrus"
 	db "github.com/wacky-tracky/wacky-tracky-server/internal/db/model"
 	. "github.com/wacky-tracky/wacky-tracky-server/internal/runtimeconfig"
+	"gopkg.in/yaml.v2"
 )
 
 const (
@@ -22,21 +23,25 @@ const (
 	defaultListName  = "Inbox"
 	listsFilename    = "todotxt_lists.txt"
 	searchesFilename = "searches.txt"
+	tppFilename      = ".tpp.yaml"
 )
 
 // TodoTxt implements db.DB using todo.txt format files.
 // See http://todotxt.org and https://github.com/todotxt/todo.txt
 type TodoTxt struct {
-	mu             sync.RWMutex
-	todoPath       string
-	donePath       string
-	listsPath      string
-	dir            string
-	tasks          []*Task
-	lists          []db.DBList
-	defaultListID  string
-	watcher        *fsnotify.Watcher
-	reloadDebounce chan struct{}
+	mu                sync.RWMutex
+	todoPath          string
+	donePath          string
+	listsPath         string
+	tppPath           string
+	dir               string
+	tasks             []*Task
+	lists             []db.DBList
+	tagProperties     map[string]map[string]string
+	contextProperties map[string]map[string]string
+	defaultListID     string
+	watcher           *fsnotify.Watcher
+	reloadDebounce    chan struct{}
 }
 
 func (d *TodoTxt) connectInitPaths() error {
@@ -47,6 +52,7 @@ func (d *TodoTxt) connectInitPaths() error {
 	d.todoPath = filepath.Join(d.dir, "todo.txt")
 	d.donePath = filepath.Join(d.dir, "done.txt")
 	d.listsPath = filepath.Join(d.dir, listsFilename)
+	d.tppPath = filepath.Join(d.dir, tppFilename)
 	d.defaultListID = defaultListID
 	if err := os.MkdirAll(d.dir, 0755); err != nil {
 		return fmt.Errorf("todotxt: create dir: %w", err)
@@ -83,29 +89,34 @@ func (d *TodoTxt) Connect() error {
 	if err := d.loadTasks(); err != nil {
 		return err
 	}
+	if err := d.loadTpp(); err != nil {
+		log.Warnf("todotxt: load .tpp.yaml: %v", err)
+	}
 	d.connectStartWatcher()
 	log.WithFields(log.Fields{
 		"dir":   d.dir,
 		"tasks": len(d.tasks),
+		"lists": len(d.lists),
 	}).Info("todotxt: connected")
 	return nil
 }
 
-func fileTriggersReload(ev fsnotify.Event, todoBase, doneBase, listsBase string) bool {
+func fileTriggersReload(ev fsnotify.Event, todoBase, doneBase, listsBase, tppBase string) bool {
 	if ev.Op&(fsnotify.Write|fsnotify.Create) == 0 {
 		return false
 	}
 	base := filepath.Base(ev.Name)
-	return base == todoBase || base == doneBase || base == listsBase
+	return base == todoBase || base == doneBase || base == listsBase || base == tppBase
 }
 
-// runFileWatcher watches the todotxt directory and reloads tasks/lists when todo.txt, done.txt, or lists file change.
+// runFileWatcher watches the todotxt directory and reloads tasks/lists when todo.txt, done.txt, lists, or .tpp.yaml change.
 func (d *TodoTxt) runFileWatcher() {
 	todoBase := filepath.Base(d.todoPath)
 	doneBase := filepath.Base(d.donePath)
 	listsBase := filepath.Base(d.listsPath)
+	tppBase := filepath.Base(d.tppPath)
 	for ev := range d.watcher.Events {
-		if !fileTriggersReload(ev, todoBase, doneBase, listsBase) {
+		if !fileTriggersReload(ev, todoBase, doneBase, listsBase, tppBase) {
 			continue
 		}
 		select {
@@ -124,6 +135,9 @@ func (d *TodoTxt) doReload() {
 	}
 	if err := d.loadLists(); err != nil {
 		log.Warnf("todotxt: reload lists after file change: %v", err)
+	}
+	if err := d.loadTpp(); err != nil {
+		log.Warnf("todotxt: reload .tpp.yaml after file change: %v", err)
 	}
 	log.Debug("todotxt: reloaded after file change")
 }
@@ -146,7 +160,7 @@ func (d *TodoTxt) runReloadLoop() {
 func (d *TodoTxt) Print() {
 	d.mu.RLock()
 	defer d.mu.RUnlock()
-	log.Infof("todotxt: %d tasks, %d lists", len(d.tasks), len(d.lists))
+	log.Debugf("todotxt: %d tasks, %d lists", len(d.tasks), len(d.lists))
 }
 
 // Dir returns the todotxt data directory (for git status, etc.).
@@ -288,6 +302,50 @@ func (d *TodoTxt) saveLists() error {
 		lines = append(lines, l.ID+"\t"+l.Title)
 	}
 	return os.WriteFile(d.listsPath, []byte(strings.Join(lines, "\n")+"\n"), 0644)
+}
+
+type tppYaml struct {
+	Tags     map[string]map[string]string `yaml:"tags"`
+	Contexts map[string]map[string]string `yaml:"contexts"`
+}
+
+func (d *TodoTxt) loadTpp() error {
+	d.tagProperties = make(map[string]map[string]string)
+	d.contextProperties = make(map[string]map[string]string)
+	b, err := os.ReadFile(d.tppPath)
+	if err != nil {
+		if os.IsNotExist(err) {
+			return nil
+		}
+		return err
+	}
+	var data tppYaml
+	if err := yaml.Unmarshal(b, &data); err != nil {
+		return err
+	}
+	assignTppFromData(d, &data)
+	return nil
+}
+
+func assignTppFromData(d *TodoTxt, data *tppYaml) {
+	if data.Tags != nil {
+		d.tagProperties = data.Tags
+	}
+	if data.Contexts != nil {
+		d.contextProperties = data.Contexts
+	}
+}
+
+func (d *TodoTxt) saveTpp() error {
+	data := tppYaml{
+		Tags:     d.tagProperties,
+		Contexts: d.contextProperties,
+	}
+	b, err := yaml.Marshal(data)
+	if err != nil {
+		return err
+	}
+	return os.WriteFile(d.tppPath, b, 0644)
 }
 
 func taskParentTypeAndID(t *Task) (parentType, parentID string) {
@@ -909,4 +967,79 @@ func (d *TodoTxt) SetTaskMetadata(taskId, field, value string) error {
 		return err
 	}
 	return os.WriteFile(p, []byte(value), 0644)
+}
+
+func copyTpp(m map[string]map[string]string) map[string]map[string]string {
+	if m == nil {
+		return nil
+	}
+	out := make(map[string]map[string]string, len(m))
+	for k, v := range m {
+		inner := make(map[string]string, len(v))
+		for k2, v2 := range v {
+			inner[k2] = v2
+		}
+		out[k] = inner
+	}
+	return out
+}
+
+// GetTaskPropertyProperties implements db.TaskPropertyPropertiesStore: read from .tpp.yaml
+func (d *TodoTxt) GetTaskPropertyProperties() (tagProperties map[string]map[string]string, contextProperties map[string]map[string]string, err error) {
+	d.mu.RLock()
+	defer d.mu.RUnlock()
+	return copyTpp(d.tagProperties), copyTpp(d.contextProperties), nil
+}
+
+func (d *TodoTxt) setTagProperty(propertyName, key, value string) {
+	if d.tagProperties == nil {
+		d.tagProperties = make(map[string]map[string]string)
+	}
+	if d.tagProperties[propertyName] == nil {
+		d.tagProperties[propertyName] = make(map[string]string)
+	}
+	if value == "" {
+		delete(d.tagProperties[propertyName], key)
+		if len(d.tagProperties[propertyName]) == 0 {
+			delete(d.tagProperties, propertyName)
+		}
+	} else {
+		d.tagProperties[propertyName][key] = value
+	}
+}
+
+func (d *TodoTxt) setContextProperty(propertyName, key, value string) {
+	if d.contextProperties == nil {
+		d.contextProperties = make(map[string]map[string]string)
+	}
+	if d.contextProperties[propertyName] == nil {
+		d.contextProperties[propertyName] = make(map[string]string)
+	}
+	if value == "" {
+		delete(d.contextProperties[propertyName], key)
+		if len(d.contextProperties[propertyName]) == 0 {
+			delete(d.contextProperties, propertyName)
+		}
+	} else {
+		d.contextProperties[propertyName][key] = value
+	}
+}
+
+// SetTaskPropertyProperty implements db.TaskPropertyPropertiesStore: write one key for one tag or context into .tpp.yaml
+func (d *TodoTxt) SetTaskPropertyProperty(propertyType, propertyName, key, value string) error {
+	d.mu.Lock()
+	defer d.mu.Unlock()
+	propertyName = strings.TrimSpace(propertyName)
+	if propertyName == "" {
+		return nil
+	}
+	switch propertyType {
+	case "tag":
+		d.setTagProperty(propertyName, key, value)
+	case "context":
+		d.setContextProperty(propertyName, key, value)
+	default:
+		return nil
+	}
+	return d.saveTpp()
 }
