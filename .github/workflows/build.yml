@@ -44,12 +44,6 @@ jobs:
           go-version-file: 'service/go.mod'
           cache: true
 
-      - name: Install buf
-        uses: bufbuild/buf-setup-action@v1
-
-      - name: Generate (protocol → service/gen, frontend/js/gen)
-        run: make generate
-
       - name: make frontend
         run: make -w frontend
 
