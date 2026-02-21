@@ -35,6 +35,7 @@ dist/
 # Temp / runtime
 tmp/
 **/*.tmp
+**/*.orig
 **/*.log
 **/.cache/
 wallpapers

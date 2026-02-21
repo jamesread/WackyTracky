@@ -1,5 +1,6 @@
 <template>
 	<Header
+<<<<<<< HEAD
 		ref="headerRef"
 		title="WackyTracky"
 		:logo-url="logoUrl"
@@ -173,15 +174,41 @@
 	</div>
 	<Navigation ref="navigation">
 		<div id="layout">
+=======
+		username="Guest"
+		title="wacky-tracky"
+		:logo-url="logoUrl"
+		:sidebar-enabled="true"
+		:show-branding="true"
+		:breadcrumbs="true"
+		:top-bar-enabled="false"
+		:navigation="navigation"
+		@toggle-sidebar="toggleSidebar"
+	>
+		<template #toolbar>
+			<div id="slot-task-input" />
+		</template>
+	</Header>
+
+	<Navigation ref="navigation">
+		<div id="layout">
+			<Sidebar ref="sidebar" />
+
+>>>>>>> 71b59258622895210856dfda62060a71fc0bc8dc
 			<div id="content">
 				<main>
 					<router-view :key="$route.fullPath" />
 				</main>
+<<<<<<< HEAD
 				<footer class="app-footer">
 					<span>WackyTracky</span>
 					<button type="button" class="footer-shortcuts-btn" @click="openShortcutsDialog" aria-label="Keyboard shortcuts">
 						Shortcuts
 					</button>
+=======
+				<footer>
+					<span>wacky-tracky</span>
+>>>>>>> 71b59258622895210856dfda62060a71fc0bc8dc
 				</footer>
 			</div>
 		</div>
@@ -189,6 +216,7 @@
 </template>
 
 <script setup>
+<<<<<<< HEAD
 import { ref, onMounted, onUnmounted, watch, nextTick, computed, provide } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import { HugeiconsIcon } from '@hugeicons/vue';
@@ -643,6 +671,52 @@ onUnmounted(() => {
 	document.removeEventListener('keydown', onKeyM);
 	document.removeEventListener('keydown', onShortcutsOpenKeydown);
 	headerLogoClickCleanup?.();
+=======
+import { ref, onMounted } from 'vue';
+
+import Header from 'picocrank/vue/components/Header.vue';
+import Navigation from 'picocrank/vue/components/Navigation.vue';
+import Sidebar from 'picocrank/vue/components/Sidebar.vue';
+
+const logoUrl = new URL('../images/logos/wacky-tracky.png', import.meta.url).href;
+const sidebar = ref(null);
+const navigation = ref(null);
+
+function toggleSidebar() {
+	if (sidebar.value) {
+		sidebar.value.toggle();
+	}
+}
+
+async function getLists() {
+	const ret = await window.client.getLists();
+	const nav = navigation.value;
+	if (!nav?.addNavigationLink) return;
+
+	for (const list of ret.lists) {
+		nav.addNavigationLink({
+			name: String(list.id),
+			title: list.title,
+			path: `/lists/${list.id}`,
+			type: 'route',
+		});
+	}
+}
+
+onMounted(() => {
+	// Add links on the Navigation component (not Sidebar).
+	const nav = navigation.value;
+	if (nav?.addRouterLink) {
+		nav.addRouterLink('Welcome');
+	}
+
+	getLists();
+
+	if (sidebar.value) {
+		sidebar.value.open();
+		sidebar.value.stick();
+	}
+>>>>>>> 71b59258622895210856dfda62060a71fc0bc8dc
 });
 </script>
 

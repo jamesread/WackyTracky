@@ -1,6 +1,10 @@
+<<<<<<< HEAD
 # MkDocs build output
 site/
 
 # Temp / cache
 .cache/
 *.log
+=======
+node_modules
+>>>>>>> 71b59258622895210856dfda62060a71fc0bc8dc

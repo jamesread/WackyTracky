@@ -18,7 +18,11 @@ const routes = [
     },
   },
   {
+<<<<<<< HEAD
     name: 'ListView',
+=======
+    name: 'List',
+>>>>>>> 71b59258622895210856dfda62060a71fc0bc8dc
     path: '/lists/:listId',
     component: ListView,
     props: true,
@@ -27,8 +31,8 @@ const routes = [
       icon: PinIcon,
       breadcrumbs: (route) => {
         return [
-          { name: 'Home', to: '/' },
-          { name: 'List: ' + String(route.params.listId), to: '/lists/:listId' }
+          { name: 'Home', href: '/' },
+          { name: 'List: ' + String(route.params.listId), href: '/lists/' + route.params.listId }
         ];
       }
     }
