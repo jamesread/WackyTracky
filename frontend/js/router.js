@@ -8,6 +8,7 @@ import ListView from '../resources/vue/views/ListView.vue';
 import NavOptions from '../resources/vue/components/NavOptions.vue';
 import Options from '../resources/vue/views/Options.vue';
 import Diagnostics from '../resources/vue/views/Diagnostics.vue';
+import TaskPropertyProperties from '../resources/vue/views/TaskPropertyProperties.vue';
 
 const routes = [
   {
@@ -57,6 +58,15 @@ const routes = [
     component: NavOptions,
     meta: {
       title: 'Options',
+      icon: Settings01Icon,
+    }
+  },
+  {
+    name: 'TaskPropertyProperties',
+    path: '/options/task-property-properties',
+    component: TaskPropertyProperties,
+    meta: {
+      title: 'TPPs',
       icon: Settings01Icon,
     }
   },

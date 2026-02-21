@@ -62,7 +62,7 @@
 		</template>
 	</Header>
 	<div v-if="navOptionsOpen" class="nav-options-overlay" @click.self="navOptionsOpen = false">
-		<NavOptions @close="navOptionsOpen = false" />
+		<NavOptions />
 	</div>
 	<div v-if="repoStatusModal" class="repo-status-overlay" @click.self="repoStatusModal = null">
 		<div class="repo-status-dialog" role="dialog" aria-labelledby="repo-status-title" aria-modal="true">
@@ -181,10 +181,14 @@
 					<router-view :key="$route.fullPath" />
 				</main>
 				<footer class="app-footer">
-					<span>WackyTracky</span>
-					<button type="button" class="footer-shortcuts-btn" @click="openShortcutsDialog" aria-label="Keyboard shortcuts">
-						Shortcuts
-					</button>
+					<span>
+						<a href="https://github.com/wacky-tracky/WackyTracky" target="_blank" rel="noopener noreferrer" class="footer-brand">WackyTracky</a>
+					</span>
+					<span>
+						<button type="button" class="footer-shortcuts-btn" @click="openShortcutsDialog" aria-label="Keyboard shortcuts">
+							Shortcuts
+						</button>
+					</span>
 				</footer>
 			</div>
 		</div>
@@ -229,6 +233,7 @@ function toastErrorReason(e) {
 const submittingTask = ref(false);
 const repoStatusModal = ref(false);
 const repoStatusOutput = ref('');
+const navOptionsOpen = ref(false);
 const shortcutsModal = ref(false);
 const shortcutsCloseRef = ref(null);
 const saveSearchModalOpen = ref(false);
@@ -272,6 +277,21 @@ const focusFirstListItemTrigger = ref(0);
 
 const SAVED_SEARCHES_KEY = 'wackytracky_saved_searches';
 const savedSearches = ref([]);
+
+const taskPropertyProperties = ref({ tagProperties: {}, contextProperties: {} });
+async function loadTaskPropertyProperties() {
+	try {
+		if (window.client) {
+			const res = await window.client.getTaskPropertyProperties({});
+			taskPropertyProperties.value = {
+				tagProperties: res.tagProperties || {},
+				contextProperties: res.contextProperties || {},
+			};
+		}
+	} catch {
+		taskPropertyProperties.value = { tagProperties: {}, contextProperties: {} };
+	}
+}
 
 async function loadSavedSearches() {
 	try {
@@ -528,6 +548,8 @@ provide('addSavedSearch', addSavedSearch);
 provide('removeSavedSearch', removeSavedSearch);
 provide('showToast', showToast);
 provide('openShortcutsDialog', openShortcutsDialog);
+provide('taskPropertyProperties', taskPropertyProperties);
+provide('refreshTaskPropertyProperties', loadTaskPropertyProperties);
 
 async function getLists() {
 	if (!navigation.value) return;
@@ -547,11 +569,13 @@ async function getLists() {
 		});
 	}
 	navigation.value.addSeparator('nav-settings');
+	navigation.value.addRouterLink('TaskPropertyProperties', 'TPPs');
 	navigation.value.addRouterLink('Settings', 'Settings');
 	navigation.value.addRouterLink('Diagnostics', 'Diagnostics');
 }
 
 function goToOptions() {
+	navOptionsOpen.value = true;
 	router.push('/options');
 }
 
@@ -613,6 +637,9 @@ watch(
 	},
 	{ immediate: true }
 );
+watch(() => route.path, (path) => {
+	if (path !== '/options') navOptionsOpen.value = false;
+});
 
 let headerLogoClickCleanup = null;
 
@@ -626,6 +653,7 @@ watch(shortcutsModal, (open) => {
 });
 onMounted(() => {
 	loadSavedSearches();
+	loadTaskPropertyProperties();
 	getLists();
 	document.addEventListener('keydown', onCtrlF);
 	document.addEventListener('keydown', onCtrlN);
@@ -840,24 +868,31 @@ onUnmounted(() => {
 .app-footer {
 	display: flex;
 	align-items: center;
-	justify-content: space-between;
+	justify-content: center;
 	gap: 0.75rem;
 	padding: 0.5rem 1rem;
 	font-size: 0.875rem;
 	color: #666;
 }
+.app-footer .footer-brand {
+	color: inherit;
+	text-decoration: none;
+}
+.app-footer .footer-brand:hover {
+	text-decoration: underline;
+}
 .footer-shortcuts-btn {
-	padding: 0.25rem 0.5rem;
-	border: 1px solid #ccc;
-	border-radius: 0.35rem;
-	background: #fff;
-	color: #555;
-	font-size: 0.85rem;
+	padding: 0;
+	border: none;
+	background: none;
+	color: inherit;
+	font-size: inherit;
+	font-weight: normal;
 	cursor: pointer;
+	text-decoration: none;
 }
 .footer-shortcuts-btn:hover {
-	background: #f5f5f5;
-	color: #333;
+	text-decoration: underline;
 }
 
 .save-search-overlay,

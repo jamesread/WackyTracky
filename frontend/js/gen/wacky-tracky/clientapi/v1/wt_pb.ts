@@ -10,7 +10,7 @@ import type { Message } from "@bufbuild/protobuf";
  * Describes the file wacky-tracky/clientapi/v1/wt.proto.
  */
 export const file_wacky_tracky_clientapi_v1_wt: GenFile = /*@__PURE__*/
-  fileDesc("CiJ3YWNreS10cmFja3kvY2xpZW50YXBpL3YxL3d0LnByb3RvEhh3YWNreXRyYWNreS5jbGllbnRhcGkudjEiNgoETGlzdBIKCgJpZBgBIAEoCRINCgV0aXRsZRgCIAEoCRITCgtjb3VudF9pdGVtcxgDIAEoBSIRCg9HZXRMaXN0c1JlcXVlc3QiQQoQR2V0TGlzdHNSZXNwb25zZRItCgVsaXN0cxgBIAMoCzIeLndhY2t5dHJhY2t5LmNsaWVudGFwaS52MS5MaXN0IiIKEUNyZWF0ZUxpc3RSZXF1ZXN0Eg0KBXRpdGxlGAEgASgJIhQKEkNyZWF0ZUxpc3RSZXNwb25zZSJUChFDcmVhdGVUYXNrUmVxdWVzdBIPCgdjb250ZW50GAEgASgJEhYKDnBhcmVudF9saXN0X2lkGAIgASgJEhYKDnBhcmVudF90YXNrX2lkGAMgASgJIkIKEkNyZWF0ZVRhc2tSZXNwb25zZRIsCgR0YXNrGAEgASgLMh4ud2Fja3l0cmFja3kuY2xpZW50YXBpLnYxLlRhc2siMAoRVXBkYXRlVGFza1JlcXVlc3QSCgoCaWQYASABKAkSDwoHY29udGVudBgCIAEoCSJCChJVcGRhdGVUYXNrUmVzcG9uc2USLAoEdGFzaxgBIAEoCzIeLndhY2t5dHJhY2t5LmNsaWVudGFwaS52MS5UYXNrIh0KD0RvbmVUYXNrUmVxdWVzdBIKCgJpZBgBIAEoCSISChBEb25lVGFza1Jlc3BvbnNlIikKFkdldFRhc2tNZXRhZGF0YVJlcXVlc3QSDwoHdGFza19pZBgBIAEoCSKXAQoXR2V0VGFza01ldGFkYXRhUmVzcG9uc2USTQoGZmllbGRzGAEgAygLMj0ud2Fja3l0cmFja3kuY2xpZW50YXBpLnYxLkdldFRhc2tNZXRhZGF0YVJlc3BvbnNlLkZpZWxkc0VudHJ5Gi0KC0ZpZWxkc0VudHJ5EgsKA2tleRgBIAEoCRINCgV2YWx1ZRgCIAEoCToCOAEiRwoWU2V0VGFza01ldGFkYXRhUmVxdWVzdBIPCgd0YXNrX2lkGAEgASgJEg0KBWZpZWxkGAIgASgJEg0KBXZhbHVlGAMgASgJIhkKF1NldFRhc2tNZXRhZGF0YVJlc3BvbnNlIiAKA1RhZxIKCgJpZBgBIAEoCRINCgV0aXRsZRgCIAEoCSIMCgpUYWdSZXF1ZXN0Ig0KC1RhZ1Jlc3BvbnNlIhAKDkdldFRhZ3NSZXF1ZXN0Ij4KD0dldFRhZ3NSZXNwb25zZRIrCgR0YWdzGAEgAygLMh0ud2Fja3l0cmFja3kuY2xpZW50YXBpLnYxLlRhZyK7AQoEVGFzaxIKCgJpZBgBIAEoCRIPCgdjb250ZW50GAIgASgJEhEKCXBhcmVudF9pZBgDIAEoCRITCgtwYXJlbnRfdHlwZRgEIAEoCRIWCg5jb3VudF9zdWJpdGVtcxgFIAEoBRIMCgR0YWdzGAYgAygJEhAKCGNvbnRleHRzGAcgAygJEhIKCndhaXRfdW50aWwYCCABKAkSEAoIcHJpb3JpdHkYCSABKAkSEAoIZHVlX2RhdGUYCiABKAkiOgoQTGlzdFRhc2tzUmVxdWVzdBIRCglwYXJlbnRfaWQYASABKAkSEwoLcGFyZW50X3R5cGUYAiABKAkiGQoKVGFza0lkTGlzdBILCgNpZHMYASADKAki2gEKEUxpc3RUYXNrc1Jlc3BvbnNlEi0KBXRhc2tzGAEgAygLMh4ud2Fja3l0cmFja3kuY2xpZW50YXBpLnYxLlRhc2sSQwoEdHJlZRgCIAMoCzI1LndhY2t5dHJhY2t5LmNsaWVudGFwaS52MS5MaXN0VGFza3NSZXNwb25zZS5UcmVlRW50cnkaUQoJVHJlZUVudHJ5EgsKA2tleRgBIAEoCRIzCgV2YWx1ZRgCIAEoCzIkLndhY2t5dHJhY2t5LmNsaWVudGFwaS52MS5UYXNrSWRMaXN0OgI4ASIjChJTZWFyY2hUYXNrc1JlcXVlc3QSDQoFcXVlcnkYASABKAkiRAoTU2VhcmNoVGFza3NSZXNwb25zZRItCgV0YXNrcxgBIAMoCzIeLndhY2t5dHJhY2t5LmNsaWVudGFwaS52MS5UYXNrIi4KEVVwZGF0ZUxpc3RSZXF1ZXN0EgoKAmlkGAEgASgJEg0KBXRpdGxlGAIgASgJIhQKElVwZGF0ZUxpc3RSZXNwb25zZSIfChFEZWxldGVMaXN0UmVxdWVzdBIKCgJpZBgBIAEoCSIUChJEZWxldGVMaXN0UmVzcG9uc2UiDQoLSW5pdFJlcXVlc3QiIQoMSW5pdFJlc3BvbnNlEhEKCXdhbGxwYXBlchgBIAEoCSIQCg5WZXJzaW9uUmVxdWVzdCJACg9WZXJzaW9uUmVzcG9uc2USDwoHdmVyc2lvbhgBIAEoCRIOCgZjb21taXQYAiABKAkSDAoEZGF0ZRgDIAEoCSITChFSZXBvU3RhdHVzUmVxdWVzdCIkChJSZXBvU3RhdHVzUmVzcG9uc2USDgoGb3V0cHV0GAEgASgJIjYKC1NhdmVkU2VhcmNoEgoKAmlkGAEgASgJEgwKBG5hbWUYAiABKAkSDQoFcXVlcnkYAyABKAkiGQoXR2V0U2F2ZWRTZWFyY2hlc1JlcXVlc3QiWQoYR2V0U2F2ZWRTZWFyY2hlc1Jlc3BvbnNlEj0KDnNhdmVkX3NlYXJjaGVzGAEgAygLMiUud2Fja3l0cmFja3kuY2xpZW50YXBpLnYxLlNhdmVkU2VhcmNoIlgKF1NldFNhdmVkU2VhcmNoZXNSZXF1ZXN0Ej0KDnNhdmVkX3NlYXJjaGVzGAEgAygLMiUud2Fja3l0cmFja3kuY2xpZW50YXBpLnYxLlNhdmVkU2VhcmNoIhoKGFNldFNhdmVkU2VhcmNoZXNSZXNwb25zZTKdDwoYV2Fja3lUcmFja3lDbGllbnRTZXJ2aWNlEmAKB1ZlcnNpb24SKC53YWNreXRyYWNreS5jbGllbnRhcGkudjEuVmVyc2lvblJlcXVlc3QaKS53YWNreXRyYWNreS5jbGllbnRhcGkudjEuVmVyc2lvblJlc3BvbnNlIgASVwoESW5pdBIlLndhY2t5dHJhY2t5LmNsaWVudGFwaS52MS5Jbml0UmVxdWVzdBomLndhY2t5dHJhY2t5LmNsaWVudGFwaS52MS5Jbml0UmVzcG9uc2UiABJjCghHZXRMaXN0cxIpLndhY2t5dHJhY2t5LmNsaWVudGFwaS52MS5HZXRMaXN0c1JlcXVlc3QaKi53YWNreXRyYWNreS5jbGllbnRhcGkudjEuR2V0TGlzdHNSZXNwb25zZSIAEmYKCUxpc3RUYXNrcxIqLndhY2t5dHJhY2t5LmNsaWVudGFwaS52MS5MaXN0VGFza3NSZXF1ZXN0Gisud2Fja3l0cmFja3kuY2xpZW50YXBpLnYxLkxpc3RUYXNrc1Jlc3BvbnNlIgASbAoLU2VhcmNoVGFza3MSLC53YWNreXRyYWNreS5jbGllbnRhcGkudjEuU2VhcmNoVGFza3NSZXF1ZXN0Gi0ud2Fja3l0cmFja3kuY2xpZW50YXBpLnYxLlNlYXJjaFRhc2tzUmVzcG9uc2UiABJpCgpDcmVhdGVUYXNrEisud2Fja3l0cmFja3kuY2xpZW50YXBpLnYxLkNyZWF0ZVRhc2tSZXF1ZXN0Giwud2Fja3l0cmFja3kuY2xpZW50YXBpLnYxLkNyZWF0ZVRhc2tSZXNwb25zZSIAEmkKClVwZGF0ZVRhc2sSKy53YWNreXRyYWNreS5jbGllbnRhcGkudjEuVXBkYXRlVGFza1JlcXVlc3QaLC53YWNreXRyYWNreS5jbGllbnRhcGkudjEuVXBkYXRlVGFza1Jlc3BvbnNlIgASYwoIRG9uZVRhc2sSKS53YWNreXRyYWNreS5jbGllbnRhcGkudjEuRG9uZVRhc2tSZXF1ZXN0Gioud2Fja3l0cmFja3kuY2xpZW50YXBpLnYxLkRvbmVUYXNrUmVzcG9uc2UiABJpCgpDcmVhdGVMaXN0Eisud2Fja3l0cmFja3kuY2xpZW50YXBpLnYxLkNyZWF0ZUxpc3RSZXF1ZXN0Giwud2Fja3l0cmFja3kuY2xpZW50YXBpLnYxLkNyZWF0ZUxpc3RSZXNwb25zZSIAElQKA1RhZxIkLndhY2t5dHJhY2t5LmNsaWVudGFwaS52MS5UYWdSZXF1ZXN0GiUud2Fja3l0cmFja3kuY2xpZW50YXBpLnYxLlRhZ1Jlc3BvbnNlIgASaQoKVXBkYXRlTGlzdBIrLndhY2t5dHJhY2t5LmNsaWVudGFwaS52MS5VcGRhdGVMaXN0UmVxdWVzdBosLndhY2t5dHJhY2t5LmNsaWVudGFwaS52MS5VcGRhdGVMaXN0UmVzcG9uc2UiABJpCgpEZWxldGVMaXN0Eisud2Fja3l0cmFja3kuY2xpZW50YXBpLnYxLkRlbGV0ZUxpc3RSZXF1ZXN0Giwud2Fja3l0cmFja3kuY2xpZW50YXBpLnYxLkRlbGV0ZUxpc3RSZXNwb25zZSIAEmAKB0dldFRhZ3MSKC53YWNreXRyYWNreS5jbGllbnRhcGkudjEuR2V0VGFnc1JlcXVlc3QaKS53YWNreXRyYWNreS5jbGllbnRhcGkudjEuR2V0VGFnc1Jlc3BvbnNlIgASaQoKUmVwb1N0YXR1cxIrLndhY2t5dHJhY2t5LmNsaWVudGFwaS52MS5SZXBvU3RhdHVzUmVxdWVzdBosLndhY2t5dHJhY2t5LmNsaWVudGFwaS52MS5SZXBvU3RhdHVzUmVzcG9uc2UiABJ7ChBHZXRTYXZlZFNlYXJjaGVzEjEud2Fja3l0cmFja3kuY2xpZW50YXBpLnYxLkdldFNhdmVkU2VhcmNoZXNSZXF1ZXN0GjIud2Fja3l0cmFja3kuY2xpZW50YXBpLnYxLkdldFNhdmVkU2VhcmNoZXNSZXNwb25zZSIAEnsKEFNldFNhdmVkU2VhcmNoZXMSMS53YWNreXRyYWNreS5jbGllbnRhcGkudjEuU2V0U2F2ZWRTZWFyY2hlc1JlcXVlc3QaMi53YWNreXRyYWNreS5jbGllbnRhcGkudjEuU2V0U2F2ZWRTZWFyY2hlc1Jlc3BvbnNlIgASeAoPR2V0VGFza01ldGFkYXRhEjAud2Fja3l0cmFja3kuY2xpZW50YXBpLnYxLkdldFRhc2tNZXRhZGF0YVJlcXVlc3QaMS53YWNreXRyYWNreS5jbGllbnRhcGkudjEuR2V0VGFza01ldGFkYXRhUmVzcG9uc2UiABJ4Cg9TZXRUYXNrTWV0YWRhdGESMC53YWNreXRyYWNreS5jbGllbnRhcGkudjEuU2V0VGFza01ldGFkYXRhUmVxdWVzdBoxLndhY2t5dHJhY2t5LmNsaWVudGFwaS52MS5TZXRUYXNrTWV0YWRhdGFSZXNwb25zZSIAQlRaUmdpdGh1Yi5jb20vd2Fja3ktdHJhY2t5L3dhY2t5LXRyYWNreS1zZXJ2ZXIvZ2VuL3dhY2t5LXRyYWNreS9jbGllbnRhcGkvdjE7Y2xpZW50djFiBnByb3RvMw");
+  fileDesc("CiJ3YWNreS10cmFja3kvY2xpZW50YXBpL3YxL3d0LnByb3RvEhh3YWNreXRyYWNreS5jbGllbnRhcGkudjEiNgoETGlzdBIKCgJpZBgBIAEoCRINCgV0aXRsZRgCIAEoCRITCgtjb3VudF9pdGVtcxgDIAEoBSIRCg9HZXRMaXN0c1JlcXVlc3QiQQoQR2V0TGlzdHNSZXNwb25zZRItCgVsaXN0cxgBIAMoCzIeLndhY2t5dHJhY2t5LmNsaWVudGFwaS52MS5MaXN0IiIKEUNyZWF0ZUxpc3RSZXF1ZXN0Eg0KBXRpdGxlGAEgASgJIhQKEkNyZWF0ZUxpc3RSZXNwb25zZSJUChFDcmVhdGVUYXNrUmVxdWVzdBIPCgdjb250ZW50GAEgASgJEhYKDnBhcmVudF9saXN0X2lkGAIgASgJEhYKDnBhcmVudF90YXNrX2lkGAMgASgJIkIKEkNyZWF0ZVRhc2tSZXNwb25zZRIsCgR0YXNrGAEgASgLMh4ud2Fja3l0cmFja3kuY2xpZW50YXBpLnYxLlRhc2siMAoRVXBkYXRlVGFza1JlcXVlc3QSCgoCaWQYASABKAkSDwoHY29udGVudBgCIAEoCSJCChJVcGRhdGVUYXNrUmVzcG9uc2USLAoEdGFzaxgBIAEoCzIeLndhY2t5dHJhY2t5LmNsaWVudGFwaS52MS5UYXNrIh0KD0RvbmVUYXNrUmVxdWVzdBIKCgJpZBgBIAEoCSISChBEb25lVGFza1Jlc3BvbnNlIikKFkdldFRhc2tNZXRhZGF0YVJlcXVlc3QSDwoHdGFza19pZBgBIAEoCSKXAQoXR2V0VGFza01ldGFkYXRhUmVzcG9uc2USTQoGZmllbGRzGAEgAygLMj0ud2Fja3l0cmFja3kuY2xpZW50YXBpLnYxLkdldFRhc2tNZXRhZGF0YVJlc3BvbnNlLkZpZWxkc0VudHJ5Gi0KC0ZpZWxkc0VudHJ5EgsKA2tleRgBIAEoCRINCgV2YWx1ZRgCIAEoCToCOAEiRwoWU2V0VGFza01ldGFkYXRhUmVxdWVzdBIPCgd0YXNrX2lkGAEgASgJEg0KBWZpZWxkGAIgASgJEg0KBXZhbHVlGAMgASgJIhkKF1NldFRhc2tNZXRhZGF0YVJlc3BvbnNlIogBChFUYXNrUHJvcGVydHlQcm9wcxJFCgVwcm9wcxgBIAMoCzI2LndhY2t5dHJhY2t5LmNsaWVudGFwaS52MS5UYXNrUHJvcGVydHlQcm9wcy5Qcm9wc0VudHJ5GiwKClByb3BzRW50cnkSCwoDa2V5GAEgASgJEg0KBXZhbHVlGAIgASgJOgI4ASIiCiBHZXRUYXNrUHJvcGVydHlQcm9wZXJ0aWVzUmVxdWVzdCLFAwohR2V0VGFza1Byb3BlcnR5UHJvcGVydGllc1Jlc3BvbnNlEmYKDnRhZ19wcm9wZXJ0aWVzGAEgAygLMk4ud2Fja3l0cmFja3kuY2xpZW50YXBpLnYxLkdldFRhc2tQcm9wZXJ0eVByb3BlcnRpZXNSZXNwb25zZS5UYWdQcm9wZXJ0aWVzRW50cnkSbgoSY29udGV4dF9wcm9wZXJ0aWVzGAIgAygLMlIud2Fja3l0cmFja3kuY2xpZW50YXBpLnYxLkdldFRhc2tQcm9wZXJ0eVByb3BlcnRpZXNSZXNwb25zZS5Db250ZXh0UHJvcGVydGllc0VudHJ5GmEKElRhZ1Byb3BlcnRpZXNFbnRyeRILCgNrZXkYASABKAkSOgoFdmFsdWUYAiABKAsyKy53YWNreXRyYWNreS5jbGllbnRhcGkudjEuVGFza1Byb3BlcnR5UHJvcHM6AjgBGmUKFkNvbnRleHRQcm9wZXJ0aWVzRW50cnkSCwoDa2V5GAEgASgJEjoKBXZhbHVlGAIgASgLMisud2Fja3l0cmFja3kuY2xpZW50YXBpLnYxLlRhc2tQcm9wZXJ0eVByb3BzOgI4ASJqCh5TZXRUYXNrUHJvcGVydHlQcm9wZXJ0eVJlcXVlc3QSFQoNcHJvcGVydHlfdHlwZRgBIAEoCRIVCg1wcm9wZXJ0eV9uYW1lGAIgASgJEgsKA2tleRgDIAEoCRINCgV2YWx1ZRgEIAEoCSIhCh9TZXRUYXNrUHJvcGVydHlQcm9wZXJ0eVJlc3BvbnNlIhMKEVJ1bGVTdGF0dXNSZXF1ZXN0IjUKElJ1bGVTdGF0dXNSZXNwb25zZRIJCgFEGAEgASgJEgkKAUgYAiABKAUSCQoBTRgDIAEoBSIlCg9SdWxlVGVzdFJlcXVlc3QSEgoKZXhwcmVzc2lvbhgBIAEoCSJfChBSdWxlVGVzdFJlc3BvbnNlEhAKCGNvbXBpbGVzGAEgASgIEhUKDWNvbXBpbGVfZXJyb3IYAiABKAkSDgoGcmVzdWx0GAMgASgIEhIKCmV2YWxfZXJyb3IYBCABKAkiIAoDVGFnEgoKAmlkGAEgASgJEg0KBXRpdGxlGAIgASgJIgwKClRhZ1JlcXVlc3QiDQoLVGFnUmVzcG9uc2UiEAoOR2V0VGFnc1JlcXVlc3QiPgoPR2V0VGFnc1Jlc3BvbnNlEisKBHRhZ3MYASADKAsyHS53YWNreXRyYWNreS5jbGllbnRhcGkudjEuVGFnIrsBCgRUYXNrEgoKAmlkGAEgASgJEg8KB2NvbnRlbnQYAiABKAkSEQoJcGFyZW50X2lkGAMgASgJEhMKC3BhcmVudF90eXBlGAQgASgJEhYKDmNvdW50X3N1Yml0ZW1zGAUgASgFEgwKBHRhZ3MYBiADKAkSEAoIY29udGV4dHMYByADKAkSEgoKd2FpdF91bnRpbBgIIAEoCRIQCghwcmlvcml0eRgJIAEoCRIQCghkdWVfZGF0ZRgKIAEoCSI6ChBMaXN0VGFza3NSZXF1ZXN0EhEKCXBhcmVudF9pZBgBIAEoCRITCgtwYXJlbnRfdHlwZRgCIAEoCSIZCgpUYXNrSWRMaXN0EgsKA2lkcxgBIAMoCSKSAgoRTGlzdFRhc2tzUmVzcG9uc2USLQoFdGFza3MYASADKAsyHi53YWNreXRyYWNreS5jbGllbnRhcGkudjEuVGFzaxJDCgR0cmVlGAIgAygLMjUud2Fja3l0cmFja3kuY2xpZW50YXBpLnYxLkxpc3RUYXNrc1Jlc3BvbnNlLlRyZWVFbnRyeRIYChBoaWRkZW5fdGFnX25hbWVzGAMgAygJEhwKFGhpZGRlbl9jb250ZXh0X25hbWVzGAQgAygJGlEKCVRyZWVFbnRyeRILCgNrZXkYASABKAkSMwoFdmFsdWUYAiABKAsyJC53YWNreXRyYWNreS5jbGllbnRhcGkudjEuVGFza0lkTGlzdDoCOAEiIwoSU2VhcmNoVGFza3NSZXF1ZXN0Eg0KBXF1ZXJ5GAEgASgJIkQKE1NlYXJjaFRhc2tzUmVzcG9uc2USLQoFdGFza3MYASADKAsyHi53YWNreXRyYWNreS5jbGllbnRhcGkudjEuVGFzayIuChFVcGRhdGVMaXN0UmVxdWVzdBIKCgJpZBgBIAEoCRINCgV0aXRsZRgCIAEoCSIUChJVcGRhdGVMaXN0UmVzcG9uc2UiHwoRRGVsZXRlTGlzdFJlcXVlc3QSCgoCaWQYASABKAkiFAoSRGVsZXRlTGlzdFJlc3BvbnNlIg0KC0luaXRSZXF1ZXN0IiEKDEluaXRSZXNwb25zZRIRCgl3YWxscGFwZXIYASABKAkiEAoOVmVyc2lvblJlcXVlc3QiQAoPVmVyc2lvblJlc3BvbnNlEg8KB3ZlcnNpb24YASABKAkSDgoGY29tbWl0GAIgASgJEgwKBGRhdGUYAyABKAkiEwoRUmVwb1N0YXR1c1JlcXVlc3QiJAoSUmVwb1N0YXR1c1Jlc3BvbnNlEg4KBm91dHB1dBgBIAEoCSI2CgtTYXZlZFNlYXJjaBIKCgJpZBgBIAEoCRIMCgRuYW1lGAIgASgJEg0KBXF1ZXJ5GAMgASgJIhkKF0dldFNhdmVkU2VhcmNoZXNSZXF1ZXN0IlkKGEdldFNhdmVkU2VhcmNoZXNSZXNwb25zZRI9Cg5zYXZlZF9zZWFyY2hlcxgBIAMoCzIlLndhY2t5dHJhY2t5LmNsaWVudGFwaS52MS5TYXZlZFNlYXJjaCJYChdTZXRTYXZlZFNlYXJjaGVzUmVxdWVzdBI9Cg5zYXZlZF9zZWFyY2hlcxgBIAMoCzIlLndhY2t5dHJhY2t5LmNsaWVudGFwaS52MS5TYXZlZFNlYXJjaCIaChhTZXRTYXZlZFNlYXJjaGVzUmVzcG9uc2UymRMKGFdhY2t5VHJhY2t5Q2xpZW50U2VydmljZRJgCgdWZXJzaW9uEigud2Fja3l0cmFja3kuY2xpZW50YXBpLnYxLlZlcnNpb25SZXF1ZXN0Gikud2Fja3l0cmFja3kuY2xpZW50YXBpLnYxLlZlcnNpb25SZXNwb25zZSIAElcKBEluaXQSJS53YWNreXRyYWNreS5jbGllbnRhcGkudjEuSW5pdFJlcXVlc3QaJi53YWNreXRyYWNreS5jbGllbnRhcGkudjEuSW5pdFJlc3BvbnNlIgASYwoIR2V0TGlzdHMSKS53YWNreXRyYWNreS5jbGllbnRhcGkudjEuR2V0TGlzdHNSZXF1ZXN0Gioud2Fja3l0cmFja3kuY2xpZW50YXBpLnYxLkdldExpc3RzUmVzcG9uc2UiABJmCglMaXN0VGFza3MSKi53YWNreXRyYWNreS5jbGllbnRhcGkudjEuTGlzdFRhc2tzUmVxdWVzdBorLndhY2t5dHJhY2t5LmNsaWVudGFwaS52MS5MaXN0VGFza3NSZXNwb25zZSIAEmwKC1NlYXJjaFRhc2tzEiwud2Fja3l0cmFja3kuY2xpZW50YXBpLnYxLlNlYXJjaFRhc2tzUmVxdWVzdBotLndhY2t5dHJhY2t5LmNsaWVudGFwaS52MS5TZWFyY2hUYXNrc1Jlc3BvbnNlIgASaQoKQ3JlYXRlVGFzaxIrLndhY2t5dHJhY2t5LmNsaWVudGFwaS52MS5DcmVhdGVUYXNrUmVxdWVzdBosLndhY2t5dHJhY2t5LmNsaWVudGFwaS52MS5DcmVhdGVUYXNrUmVzcG9uc2UiABJpCgpVcGRhdGVUYXNrEisud2Fja3l0cmFja3kuY2xpZW50YXBpLnYxLlVwZGF0ZVRhc2tSZXF1ZXN0Giwud2Fja3l0cmFja3kuY2xpZW50YXBpLnYxLlVwZGF0ZVRhc2tSZXNwb25zZSIAEmMKCERvbmVUYXNrEikud2Fja3l0cmFja3kuY2xpZW50YXBpLnYxLkRvbmVUYXNrUmVxdWVzdBoqLndhY2t5dHJhY2t5LmNsaWVudGFwaS52MS5Eb25lVGFza1Jlc3BvbnNlIgASaQoKQ3JlYXRlTGlzdBIrLndhY2t5dHJhY2t5LmNsaWVudGFwaS52MS5DcmVhdGVMaXN0UmVxdWVzdBosLndhY2t5dHJhY2t5LmNsaWVudGFwaS52MS5DcmVhdGVMaXN0UmVzcG9uc2UiABJUCgNUYWcSJC53YWNreXRyYWNreS5jbGllbnRhcGkudjEuVGFnUmVxdWVzdBolLndhY2t5dHJhY2t5LmNsaWVudGFwaS52MS5UYWdSZXNwb25zZSIAEmkKClVwZGF0ZUxpc3QSKy53YWNreXRyYWNreS5jbGllbnRhcGkudjEuVXBkYXRlTGlzdFJlcXVlc3QaLC53YWNreXRyYWNreS5jbGllbnRhcGkudjEuVXBkYXRlTGlzdFJlc3BvbnNlIgASaQoKRGVsZXRlTGlzdBIrLndhY2t5dHJhY2t5LmNsaWVudGFwaS52MS5EZWxldGVMaXN0UmVxdWVzdBosLndhY2t5dHJhY2t5LmNsaWVudGFwaS52MS5EZWxldGVMaXN0UmVzcG9uc2UiABJgCgdHZXRUYWdzEigud2Fja3l0cmFja3kuY2xpZW50YXBpLnYxLkdldFRhZ3NSZXF1ZXN0Gikud2Fja3l0cmFja3kuY2xpZW50YXBpLnYxLkdldFRhZ3NSZXNwb25zZSIAEmkKClJlcG9TdGF0dXMSKy53YWNreXRyYWNreS5jbGllbnRhcGkudjEuUmVwb1N0YXR1c1JlcXVlc3QaLC53YWNreXRyYWNreS5jbGllbnRhcGkudjEuUmVwb1N0YXR1c1Jlc3BvbnNlIgASewoQR2V0U2F2ZWRTZWFyY2hlcxIxLndhY2t5dHJhY2t5LmNsaWVudGFwaS52MS5HZXRTYXZlZFNlYXJjaGVzUmVxdWVzdBoyLndhY2t5dHJhY2t5LmNsaWVudGFwaS52MS5HZXRTYXZlZFNlYXJjaGVzUmVzcG9uc2UiABJ7ChBTZXRTYXZlZFNlYXJjaGVzEjEud2Fja3l0cmFja3kuY2xpZW50YXBpLnYxLlNldFNhdmVkU2VhcmNoZXNSZXF1ZXN0GjIud2Fja3l0cmFja3kuY2xpZW50YXBpLnYxLlNldFNhdmVkU2VhcmNoZXNSZXNwb25zZSIAEngKD0dldFRhc2tNZXRhZGF0YRIwLndhY2t5dHJhY2t5LmNsaWVudGFwaS52MS5HZXRUYXNrTWV0YWRhdGFSZXF1ZXN0GjEud2Fja3l0cmFja3kuY2xpZW50YXBpLnYxLkdldFRhc2tNZXRhZGF0YVJlc3BvbnNlIgASeAoPU2V0VGFza01ldGFkYXRhEjAud2Fja3l0cmFja3kuY2xpZW50YXBpLnYxLlNldFRhc2tNZXRhZGF0YVJlcXVlc3QaMS53YWNreXRyYWNreS5jbGllbnRhcGkudjEuU2V0VGFza01ldGFkYXRhUmVzcG9uc2UiABKWAQoZR2V0VGFza1Byb3BlcnR5UHJvcGVydGllcxI6LndhY2t5dHJhY2t5LmNsaWVudGFwaS52MS5HZXRUYXNrUHJvcGVydHlQcm9wZXJ0aWVzUmVxdWVzdBo7LndhY2t5dHJhY2t5LmNsaWVudGFwaS52MS5HZXRUYXNrUHJvcGVydHlQcm9wZXJ0aWVzUmVzcG9uc2UiABKQAQoXU2V0VGFza1Byb3BlcnR5UHJvcGVydHkSOC53YWNreXRyYWNreS5jbGllbnRhcGkudjEuU2V0VGFza1Byb3BlcnR5UHJvcGVydHlSZXF1ZXN0Gjkud2Fja3l0cmFja3kuY2xpZW50YXBpLnYxLlNldFRhc2tQcm9wZXJ0eVByb3BlcnR5UmVzcG9uc2UiABJpCgpSdWxlU3RhdHVzEisud2Fja3l0cmFja3kuY2xpZW50YXBpLnYxLlJ1bGVTdGF0dXNSZXF1ZXN0Giwud2Fja3l0cmFja3kuY2xpZW50YXBpLnYxLlJ1bGVTdGF0dXNSZXNwb25zZSIAEmMKCFJ1bGVUZXN0Eikud2Fja3l0cmFja3kuY2xpZW50YXBpLnYxLlJ1bGVUZXN0UmVxdWVzdBoqLndhY2t5dHJhY2t5LmNsaWVudGFwaS52MS5SdWxlVGVzdFJlc3BvbnNlIgBCVFpSZ2l0aHViLmNvbS93YWNreS10cmFja3kvd2Fja3ktdHJhY2t5LXNlcnZlci9nZW4vd2Fja3ktdHJhY2t5L2NsaWVudGFwaS92MTtjbGllbnR2MWIGcHJvdG8z");
 
 /**
  * @generated from message wackytracky.clientapi.v1.List
@@ -295,6 +295,217 @@ export const SetTaskMetadataResponseSchema: GenMessage<SetTaskMetadataResponse> 
   messageDesc(file_wacky_tracky_clientapi_v1_wt, 14);
 
 /**
+ * TaskPropertyProperties: optional key/value settings per task property (e.g. tag #work, context @home).
+ * First supported key: bgcolor (background color for the tag/context chip).
+ *
+ * @generated from message wackytracky.clientapi.v1.TaskPropertyProps
+ */
+export type TaskPropertyProps = Message<"wackytracky.clientapi.v1.TaskPropertyProps"> & {
+  /**
+   * @generated from field: map<string, string> props = 1;
+   */
+  props: { [key: string]: string };
+};
+
+/**
+ * Describes the message wackytracky.clientapi.v1.TaskPropertyProps.
+ * Use `create(TaskPropertyPropsSchema)` to create a new message.
+ */
+export const TaskPropertyPropsSchema: GenMessage<TaskPropertyProps> = /*@__PURE__*/
+  messageDesc(file_wacky_tracky_clientapi_v1_wt, 15);
+
+/**
+ * @generated from message wackytracky.clientapi.v1.GetTaskPropertyPropertiesRequest
+ */
+export type GetTaskPropertyPropertiesRequest = Message<"wackytracky.clientapi.v1.GetTaskPropertyPropertiesRequest"> & {
+};
+
+/**
+ * Describes the message wackytracky.clientapi.v1.GetTaskPropertyPropertiesRequest.
+ * Use `create(GetTaskPropertyPropertiesRequestSchema)` to create a new message.
+ */
+export const GetTaskPropertyPropertiesRequestSchema: GenMessage<GetTaskPropertyPropertiesRequest> = /*@__PURE__*/
+  messageDesc(file_wacky_tracky_clientapi_v1_wt, 16);
+
+/**
+ * @generated from message wackytracky.clientapi.v1.GetTaskPropertyPropertiesResponse
+ */
+export type GetTaskPropertyPropertiesResponse = Message<"wackytracky.clientapi.v1.GetTaskPropertyPropertiesResponse"> & {
+  /**
+   * tag name -> props (e.g. bgcolor)
+   *
+   * @generated from field: map<string, wackytracky.clientapi.v1.TaskPropertyProps> tag_properties = 1;
+   */
+  tagProperties: { [key: string]: TaskPropertyProps };
+
+  /**
+   * context name -> props
+   *
+   * @generated from field: map<string, wackytracky.clientapi.v1.TaskPropertyProps> context_properties = 2;
+   */
+  contextProperties: { [key: string]: TaskPropertyProps };
+};
+
+/**
+ * Describes the message wackytracky.clientapi.v1.GetTaskPropertyPropertiesResponse.
+ * Use `create(GetTaskPropertyPropertiesResponseSchema)` to create a new message.
+ */
+export const GetTaskPropertyPropertiesResponseSchema: GenMessage<GetTaskPropertyPropertiesResponse> = /*@__PURE__*/
+  messageDesc(file_wacky_tracky_clientapi_v1_wt, 17);
+
+/**
+ * @generated from message wackytracky.clientapi.v1.SetTaskPropertyPropertyRequest
+ */
+export type SetTaskPropertyPropertyRequest = Message<"wackytracky.clientapi.v1.SetTaskPropertyPropertyRequest"> & {
+  /**
+   * "tag" or "context"
+   *
+   * @generated from field: string property_type = 1;
+   */
+  propertyType: string;
+
+  /**
+   * @generated from field: string property_name = 2;
+   */
+  propertyName: string;
+
+  /**
+   * @generated from field: string key = 3;
+   */
+  key: string;
+
+  /**
+   * @generated from field: string value = 4;
+   */
+  value: string;
+};
+
+/**
+ * Describes the message wackytracky.clientapi.v1.SetTaskPropertyPropertyRequest.
+ * Use `create(SetTaskPropertyPropertyRequestSchema)` to create a new message.
+ */
+export const SetTaskPropertyPropertyRequestSchema: GenMessage<SetTaskPropertyPropertyRequest> = /*@__PURE__*/
+  messageDesc(file_wacky_tracky_clientapi_v1_wt, 18);
+
+/**
+ * @generated from message wackytracky.clientapi.v1.SetTaskPropertyPropertyResponse
+ */
+export type SetTaskPropertyPropertyResponse = Message<"wackytracky.clientapi.v1.SetTaskPropertyPropertyResponse"> & {
+};
+
+/**
+ * Describes the message wackytracky.clientapi.v1.SetTaskPropertyPropertyResponse.
+ * Use `create(SetTaskPropertyPropertyResponseSchema)` to create a new message.
+ */
+export const SetTaskPropertyPropertyResponseSchema: GenMessage<SetTaskPropertyPropertyResponse> = /*@__PURE__*/
+  messageDesc(file_wacky_tracky_clientapi_v1_wt, 19);
+
+/**
+ * RuleStatus returns current date/time components for hide-at-times rule builder (D=day short name, H=hour, M=minute).
+ *
+ * @generated from message wackytracky.clientapi.v1.RuleStatusRequest
+ */
+export type RuleStatusRequest = Message<"wackytracky.clientapi.v1.RuleStatusRequest"> & {
+};
+
+/**
+ * Describes the message wackytracky.clientapi.v1.RuleStatusRequest.
+ * Use `create(RuleStatusRequestSchema)` to create a new message.
+ */
+export const RuleStatusRequestSchema: GenMessage<RuleStatusRequest> = /*@__PURE__*/
+  messageDesc(file_wacky_tracky_clientapi_v1_wt, 20);
+
+/**
+ * @generated from message wackytracky.clientapi.v1.RuleStatusResponse
+ */
+export type RuleStatusResponse = Message<"wackytracky.clientapi.v1.RuleStatusResponse"> & {
+  /**
+   * short day name: Mon, Tue, ..., Sun
+   *
+   * @generated from field: string D = 1;
+   */
+  D: string;
+
+  /**
+   * hour 0-23
+   *
+   * @generated from field: int32 H = 2;
+   */
+  H: number;
+
+  /**
+   * minute 0-59
+   *
+   * @generated from field: int32 M = 3;
+   */
+  M: number;
+};
+
+/**
+ * Describes the message wackytracky.clientapi.v1.RuleStatusResponse.
+ * Use `create(RuleStatusResponseSchema)` to create a new message.
+ */
+export const RuleStatusResponseSchema: GenMessage<RuleStatusResponse> = /*@__PURE__*/
+  messageDesc(file_wacky_tracky_clientapi_v1_wt, 21);
+
+/**
+ * RuleTest compiles and evaluates a hide-at-times expression; used by UI to validate and preview rules.
+ *
+ * @generated from message wackytracky.clientapi.v1.RuleTestRequest
+ */
+export type RuleTestRequest = Message<"wackytracky.clientapi.v1.RuleTestRequest"> & {
+  /**
+   * @generated from field: string expression = 1;
+   */
+  expression: string;
+};
+
+/**
+ * Describes the message wackytracky.clientapi.v1.RuleTestRequest.
+ * Use `create(RuleTestRequestSchema)` to create a new message.
+ */
+export const RuleTestRequestSchema: GenMessage<RuleTestRequest> = /*@__PURE__*/
+  messageDesc(file_wacky_tracky_clientapi_v1_wt, 22);
+
+/**
+ * @generated from message wackytracky.clientapi.v1.RuleTestResponse
+ */
+export type RuleTestResponse = Message<"wackytracky.clientapi.v1.RuleTestResponse"> & {
+  /**
+   * @generated from field: bool compiles = 1;
+   */
+  compiles: boolean;
+
+  /**
+   * set when compiles is false
+   *
+   * @generated from field: string compile_error = 2;
+   */
+  compileError: string;
+
+  /**
+   * set when compiles is true (eval result)
+   *
+   * @generated from field: bool result = 3;
+   */
+  result: boolean;
+
+  /**
+   * set when compiles is true but eval failed
+   *
+   * @generated from field: string eval_error = 4;
+   */
+  evalError: string;
+};
+
+/**
+ * Describes the message wackytracky.clientapi.v1.RuleTestResponse.
+ * Use `create(RuleTestResponseSchema)` to create a new message.
+ */
+export const RuleTestResponseSchema: GenMessage<RuleTestResponse> = /*@__PURE__*/
+  messageDesc(file_wacky_tracky_clientapi_v1_wt, 23);
+
+/**
  * @generated from message wackytracky.clientapi.v1.Tag
  */
 export type Tag = Message<"wackytracky.clientapi.v1.Tag"> & {
@@ -314,7 +525,7 @@ export type Tag = Message<"wackytracky.clientapi.v1.Tag"> & {
  * Use `create(TagSchema)` to create a new message.
  */
 export const TagSchema: GenMessage<Tag> = /*@__PURE__*/
-  messageDesc(file_wacky_tracky_clientapi_v1_wt, 15);
+  messageDesc(file_wacky_tracky_clientapi_v1_wt, 24);
 
 /**
  * @generated from message wackytracky.clientapi.v1.TagRequest
@@ -327,7 +538,7 @@ export type TagRequest = Message<"wackytracky.clientapi.v1.TagRequest"> & {
  * Use `create(TagRequestSchema)` to create a new message.
  */
 export const TagRequestSchema: GenMessage<TagRequest> = /*@__PURE__*/
-  messageDesc(file_wacky_tracky_clientapi_v1_wt, 16);
+  messageDesc(file_wacky_tracky_clientapi_v1_wt, 25);
 
 /**
  * @generated from message wackytracky.clientapi.v1.TagResponse
@@ -340,7 +551,7 @@ export type TagResponse = Message<"wackytracky.clientapi.v1.TagResponse"> & {
  * Use `create(TagResponseSchema)` to create a new message.
  */
 export const TagResponseSchema: GenMessage<TagResponse> = /*@__PURE__*/
-  messageDesc(file_wacky_tracky_clientapi_v1_wt, 17);
+  messageDesc(file_wacky_tracky_clientapi_v1_wt, 26);
 
 /**
  * @generated from message wackytracky.clientapi.v1.GetTagsRequest
@@ -353,7 +564,7 @@ export type GetTagsRequest = Message<"wackytracky.clientapi.v1.GetTagsRequest"> 
  * Use `create(GetTagsRequestSchema)` to create a new message.
  */
 export const GetTagsRequestSchema: GenMessage<GetTagsRequest> = /*@__PURE__*/
-  messageDesc(file_wacky_tracky_clientapi_v1_wt, 18);
+  messageDesc(file_wacky_tracky_clientapi_v1_wt, 27);
 
 /**
  * @generated from message wackytracky.clientapi.v1.GetTagsResponse
@@ -370,7 +581,7 @@ export type GetTagsResponse = Message<"wackytracky.clientapi.v1.GetTagsResponse"
  * Use `create(GetTagsResponseSchema)` to create a new message.
  */
 export const GetTagsResponseSchema: GenMessage<GetTagsResponse> = /*@__PURE__*/
-  messageDesc(file_wacky_tracky_clientapi_v1_wt, 19);
+  messageDesc(file_wacky_tracky_clientapi_v1_wt, 28);
 
 /**
  * @generated from message wackytracky.clientapi.v1.Task
@@ -442,7 +653,7 @@ export type Task = Message<"wackytracky.clientapi.v1.Task"> & {
  * Use `create(TaskSchema)` to create a new message.
  */
 export const TaskSchema: GenMessage<Task> = /*@__PURE__*/
-  messageDesc(file_wacky_tracky_clientapi_v1_wt, 20);
+  messageDesc(file_wacky_tracky_clientapi_v1_wt, 29);
 
 /**
  * @generated from message wackytracky.clientapi.v1.ListTasksRequest
@@ -464,7 +675,7 @@ export type ListTasksRequest = Message<"wackytracky.clientapi.v1.ListTasksReques
  * Use `create(ListTasksRequestSchema)` to create a new message.
  */
 export const ListTasksRequestSchema: GenMessage<ListTasksRequest> = /*@__PURE__*/
-  messageDesc(file_wacky_tracky_clientapi_v1_wt, 21);
+  messageDesc(file_wacky_tracky_clientapi_v1_wt, 30);
 
 /**
  * TaskIdList holds ordered child task IDs for a parent in the tree.
@@ -483,7 +694,7 @@ export type TaskIdList = Message<"wackytracky.clientapi.v1.TaskIdList"> & {
  * Use `create(TaskIdListSchema)` to create a new message.
  */
 export const TaskIdListSchema: GenMessage<TaskIdList> = /*@__PURE__*/
-  messageDesc(file_wacky_tracky_clientapi_v1_wt, 22);
+  messageDesc(file_wacky_tracky_clientapi_v1_wt, 31);
 
 /**
  * @generated from message wackytracky.clientapi.v1.ListTasksResponse
@@ -500,6 +711,18 @@ export type ListTasksResponse = Message<"wackytracky.clientapi.v1.ListTasksRespo
    * @generated from field: map<string, wackytracky.clientapi.v1.TaskIdList> tree = 2;
    */
   tree: { [key: string]: TaskIdList };
+
+  /**
+   * Tags/contexts whose hide-at-times rule is currently true; tasks with these are excluded from tasks/tree.
+   *
+   * @generated from field: repeated string hidden_tag_names = 3;
+   */
+  hiddenTagNames: string[];
+
+  /**
+   * @generated from field: repeated string hidden_context_names = 4;
+   */
+  hiddenContextNames: string[];
 };
 
 /**
@@ -507,7 +730,7 @@ export type ListTasksResponse = Message<"wackytracky.clientapi.v1.ListTasksRespo
  * Use `create(ListTasksResponseSchema)` to create a new message.
  */
 export const ListTasksResponseSchema: GenMessage<ListTasksResponse> = /*@__PURE__*/
-  messageDesc(file_wacky_tracky_clientapi_v1_wt, 23);
+  messageDesc(file_wacky_tracky_clientapi_v1_wt, 32);
 
 /**
  * @generated from message wackytracky.clientapi.v1.SearchTasksRequest
@@ -526,7 +749,7 @@ export type SearchTasksRequest = Message<"wackytracky.clientapi.v1.SearchTasksRe
  * Use `create(SearchTasksRequestSchema)` to create a new message.
  */
 export const SearchTasksRequestSchema: GenMessage<SearchTasksRequest> = /*@__PURE__*/
-  messageDesc(file_wacky_tracky_clientapi_v1_wt, 24);
+  messageDesc(file_wacky_tracky_clientapi_v1_wt, 33);
 
 /**
  * @generated from message wackytracky.clientapi.v1.SearchTasksResponse
@@ -543,7 +766,7 @@ export type SearchTasksResponse = Message<"wackytracky.clientapi.v1.SearchTasksR
  * Use `create(SearchTasksResponseSchema)` to create a new message.
  */
 export const SearchTasksResponseSchema: GenMessage<SearchTasksResponse> = /*@__PURE__*/
-  messageDesc(file_wacky_tracky_clientapi_v1_wt, 25);
+  messageDesc(file_wacky_tracky_clientapi_v1_wt, 34);
 
 /**
  * @generated from message wackytracky.clientapi.v1.UpdateListRequest
@@ -565,7 +788,7 @@ export type UpdateListRequest = Message<"wackytracky.clientapi.v1.UpdateListRequ
  * Use `create(UpdateListRequestSchema)` to create a new message.
  */
 export const UpdateListRequestSchema: GenMessage<UpdateListRequest> = /*@__PURE__*/
-  messageDesc(file_wacky_tracky_clientapi_v1_wt, 26);
+  messageDesc(file_wacky_tracky_clientapi_v1_wt, 35);
 
 /**
  * @generated from message wackytracky.clientapi.v1.UpdateListResponse
@@ -578,7 +801,7 @@ export type UpdateListResponse = Message<"wackytracky.clientapi.v1.UpdateListRes
  * Use `create(UpdateListResponseSchema)` to create a new message.
  */
 export const UpdateListResponseSchema: GenMessage<UpdateListResponse> = /*@__PURE__*/
-  messageDesc(file_wacky_tracky_clientapi_v1_wt, 27);
+  messageDesc(file_wacky_tracky_clientapi_v1_wt, 36);
 
 /**
  * @generated from message wackytracky.clientapi.v1.DeleteListRequest
@@ -595,7 +818,7 @@ export type DeleteListRequest = Message<"wackytracky.clientapi.v1.DeleteListRequ
  * Use `create(DeleteListRequestSchema)` to create a new message.
  */
 export const DeleteListRequestSchema: GenMessage<DeleteListRequest> = /*@__PURE__*/
-  messageDesc(file_wacky_tracky_clientapi_v1_wt, 28);
+  messageDesc(file_wacky_tracky_clientapi_v1_wt, 37);
 
 /**
  * @generated from message wackytracky.clientapi.v1.DeleteListResponse
@@ -608,7 +831,7 @@ export type DeleteListResponse = Message<"wackytracky.clientapi.v1.DeleteListRes
  * Use `create(DeleteListResponseSchema)` to create a new message.
  */
 export const DeleteListResponseSchema: GenMessage<DeleteListResponse> = /*@__PURE__*/
-  messageDesc(file_wacky_tracky_clientapi_v1_wt, 29);
+  messageDesc(file_wacky_tracky_clientapi_v1_wt, 38);
 
 /**
  * @generated from message wackytracky.clientapi.v1.InitRequest
@@ -621,7 +844,7 @@ export type InitRequest = Message<"wackytracky.clientapi.v1.InitRequest"> & {
  * Use `create(InitRequestSchema)` to create a new message.
  */
 export const InitRequestSchema: GenMessage<InitRequest> = /*@__PURE__*/
-  messageDesc(file_wacky_tracky_clientapi_v1_wt, 30);
+  messageDesc(file_wacky_tracky_clientapi_v1_wt, 39);
 
 /**
  * @generated from message wackytracky.clientapi.v1.InitResponse
@@ -638,7 +861,7 @@ export type InitResponse = Message<"wackytracky.clientapi.v1.InitResponse"> & {
  * Use `create(InitResponseSchema)` to create a new message.
  */
 export const InitResponseSchema: GenMessage<InitResponse> = /*@__PURE__*/
-  messageDesc(file_wacky_tracky_clientapi_v1_wt, 31);
+  messageDesc(file_wacky_tracky_clientapi_v1_wt, 40);
 
 /**
  * @generated from message wackytracky.clientapi.v1.VersionRequest
@@ -651,7 +874,7 @@ export type VersionRequest = Message<"wackytracky.clientapi.v1.VersionRequest"> 
  * Use `create(VersionRequestSchema)` to create a new message.
  */
 export const VersionRequestSchema: GenMessage<VersionRequest> = /*@__PURE__*/
-  messageDesc(file_wacky_tracky_clientapi_v1_wt, 32);
+  messageDesc(file_wacky_tracky_clientapi_v1_wt, 41);
 
 /**
  * @generated from message wackytracky.clientapi.v1.VersionResponse
@@ -678,7 +901,7 @@ export type VersionResponse = Message<"wackytracky.clientapi.v1.VersionResponse"
  * Use `create(VersionResponseSchema)` to create a new message.
  */
 export const VersionResponseSchema: GenMessage<VersionResponse> = /*@__PURE__*/
-  messageDesc(file_wacky_tracky_clientapi_v1_wt, 33);
+  messageDesc(file_wacky_tracky_clientapi_v1_wt, 42);
 
 /**
  * @generated from message wackytracky.clientapi.v1.RepoStatusRequest
@@ -691,7 +914,7 @@ export type RepoStatusRequest = Message<"wackytracky.clientapi.v1.RepoStatusRequ
  * Use `create(RepoStatusRequestSchema)` to create a new message.
  */
 export const RepoStatusRequestSchema: GenMessage<RepoStatusRequest> = /*@__PURE__*/
-  messageDesc(file_wacky_tracky_clientapi_v1_wt, 34);
+  messageDesc(file_wacky_tracky_clientapi_v1_wt, 43);
 
 /**
  * @generated from message wackytracky.clientapi.v1.RepoStatusResponse
@@ -710,7 +933,7 @@ export type RepoStatusResponse = Message<"wackytracky.clientapi.v1.RepoStatusRes
  * Use `create(RepoStatusResponseSchema)` to create a new message.
  */
 export const RepoStatusResponseSchema: GenMessage<RepoStatusResponse> = /*@__PURE__*/
-  messageDesc(file_wacky_tracky_clientapi_v1_wt, 35);
+  messageDesc(file_wacky_tracky_clientapi_v1_wt, 44);
 
 /**
  * @generated from message wackytracky.clientapi.v1.SavedSearch
@@ -737,7 +960,7 @@ export type SavedSearch = Message<"wackytracky.clientapi.v1.SavedSearch"> & {
  * Use `create(SavedSearchSchema)` to create a new message.
  */
 export const SavedSearchSchema: GenMessage<SavedSearch> = /*@__PURE__*/
-  messageDesc(file_wacky_tracky_clientapi_v1_wt, 36);
+  messageDesc(file_wacky_tracky_clientapi_v1_wt, 45);
 
 /**
  * @generated from message wackytracky.clientapi.v1.GetSavedSearchesRequest
@@ -750,7 +973,7 @@ export type GetSavedSearchesRequest = Message<"wackytracky.clientapi.v1.GetSaved
  * Use `create(GetSavedSearchesRequestSchema)` to create a new message.
  */
 export const GetSavedSearchesRequestSchema: GenMessage<GetSavedSearchesRequest> = /*@__PURE__*/
-  messageDesc(file_wacky_tracky_clientapi_v1_wt, 37);
+  messageDesc(file_wacky_tracky_clientapi_v1_wt, 46);
 
 /**
  * @generated from message wackytracky.clientapi.v1.GetSavedSearchesResponse
@@ -767,7 +990,7 @@ export type GetSavedSearchesResponse = Message<"wackytracky.clientapi.v1.GetSave
  * Use `create(GetSavedSearchesResponseSchema)` to create a new message.
  */
 export const GetSavedSearchesResponseSchema: GenMessage<GetSavedSearchesResponse> = /*@__PURE__*/
-  messageDesc(file_wacky_tracky_clientapi_v1_wt, 38);
+  messageDesc(file_wacky_tracky_clientapi_v1_wt, 47);
 
 /**
  * @generated from message wackytracky.clientapi.v1.SetSavedSearchesRequest
@@ -784,7 +1007,7 @@ export type SetSavedSearchesRequest = Message<"wackytracky.clientapi.v1.SetSaved
  * Use `create(SetSavedSearchesRequestSchema)` to create a new message.
  */
 export const SetSavedSearchesRequestSchema: GenMessage<SetSavedSearchesRequest> = /*@__PURE__*/
-  messageDesc(file_wacky_tracky_clientapi_v1_wt, 39);
+  messageDesc(file_wacky_tracky_clientapi_v1_wt, 48);
 
 /**
  * @generated from message wackytracky.clientapi.v1.SetSavedSearchesResponse
@@ -797,7 +1020,7 @@ export type SetSavedSearchesResponse = Message<"wackytracky.clientapi.v1.SetSave
  * Use `create(SetSavedSearchesResponseSchema)` to create a new message.
  */
 export const SetSavedSearchesResponseSchema: GenMessage<SetSavedSearchesResponse> = /*@__PURE__*/
-  messageDesc(file_wacky_tracky_clientapi_v1_wt, 40);
+  messageDesc(file_wacky_tracky_clientapi_v1_wt, 49);
 
 /**
  * @generated from service wackytracky.clientapi.v1.WackyTrackyClientService
@@ -946,6 +1169,38 @@ export const WackyTrackyClientService: GenService<{
     methodKind: "unary";
     input: typeof SetTaskMetadataRequestSchema;
     output: typeof SetTaskMetadataResponseSchema;
+  },
+  /**
+   * @generated from rpc wackytracky.clientapi.v1.WackyTrackyClientService.GetTaskPropertyProperties
+   */
+  getTaskPropertyProperties: {
+    methodKind: "unary";
+    input: typeof GetTaskPropertyPropertiesRequestSchema;
+    output: typeof GetTaskPropertyPropertiesResponseSchema;
+  },
+  /**
+   * @generated from rpc wackytracky.clientapi.v1.WackyTrackyClientService.SetTaskPropertyProperty
+   */
+  setTaskPropertyProperty: {
+    methodKind: "unary";
+    input: typeof SetTaskPropertyPropertyRequestSchema;
+    output: typeof SetTaskPropertyPropertyResponseSchema;
+  },
+  /**
+   * @generated from rpc wackytracky.clientapi.v1.WackyTrackyClientService.RuleStatus
+   */
+  ruleStatus: {
+    methodKind: "unary";
+    input: typeof RuleStatusRequestSchema;
+    output: typeof RuleStatusResponseSchema;
+  },
+  /**
+   * @generated from rpc wackytracky.clientapi.v1.WackyTrackyClientService.RuleTest
+   */
+  ruleTest: {
+    methodKind: "unary";
+    input: typeof RuleTestRequestSchema;
+    output: typeof RuleTestResponseSchema;
   },
 }> = /*@__PURE__*/
   serviceDesc(file_wacky_tracky_clientapi_v1_wt, 0);

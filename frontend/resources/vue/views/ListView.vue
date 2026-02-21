@@ -1,6 +1,8 @@
 <template>
-
-	<section>
+	<Section :title="sectionTitle">
+		<template #toolbar>
+			<button v-if="listId && !searchQuery" type="button" class="list-options-btn" @click="openListOptions">List options</button>
+		</template>
 		<div v-if="searchQuery" class="search-heading">
 			<p>Search results for “{{ searchQuery }}”</p>
 		</div>
@@ -57,7 +59,7 @@
 						<span v-if="(row.task.priority || row.task.tags?.length || row.task.contexts?.length || row.task.dueDate)" class="task-meta">
 							<span v-if="row.task.priority" class="task-priority" :title="'Priority ' + row.task.priority">{{ row.task.priority }}</span>
 							<span v-for="tag in (row.task.tags || [])" :key="'tag-' + tag" class="tag task-meta-clickable" :style="tagStyle(tag)" title="Search for #{{ tag }}" @click.stop="setSearchQuery('#' + tag)">#{{ tag }}</span>
-							<span v-for="ctx in (row.task.contexts || [])" :key="'ctx-' + ctx" class="context task-meta-clickable" title="Search for @{{ ctx }}" @click.stop="setSearchQuery('@' + ctx)">@{{ ctx }}</span>
+							<span v-for="ctx in (row.task.contexts || [])" :key="'ctx-' + ctx" class="context task-meta-clickable" :style="contextStyle(ctx)" title="Search for @{{ ctx }}" @click.stop="setSearchQuery('@' + ctx)">@{{ ctx }}</span>
 							<span v-if="row.task.dueDate" class="task-due task-meta-clickable" :class="{ 'task-due-overdue': isOverdue(row.task) }" :title="'Due ' + formatDateDisplay(row.task.dueDate)">
 								<HugeiconsIcon :icon="Calendar03Icon" width="1em" height="1em" />
 								due {{ formatDateDisplay(row.task.dueDate) }}
@@ -67,8 +69,12 @@
 				</li>
 			</ul>
 		</div>
-		<div v-if="listId && !searchQuery" class="list-options-footer">
-			<button type="button" class="list-options-btn" @click="openListOptions">List options</button>
+		<div v-if="listId && !searchQuery && (hiddenTagNames.length > 0 || hiddenContextNames.length > 0)" class="list-hidden-footer" role="status" aria-live="polite">
+			<span class="list-hidden-label">Hidden by hide-at-times:</span>
+			<span class="task-meta">
+				<span v-for="tag in hiddenTagNames" :key="'ht-' + tag" class="tag task-meta-clickable" :style="tagStyle(tag)" :title="'Search for #' + tag" @click.stop="setSearchQuery('#' + tag)">#{{ tag }}</span>
+				<span v-for="ctx in hiddenContextNames" :key="'hc-' + ctx" class="context task-meta-clickable" :style="contextStyle(ctx)" :title="'Search for @' + ctx" @click.stop="setSearchQuery('@' + ctx)">@{{ ctx }}</span>
+			</span>
 		</div>
 		<div v-if="taskDetailsTask" class="confirm-overlay task-details-overlay" @click.self="closeTaskDetails">
 			<div class="task-details-dialog" role="dialog" aria-labelledby="task-details-title" aria-modal="true" @click.stop>
@@ -177,7 +183,7 @@
 				</div>
 			</div>
 		</div>
-	</section>
+	</Section>
 </template>
 
 <script setup>
@@ -186,12 +192,15 @@
 	import { useRouter } from 'vue-router';
 	import { HugeiconsIcon } from '@hugeicons/vue';
 	import { Folder01Icon, FolderOpenIcon, CheckmarkBadge01Icon, PlayIcon, ClockIcon, Calendar03Icon } from '@hugeicons/core-free-icons';
+	import Section from 'picocrank/vue/components/Section.vue';
 	import { useSettings } from '../composables/useSettings.js';
 
 	const router = useRouter();
 	const { formatDateDisplay } = useSettings();
 	const items = ref([]);
 	const allItems = ref([]);
+	const hiddenTagNames = ref([]);
+	const hiddenContextNames = ref([]);
 	const loading = ref(false);
 	const searchError = ref(null);
 	const collapsedParentIds = ref([]);
@@ -227,6 +236,7 @@
 	const displayMode = inject('displayMode', ref('hierarchy'));
 	const focusAddTaskInput = inject('focusAddTaskInput', () => {});
 	const showToast = inject('showToast', () => {});
+	const taskPropertyProperties = inject('taskPropertyProperties', ref({ tagProperties: {}, contextProperties: {} }));
 
 	const focusedIndex = ref(0);
 	const ddLastKey = ref(null);
@@ -234,6 +244,10 @@
 	const DD_TIMEOUT_MS = 500;
 	const yankedTask = ref(null);
 
+	const sectionTitle = computed(() => {
+		if (props.searchQuery) return 'Search results';
+		return listTitle.value || 'Tasks';
+	});
 	const currentEditingId = computed(() => editingTaskId?.value ?? null);
 	const currentEditingDraft = computed(() => editingDraft?.value ?? '');
 	function setEditingDraft(v) {
@@ -262,8 +276,7 @@
 		},
 	});
 
-	// Deterministic pastel background from tag name (same name → same color).
-	function tagStyle(name) {
+	function defaultPastelStyle(name) {
 		let h = 0;
 		const s = String(name || '');
 		for (let i = 0; i < s.length; i++) {
@@ -275,6 +288,26 @@
 			backgroundColor: `hsl(${hue}, 65%, 88%)`,
 			color: `hsl(${hue}, 45%, 35%)`,
 		};
+	}
+
+	function tagStyle(name) {
+		const props = taskPropertyProperties?.value?.tagProperties?.[name]?.props;
+		if (!props) return defaultPastelStyle(name);
+		const css = props.css?.trim();
+		if (css) return css;
+		const bg = props.bgcolor;
+		if (bg) return { backgroundColor: bg, color: '#333' };
+		return defaultPastelStyle(name);
+	}
+
+	function contextStyle(name) {
+		const props = taskPropertyProperties?.value?.contextProperties?.[name]?.props;
+		if (!props) return defaultPastelStyle(name);
+		const css = props.css?.trim();
+		if (css) return css;
+		const bg = props.bgcolor;
+		if (bg) return { backgroundColor: bg, color: '#333' };
+		return defaultPastelStyle(name);
 	}
 
 	function isFutureWait(task) {
@@ -362,6 +395,8 @@
 		});
 		const tasks = ret.tasks || [];
 		const tree = ret.tree || {};
+		hiddenTagNames.value = ret.hiddenTagNames || [];
+		hiddenContextNames.value = ret.hiddenContextNames || [];
 		const idToTask = new Map(tasks.map((t) => [t.id, t]));
 		const flat = [];
 		function walk(parentId, depth) {
@@ -426,6 +461,8 @@
 				await loadListTasks();
 			} else {
 				items.value = [];
+				hiddenTagNames.value = [];
+				hiddenContextNames.value = [];
 			}
 		} finally {
 			loading.value = false;
@@ -922,10 +959,6 @@
 </script>
 
 <style scoped>
-	section {
-		padding: inherit;
-		margin: 0;
-	}
 	.list-loading,
 	.list-empty {
 		text-align: center;
@@ -1331,9 +1364,18 @@
 		background: #f0f0f0;
 	}
 
-	.list-options-footer {
-		margin-top: 1.5rem;
-		padding: 0 0.25rem;
+	.list-hidden-footer {
+		margin-top: 1rem;
+		padding: 0.5rem 0.25rem;
+		font-size: 0.875rem;
+		color: var(--femtocrank-text-muted, #666);
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		gap: 0.35rem;
+	}
+	.list-hidden-label {
+		margin-right: 0.25rem;
 	}
 	.list-options-btn {
 		padding: 0.4rem 0.75rem;

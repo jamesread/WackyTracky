@@ -60,6 +60,45 @@ message SetTaskMetadataRequest {
 }
 message SetTaskMetadataResponse {}
 
+// TaskPropertyProperties: optional key/value settings per task property (e.g. tag #work, context @home).
+// Supported keys: css (arbitrary CSS for the tag/context chip style attribute), hide-at-times.
+message TaskPropertyProps {
+	map<string, string> props = 1;
+}
+
+message GetTaskPropertyPropertiesRequest {}
+message GetTaskPropertyPropertiesResponse {
+	map<string, TaskPropertyProps> tag_properties = 1;     // tag name -> props (e.g. css)
+	map<string, TaskPropertyProps> context_properties = 2; // context name -> props
+}
+
+message SetTaskPropertyPropertyRequest {
+	string property_type = 1;  // "tag" or "context"
+	string property_name = 2;
+	string key = 3;
+	string value = 4;
+}
+message SetTaskPropertyPropertyResponse {}
+
+// RuleStatus returns current date/time components for hide-at-times rule builder (D=day short name, H=hour, M=minute).
+message RuleStatusRequest {}
+message RuleStatusResponse {
+	string D = 1;  // short day name: Mon, Tue, ..., Sun
+	int32 H = 2;  // hour 0-23
+	int32 M = 3;  // minute 0-59
+}
+
+// RuleTest compiles and evaluates a hide-at-times expression; used by UI to validate and preview rules.
+message RuleTestRequest {
+	string expression = 1;
+}
+message RuleTestResponse {
+	bool compiles = 1;
+	string compile_error = 2;  // set when compiles is false
+	bool result = 3;           // set when compiles is true (eval result)
+	string eval_error = 4;     // set when compiles is true but eval failed
+}
+
 
 message Tag {
 	string id = 1;
@@ -101,6 +140,9 @@ message ListTasksResponse {
 	repeated Task tasks = 1;
 	// tree: parent ID (list ID for roots) -> ordered child task IDs. Enables client to render hierarchy without extra calls.
 	map<string, TaskIdList> tree = 2;
+	// Tags/contexts whose hide-at-times rule is currently true; tasks with these are excluded from tasks/tree.
+	repeated string hidden_tag_names = 3;
+	repeated string hidden_context_names = 4;
 }
 
 message SearchTasksRequest {
@@ -189,4 +231,10 @@ service WackyTrackyClientService {
 
 	rpc GetTaskMetadata(GetTaskMetadataRequest) returns (GetTaskMetadataResponse) {}
 	rpc SetTaskMetadata(SetTaskMetadataRequest) returns (SetTaskMetadataResponse) {}
+
+	rpc GetTaskPropertyProperties(GetTaskPropertyPropertiesRequest) returns (GetTaskPropertyPropertiesResponse) {}
+	rpc SetTaskPropertyProperty(SetTaskPropertyPropertyRequest) returns (SetTaskPropertyPropertyResponse) {}
+
+	rpc RuleStatus(RuleStatusRequest) returns (RuleStatusResponse) {}
+	rpc RuleTest(RuleTestRequest) returns (RuleTestResponse) {}
 }
