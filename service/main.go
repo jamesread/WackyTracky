@@ -6,6 +6,7 @@ import (
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
+	"github.com/wacky-tracky/wacky-tracky-server/internal/buildinfo"
 	"github.com/wacky-tracky/wacky-tracky-server/internal/httpserver"
 	"github.com/wacky-tracky/wacky-tracky-server/internal/runtimeconfig"
 )
@@ -55,7 +56,10 @@ func initViperConfig() {
 func main() {
 	disableLogTimestamps()
 
-	log.Info("wacky-tracky")
+	log.WithFields(log.Fields{
+		"version": buildinfo.Version,
+		"commit":  buildinfo.Commit,
+	}).Info("wacky-tracky")
 
 	initViperConfig()
 

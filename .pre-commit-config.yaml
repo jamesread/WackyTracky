@@ -10,6 +10,38 @@ repos:
       - id: check-yaml
       - id: check-added-large-files
 
+  # Go codestyle, complexity, and unit tests (service/) — see specs/go-development.md
+  - repo: local
+    hooks:
+      - id: go-fmt
+        name: go fmt
+        entry: bash -c 'cd service && go fmt ./...'
+        language: system
+        types: [go]
+        pass_filenames: false
+        files: ^service/.*\.go$
+      - id: go-vet
+        name: go vet
+        entry: bash -c 'cd service && go vet ./...'
+        language: system
+        types: [go]
+        pass_filenames: false
+        files: ^service/.*\.go$
+      - id: go-cyclo
+        name: gocyclo (complexity ≤ 5)
+        entry: bash -c 'cd service && gocyclo -over 5 $(find internal -name "*.go" ! -name "*_test.go")'
+        language: system
+        types: [go]
+        pass_filenames: false
+        files: ^service/.*\.go$
+      - id: go-test
+        name: go test
+        entry: bash -c 'cd service && go test ./...'
+        language: system
+        types: [go]
+        pass_filenames: false
+        files: ^service/.*\.go$
+
   # Alternative semantic commit checker
   - repo: https://github.com/compilerla/conventional-pre-commit
     rev: v3.1.0

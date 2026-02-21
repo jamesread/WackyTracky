@@ -45,12 +45,18 @@ const (
 	// WackyTrackyClientServiceListTasksProcedure is the fully-qualified name of the
 	// WackyTrackyClientService's ListTasks RPC.
 	WackyTrackyClientServiceListTasksProcedure = "/wackytracky.clientapi.v1.WackyTrackyClientService/ListTasks"
+	// WackyTrackyClientServiceSearchTasksProcedure is the fully-qualified name of the
+	// WackyTrackyClientService's SearchTasks RPC.
+	WackyTrackyClientServiceSearchTasksProcedure = "/wackytracky.clientapi.v1.WackyTrackyClientService/SearchTasks"
 	// WackyTrackyClientServiceCreateTaskProcedure is the fully-qualified name of the
 	// WackyTrackyClientService's CreateTask RPC.
 	WackyTrackyClientServiceCreateTaskProcedure = "/wackytracky.clientapi.v1.WackyTrackyClientService/CreateTask"
-	// WackyTrackyClientServiceDeleteTaskProcedure is the fully-qualified name of the
-	// WackyTrackyClientService's DeleteTask RPC.
-	WackyTrackyClientServiceDeleteTaskProcedure = "/wackytracky.clientapi.v1.WackyTrackyClientService/DeleteTask"
+	// WackyTrackyClientServiceUpdateTaskProcedure is the fully-qualified name of the
+	// WackyTrackyClientService's UpdateTask RPC.
+	WackyTrackyClientServiceUpdateTaskProcedure = "/wackytracky.clientapi.v1.WackyTrackyClientService/UpdateTask"
+	// WackyTrackyClientServiceDoneTaskProcedure is the fully-qualified name of the
+	// WackyTrackyClientService's DoneTask RPC.
+	WackyTrackyClientServiceDoneTaskProcedure = "/wackytracky.clientapi.v1.WackyTrackyClientService/DoneTask"
 	// WackyTrackyClientServiceCreateListProcedure is the fully-qualified name of the
 	// WackyTrackyClientService's CreateList RPC.
 	WackyTrackyClientServiceCreateListProcedure = "/wackytracky.clientapi.v1.WackyTrackyClientService/CreateList"
@@ -60,9 +66,27 @@ const (
 	// WackyTrackyClientServiceUpdateListProcedure is the fully-qualified name of the
 	// WackyTrackyClientService's UpdateList RPC.
 	WackyTrackyClientServiceUpdateListProcedure = "/wackytracky.clientapi.v1.WackyTrackyClientService/UpdateList"
+	// WackyTrackyClientServiceDeleteListProcedure is the fully-qualified name of the
+	// WackyTrackyClientService's DeleteList RPC.
+	WackyTrackyClientServiceDeleteListProcedure = "/wackytracky.clientapi.v1.WackyTrackyClientService/DeleteList"
 	// WackyTrackyClientServiceGetTagsProcedure is the fully-qualified name of the
 	// WackyTrackyClientService's GetTags RPC.
 	WackyTrackyClientServiceGetTagsProcedure = "/wackytracky.clientapi.v1.WackyTrackyClientService/GetTags"
+	// WackyTrackyClientServiceRepoStatusProcedure is the fully-qualified name of the
+	// WackyTrackyClientService's RepoStatus RPC.
+	WackyTrackyClientServiceRepoStatusProcedure = "/wackytracky.clientapi.v1.WackyTrackyClientService/RepoStatus"
+	// WackyTrackyClientServiceGetSavedSearchesProcedure is the fully-qualified name of the
+	// WackyTrackyClientService's GetSavedSearches RPC.
+	WackyTrackyClientServiceGetSavedSearchesProcedure = "/wackytracky.clientapi.v1.WackyTrackyClientService/GetSavedSearches"
+	// WackyTrackyClientServiceSetSavedSearchesProcedure is the fully-qualified name of the
+	// WackyTrackyClientService's SetSavedSearches RPC.
+	WackyTrackyClientServiceSetSavedSearchesProcedure = "/wackytracky.clientapi.v1.WackyTrackyClientService/SetSavedSearches"
+	// WackyTrackyClientServiceGetTaskMetadataProcedure is the fully-qualified name of the
+	// WackyTrackyClientService's GetTaskMetadata RPC.
+	WackyTrackyClientServiceGetTaskMetadataProcedure = "/wackytracky.clientapi.v1.WackyTrackyClientService/GetTaskMetadata"
+	// WackyTrackyClientServiceSetTaskMetadataProcedure is the fully-qualified name of the
+	// WackyTrackyClientService's SetTaskMetadata RPC.
+	WackyTrackyClientServiceSetTaskMetadataProcedure = "/wackytracky.clientapi.v1.WackyTrackyClientService/SetTaskMetadata"
 )
 
 // WackyTrackyClientServiceClient is a client for the
@@ -72,12 +96,20 @@ type WackyTrackyClientServiceClient interface {
 	Init(context.Context, *connect.Request[v1.InitRequest]) (*connect.Response[v1.InitResponse], error)
 	GetLists(context.Context, *connect.Request[v1.GetListsRequest]) (*connect.Response[v1.GetListsResponse], error)
 	ListTasks(context.Context, *connect.Request[v1.ListTasksRequest]) (*connect.Response[v1.ListTasksResponse], error)
+	SearchTasks(context.Context, *connect.Request[v1.SearchTasksRequest]) (*connect.Response[v1.SearchTasksResponse], error)
 	CreateTask(context.Context, *connect.Request[v1.CreateTaskRequest]) (*connect.Response[v1.CreateTaskResponse], error)
-	DeleteTask(context.Context, *connect.Request[v1.DeleteTaskRequest]) (*connect.Response[v1.DeleteTaskResponse], error)
+	UpdateTask(context.Context, *connect.Request[v1.UpdateTaskRequest]) (*connect.Response[v1.UpdateTaskResponse], error)
+	DoneTask(context.Context, *connect.Request[v1.DoneTaskRequest]) (*connect.Response[v1.DoneTaskResponse], error)
 	CreateList(context.Context, *connect.Request[v1.CreateListRequest]) (*connect.Response[v1.CreateListResponse], error)
 	Tag(context.Context, *connect.Request[v1.TagRequest]) (*connect.Response[v1.TagResponse], error)
 	UpdateList(context.Context, *connect.Request[v1.UpdateListRequest]) (*connect.Response[v1.UpdateListResponse], error)
+	DeleteList(context.Context, *connect.Request[v1.DeleteListRequest]) (*connect.Response[v1.DeleteListResponse], error)
 	GetTags(context.Context, *connect.Request[v1.GetTagsRequest]) (*connect.Response[v1.GetTagsResponse], error)
+	RepoStatus(context.Context, *connect.Request[v1.RepoStatusRequest]) (*connect.Response[v1.RepoStatusResponse], error)
+	GetSavedSearches(context.Context, *connect.Request[v1.GetSavedSearchesRequest]) (*connect.Response[v1.GetSavedSearchesResponse], error)
+	SetSavedSearches(context.Context, *connect.Request[v1.SetSavedSearchesRequest]) (*connect.Response[v1.SetSavedSearchesResponse], error)
+	GetTaskMetadata(context.Context, *connect.Request[v1.GetTaskMetadataRequest]) (*connect.Response[v1.GetTaskMetadataResponse], error)
+	SetTaskMetadata(context.Context, *connect.Request[v1.SetTaskMetadataRequest]) (*connect.Response[v1.SetTaskMetadataResponse], error)
 }
 
 // NewWackyTrackyClientServiceClient constructs a client for the
@@ -116,16 +148,28 @@ func NewWackyTrackyClientServiceClient(httpClient connect.HTTPClient, baseURL st
 			connect.WithSchema(wackyTrackyClientServiceMethods.ByName("ListTasks")),
 			connect.WithClientOptions(opts...),
 		),
+		searchTasks: connect.NewClient[v1.SearchTasksRequest, v1.SearchTasksResponse](
+			httpClient,
+			baseURL+WackyTrackyClientServiceSearchTasksProcedure,
+			connect.WithSchema(wackyTrackyClientServiceMethods.ByName("SearchTasks")),
+			connect.WithClientOptions(opts...),
+		),
 		createTask: connect.NewClient[v1.CreateTaskRequest, v1.CreateTaskResponse](
 			httpClient,
 			baseURL+WackyTrackyClientServiceCreateTaskProcedure,
 			connect.WithSchema(wackyTrackyClientServiceMethods.ByName("CreateTask")),
 			connect.WithClientOptions(opts...),
 		),
-		deleteTask: connect.NewClient[v1.DeleteTaskRequest, v1.DeleteTaskResponse](
+		updateTask: connect.NewClient[v1.UpdateTaskRequest, v1.UpdateTaskResponse](
 			httpClient,
-			baseURL+WackyTrackyClientServiceDeleteTaskProcedure,
-			connect.WithSchema(wackyTrackyClientServiceMethods.ByName("DeleteTask")),
+			baseURL+WackyTrackyClientServiceUpdateTaskProcedure,
+			connect.WithSchema(wackyTrackyClientServiceMethods.ByName("UpdateTask")),
+			connect.WithClientOptions(opts...),
+		),
+		doneTask: connect.NewClient[v1.DoneTaskRequest, v1.DoneTaskResponse](
+			httpClient,
+			baseURL+WackyTrackyClientServiceDoneTaskProcedure,
+			connect.WithSchema(wackyTrackyClientServiceMethods.ByName("DoneTask")),
 			connect.WithClientOptions(opts...),
 		),
 		createList: connect.NewClient[v1.CreateListRequest, v1.CreateListResponse](
@@ -146,10 +190,46 @@ func NewWackyTrackyClientServiceClient(httpClient connect.HTTPClient, baseURL st
 			connect.WithSchema(wackyTrackyClientServiceMethods.ByName("UpdateList")),
 			connect.WithClientOptions(opts...),
 		),
+		deleteList: connect.NewClient[v1.DeleteListRequest, v1.DeleteListResponse](
+			httpClient,
+			baseURL+WackyTrackyClientServiceDeleteListProcedure,
+			connect.WithSchema(wackyTrackyClientServiceMethods.ByName("DeleteList")),
+			connect.WithClientOptions(opts...),
+		),
 		getTags: connect.NewClient[v1.GetTagsRequest, v1.GetTagsResponse](
 			httpClient,
 			baseURL+WackyTrackyClientServiceGetTagsProcedure,
 			connect.WithSchema(wackyTrackyClientServiceMethods.ByName("GetTags")),
+			connect.WithClientOptions(opts...),
+		),
+		repoStatus: connect.NewClient[v1.RepoStatusRequest, v1.RepoStatusResponse](
+			httpClient,
+			baseURL+WackyTrackyClientServiceRepoStatusProcedure,
+			connect.WithSchema(wackyTrackyClientServiceMethods.ByName("RepoStatus")),
+			connect.WithClientOptions(opts...),
+		),
+		getSavedSearches: connect.NewClient[v1.GetSavedSearchesRequest, v1.GetSavedSearchesResponse](
+			httpClient,
+			baseURL+WackyTrackyClientServiceGetSavedSearchesProcedure,
+			connect.WithSchema(wackyTrackyClientServiceMethods.ByName("GetSavedSearches")),
+			connect.WithClientOptions(opts...),
+		),
+		setSavedSearches: connect.NewClient[v1.SetSavedSearchesRequest, v1.SetSavedSearchesResponse](
+			httpClient,
+			baseURL+WackyTrackyClientServiceSetSavedSearchesProcedure,
+			connect.WithSchema(wackyTrackyClientServiceMethods.ByName("SetSavedSearches")),
+			connect.WithClientOptions(opts...),
+		),
+		getTaskMetadata: connect.NewClient[v1.GetTaskMetadataRequest, v1.GetTaskMetadataResponse](
+			httpClient,
+			baseURL+WackyTrackyClientServiceGetTaskMetadataProcedure,
+			connect.WithSchema(wackyTrackyClientServiceMethods.ByName("GetTaskMetadata")),
+			connect.WithClientOptions(opts...),
+		),
+		setTaskMetadata: connect.NewClient[v1.SetTaskMetadataRequest, v1.SetTaskMetadataResponse](
+			httpClient,
+			baseURL+WackyTrackyClientServiceSetTaskMetadataProcedure,
+			connect.WithSchema(wackyTrackyClientServiceMethods.ByName("SetTaskMetadata")),
 			connect.WithClientOptions(opts...),
 		),
 	}
@@ -157,16 +237,24 @@ func NewWackyTrackyClientServiceClient(httpClient connect.HTTPClient, baseURL st
 
 // wackyTrackyClientServiceClient implements WackyTrackyClientServiceClient.
 type wackyTrackyClientServiceClient struct {
-	version    *connect.Client[v1.VersionRequest, v1.VersionResponse]
-	init       *connect.Client[v1.InitRequest, v1.InitResponse]
-	getLists   *connect.Client[v1.GetListsRequest, v1.GetListsResponse]
-	listTasks  *connect.Client[v1.ListTasksRequest, v1.ListTasksResponse]
-	createTask *connect.Client[v1.CreateTaskRequest, v1.CreateTaskResponse]
-	deleteTask *connect.Client[v1.DeleteTaskRequest, v1.DeleteTaskResponse]
-	createList *connect.Client[v1.CreateListRequest, v1.CreateListResponse]
-	tag        *connect.Client[v1.TagRequest, v1.TagResponse]
-	updateList *connect.Client[v1.UpdateListRequest, v1.UpdateListResponse]
-	getTags    *connect.Client[v1.GetTagsRequest, v1.GetTagsResponse]
+	version          *connect.Client[v1.VersionRequest, v1.VersionResponse]
+	init             *connect.Client[v1.InitRequest, v1.InitResponse]
+	getLists         *connect.Client[v1.GetListsRequest, v1.GetListsResponse]
+	listTasks        *connect.Client[v1.ListTasksRequest, v1.ListTasksResponse]
+	searchTasks      *connect.Client[v1.SearchTasksRequest, v1.SearchTasksResponse]
+	createTask       *connect.Client[v1.CreateTaskRequest, v1.CreateTaskResponse]
+	updateTask       *connect.Client[v1.UpdateTaskRequest, v1.UpdateTaskResponse]
+	doneTask         *connect.Client[v1.DoneTaskRequest, v1.DoneTaskResponse]
+	createList       *connect.Client[v1.CreateListRequest, v1.CreateListResponse]
+	tag              *connect.Client[v1.TagRequest, v1.TagResponse]
+	updateList       *connect.Client[v1.UpdateListRequest, v1.UpdateListResponse]
+	deleteList       *connect.Client[v1.DeleteListRequest, v1.DeleteListResponse]
+	getTags          *connect.Client[v1.GetTagsRequest, v1.GetTagsResponse]
+	repoStatus       *connect.Client[v1.RepoStatusRequest, v1.RepoStatusResponse]
+	getSavedSearches *connect.Client[v1.GetSavedSearchesRequest, v1.GetSavedSearchesResponse]
+	setSavedSearches *connect.Client[v1.SetSavedSearchesRequest, v1.SetSavedSearchesResponse]
+	getTaskMetadata  *connect.Client[v1.GetTaskMetadataRequest, v1.GetTaskMetadataResponse]
+	setTaskMetadata  *connect.Client[v1.SetTaskMetadataRequest, v1.SetTaskMetadataResponse]
 }
 
 // Version calls wackytracky.clientapi.v1.WackyTrackyClientService.Version.
@@ -189,14 +277,24 @@ func (c *wackyTrackyClientServiceClient) ListTasks(ctx context.Context, req *con
 	return c.listTasks.CallUnary(ctx, req)
 }
 
+// SearchTasks calls wackytracky.clientapi.v1.WackyTrackyClientService.SearchTasks.
+func (c *wackyTrackyClientServiceClient) SearchTasks(ctx context.Context, req *connect.Request[v1.SearchTasksRequest]) (*connect.Response[v1.SearchTasksResponse], error) {
+	return c.searchTasks.CallUnary(ctx, req)
+}
+
 // CreateTask calls wackytracky.clientapi.v1.WackyTrackyClientService.CreateTask.
 func (c *wackyTrackyClientServiceClient) CreateTask(ctx context.Context, req *connect.Request[v1.CreateTaskRequest]) (*connect.Response[v1.CreateTaskResponse], error) {
 	return c.createTask.CallUnary(ctx, req)
 }
 
-// DeleteTask calls wackytracky.clientapi.v1.WackyTrackyClientService.DeleteTask.
-func (c *wackyTrackyClientServiceClient) DeleteTask(ctx context.Context, req *connect.Request[v1.DeleteTaskRequest]) (*connect.Response[v1.DeleteTaskResponse], error) {
-	return c.deleteTask.CallUnary(ctx, req)
+// UpdateTask calls wackytracky.clientapi.v1.WackyTrackyClientService.UpdateTask.
+func (c *wackyTrackyClientServiceClient) UpdateTask(ctx context.Context, req *connect.Request[v1.UpdateTaskRequest]) (*connect.Response[v1.UpdateTaskResponse], error) {
+	return c.updateTask.CallUnary(ctx, req)
+}
+
+// DoneTask calls wackytracky.clientapi.v1.WackyTrackyClientService.DoneTask.
+func (c *wackyTrackyClientServiceClient) DoneTask(ctx context.Context, req *connect.Request[v1.DoneTaskRequest]) (*connect.Response[v1.DoneTaskResponse], error) {
+	return c.doneTask.CallUnary(ctx, req)
 }
 
 // CreateList calls wackytracky.clientapi.v1.WackyTrackyClientService.CreateList.
@@ -214,9 +312,39 @@ func (c *wackyTrackyClientServiceClient) UpdateList(ctx context.Context, req *co
 	return c.updateList.CallUnary(ctx, req)
 }
 
+// DeleteList calls wackytracky.clientapi.v1.WackyTrackyClientService.DeleteList.
+func (c *wackyTrackyClientServiceClient) DeleteList(ctx context.Context, req *connect.Request[v1.DeleteListRequest]) (*connect.Response[v1.DeleteListResponse], error) {
+	return c.deleteList.CallUnary(ctx, req)
+}
+
 // GetTags calls wackytracky.clientapi.v1.WackyTrackyClientService.GetTags.
 func (c *wackyTrackyClientServiceClient) GetTags(ctx context.Context, req *connect.Request[v1.GetTagsRequest]) (*connect.Response[v1.GetTagsResponse], error) {
 	return c.getTags.CallUnary(ctx, req)
+}
+
+// RepoStatus calls wackytracky.clientapi.v1.WackyTrackyClientService.RepoStatus.
+func (c *wackyTrackyClientServiceClient) RepoStatus(ctx context.Context, req *connect.Request[v1.RepoStatusRequest]) (*connect.Response[v1.RepoStatusResponse], error) {
+	return c.repoStatus.CallUnary(ctx, req)
+}
+
+// GetSavedSearches calls wackytracky.clientapi.v1.WackyTrackyClientService.GetSavedSearches.
+func (c *wackyTrackyClientServiceClient) GetSavedSearches(ctx context.Context, req *connect.Request[v1.GetSavedSearchesRequest]) (*connect.Response[v1.GetSavedSearchesResponse], error) {
+	return c.getSavedSearches.CallUnary(ctx, req)
+}
+
+// SetSavedSearches calls wackytracky.clientapi.v1.WackyTrackyClientService.SetSavedSearches.
+func (c *wackyTrackyClientServiceClient) SetSavedSearches(ctx context.Context, req *connect.Request[v1.SetSavedSearchesRequest]) (*connect.Response[v1.SetSavedSearchesResponse], error) {
+	return c.setSavedSearches.CallUnary(ctx, req)
+}
+
+// GetTaskMetadata calls wackytracky.clientapi.v1.WackyTrackyClientService.GetTaskMetadata.
+func (c *wackyTrackyClientServiceClient) GetTaskMetadata(ctx context.Context, req *connect.Request[v1.GetTaskMetadataRequest]) (*connect.Response[v1.GetTaskMetadataResponse], error) {
+	return c.getTaskMetadata.CallUnary(ctx, req)
+}
+
+// SetTaskMetadata calls wackytracky.clientapi.v1.WackyTrackyClientService.SetTaskMetadata.
+func (c *wackyTrackyClientServiceClient) SetTaskMetadata(ctx context.Context, req *connect.Request[v1.SetTaskMetadataRequest]) (*connect.Response[v1.SetTaskMetadataResponse], error) {
+	return c.setTaskMetadata.CallUnary(ctx, req)
 }
 
 // WackyTrackyClientServiceHandler is an implementation of the
@@ -226,12 +354,20 @@ type WackyTrackyClientServiceHandler interface {
 	Init(context.Context, *connect.Request[v1.InitRequest]) (*connect.Response[v1.InitResponse], error)
 	GetLists(context.Context, *connect.Request[v1.GetListsRequest]) (*connect.Response[v1.GetListsResponse], error)
 	ListTasks(context.Context, *connect.Request[v1.ListTasksRequest]) (*connect.Response[v1.ListTasksResponse], error)
+	SearchTasks(context.Context, *connect.Request[v1.SearchTasksRequest]) (*connect.Response[v1.SearchTasksResponse], error)
 	CreateTask(context.Context, *connect.Request[v1.CreateTaskRequest]) (*connect.Response[v1.CreateTaskResponse], error)
-	DeleteTask(context.Context, *connect.Request[v1.DeleteTaskRequest]) (*connect.Response[v1.DeleteTaskResponse], error)
+	UpdateTask(context.Context, *connect.Request[v1.UpdateTaskRequest]) (*connect.Response[v1.UpdateTaskResponse], error)
+	DoneTask(context.Context, *connect.Request[v1.DoneTaskRequest]) (*connect.Response[v1.DoneTaskResponse], error)
 	CreateList(context.Context, *connect.Request[v1.CreateListRequest]) (*connect.Response[v1.CreateListResponse], error)
 	Tag(context.Context, *connect.Request[v1.TagRequest]) (*connect.Response[v1.TagResponse], error)
 	UpdateList(context.Context, *connect.Request[v1.UpdateListRequest]) (*connect.Response[v1.UpdateListResponse], error)
+	DeleteList(context.Context, *connect.Request[v1.DeleteListRequest]) (*connect.Response[v1.DeleteListResponse], error)
 	GetTags(context.Context, *connect.Request[v1.GetTagsRequest]) (*connect.Response[v1.GetTagsResponse], error)
+	RepoStatus(context.Context, *connect.Request[v1.RepoStatusRequest]) (*connect.Response[v1.RepoStatusResponse], error)
+	GetSavedSearches(context.Context, *connect.Request[v1.GetSavedSearchesRequest]) (*connect.Response[v1.GetSavedSearchesResponse], error)
+	SetSavedSearches(context.Context, *connect.Request[v1.SetSavedSearchesRequest]) (*connect.Response[v1.SetSavedSearchesResponse], error)
+	GetTaskMetadata(context.Context, *connect.Request[v1.GetTaskMetadataRequest]) (*connect.Response[v1.GetTaskMetadataResponse], error)
+	SetTaskMetadata(context.Context, *connect.Request[v1.SetTaskMetadataRequest]) (*connect.Response[v1.SetTaskMetadataResponse], error)
 }
 
 // NewWackyTrackyClientServiceHandler builds an HTTP handler from the service implementation. It
@@ -265,16 +401,28 @@ func NewWackyTrackyClientServiceHandler(svc WackyTrackyClientServiceHandler, opt
 		connect.WithSchema(wackyTrackyClientServiceMethods.ByName("ListTasks")),
 		connect.WithHandlerOptions(opts...),
 	)
+	wackyTrackyClientServiceSearchTasksHandler := connect.NewUnaryHandler(
+		WackyTrackyClientServiceSearchTasksProcedure,
+		svc.SearchTasks,
+		connect.WithSchema(wackyTrackyClientServiceMethods.ByName("SearchTasks")),
+		connect.WithHandlerOptions(opts...),
+	)
 	wackyTrackyClientServiceCreateTaskHandler := connect.NewUnaryHandler(
 		WackyTrackyClientServiceCreateTaskProcedure,
 		svc.CreateTask,
 		connect.WithSchema(wackyTrackyClientServiceMethods.ByName("CreateTask")),
 		connect.WithHandlerOptions(opts...),
 	)
-	wackyTrackyClientServiceDeleteTaskHandler := connect.NewUnaryHandler(
-		WackyTrackyClientServiceDeleteTaskProcedure,
-		svc.DeleteTask,
-		connect.WithSchema(wackyTrackyClientServiceMethods.ByName("DeleteTask")),
+	wackyTrackyClientServiceUpdateTaskHandler := connect.NewUnaryHandler(
+		WackyTrackyClientServiceUpdateTaskProcedure,
+		svc.UpdateTask,
+		connect.WithSchema(wackyTrackyClientServiceMethods.ByName("UpdateTask")),
+		connect.WithHandlerOptions(opts...),
+	)
+	wackyTrackyClientServiceDoneTaskHandler := connect.NewUnaryHandler(
+		WackyTrackyClientServiceDoneTaskProcedure,
+		svc.DoneTask,
+		connect.WithSchema(wackyTrackyClientServiceMethods.ByName("DoneTask")),
 		connect.WithHandlerOptions(opts...),
 	)
 	wackyTrackyClientServiceCreateListHandler := connect.NewUnaryHandler(
@@ -295,10 +443,46 @@ func NewWackyTrackyClientServiceHandler(svc WackyTrackyClientServiceHandler, opt
 		connect.WithSchema(wackyTrackyClientServiceMethods.ByName("UpdateList")),
 		connect.WithHandlerOptions(opts...),
 	)
+	wackyTrackyClientServiceDeleteListHandler := connect.NewUnaryHandler(
+		WackyTrackyClientServiceDeleteListProcedure,
+		svc.DeleteList,
+		connect.WithSchema(wackyTrackyClientServiceMethods.ByName("DeleteList")),
+		connect.WithHandlerOptions(opts...),
+	)
 	wackyTrackyClientServiceGetTagsHandler := connect.NewUnaryHandler(
 		WackyTrackyClientServiceGetTagsProcedure,
 		svc.GetTags,
 		connect.WithSchema(wackyTrackyClientServiceMethods.ByName("GetTags")),
+		connect.WithHandlerOptions(opts...),
+	)
+	wackyTrackyClientServiceRepoStatusHandler := connect.NewUnaryHandler(
+		WackyTrackyClientServiceRepoStatusProcedure,
+		svc.RepoStatus,
+		connect.WithSchema(wackyTrackyClientServiceMethods.ByName("RepoStatus")),
+		connect.WithHandlerOptions(opts...),
+	)
+	wackyTrackyClientServiceGetSavedSearchesHandler := connect.NewUnaryHandler(
+		WackyTrackyClientServiceGetSavedSearchesProcedure,
+		svc.GetSavedSearches,
+		connect.WithSchema(wackyTrackyClientServiceMethods.ByName("GetSavedSearches")),
+		connect.WithHandlerOptions(opts...),
+	)
+	wackyTrackyClientServiceSetSavedSearchesHandler := connect.NewUnaryHandler(
+		WackyTrackyClientServiceSetSavedSearchesProcedure,
+		svc.SetSavedSearches,
+		connect.WithSchema(wackyTrackyClientServiceMethods.ByName("SetSavedSearches")),
+		connect.WithHandlerOptions(opts...),
+	)
+	wackyTrackyClientServiceGetTaskMetadataHandler := connect.NewUnaryHandler(
+		WackyTrackyClientServiceGetTaskMetadataProcedure,
+		svc.GetTaskMetadata,
+		connect.WithSchema(wackyTrackyClientServiceMethods.ByName("GetTaskMetadata")),
+		connect.WithHandlerOptions(opts...),
+	)
+	wackyTrackyClientServiceSetTaskMetadataHandler := connect.NewUnaryHandler(
+		WackyTrackyClientServiceSetTaskMetadataProcedure,
+		svc.SetTaskMetadata,
+		connect.WithSchema(wackyTrackyClientServiceMethods.ByName("SetTaskMetadata")),
 		connect.WithHandlerOptions(opts...),
 	)
 	return "/wackytracky.clientapi.v1.WackyTrackyClientService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -311,18 +495,34 @@ func NewWackyTrackyClientServiceHandler(svc WackyTrackyClientServiceHandler, opt
 			wackyTrackyClientServiceGetListsHandler.ServeHTTP(w, r)
 		case WackyTrackyClientServiceListTasksProcedure:
 			wackyTrackyClientServiceListTasksHandler.ServeHTTP(w, r)
+		case WackyTrackyClientServiceSearchTasksProcedure:
+			wackyTrackyClientServiceSearchTasksHandler.ServeHTTP(w, r)
 		case WackyTrackyClientServiceCreateTaskProcedure:
 			wackyTrackyClientServiceCreateTaskHandler.ServeHTTP(w, r)
-		case WackyTrackyClientServiceDeleteTaskProcedure:
-			wackyTrackyClientServiceDeleteTaskHandler.ServeHTTP(w, r)
+		case WackyTrackyClientServiceUpdateTaskProcedure:
+			wackyTrackyClientServiceUpdateTaskHandler.ServeHTTP(w, r)
+		case WackyTrackyClientServiceDoneTaskProcedure:
+			wackyTrackyClientServiceDoneTaskHandler.ServeHTTP(w, r)
 		case WackyTrackyClientServiceCreateListProcedure:
 			wackyTrackyClientServiceCreateListHandler.ServeHTTP(w, r)
 		case WackyTrackyClientServiceTagProcedure:
 			wackyTrackyClientServiceTagHandler.ServeHTTP(w, r)
 		case WackyTrackyClientServiceUpdateListProcedure:
 			wackyTrackyClientServiceUpdateListHandler.ServeHTTP(w, r)
+		case WackyTrackyClientServiceDeleteListProcedure:
+			wackyTrackyClientServiceDeleteListHandler.ServeHTTP(w, r)
 		case WackyTrackyClientServiceGetTagsProcedure:
 			wackyTrackyClientServiceGetTagsHandler.ServeHTTP(w, r)
+		case WackyTrackyClientServiceRepoStatusProcedure:
+			wackyTrackyClientServiceRepoStatusHandler.ServeHTTP(w, r)
+		case WackyTrackyClientServiceGetSavedSearchesProcedure:
+			wackyTrackyClientServiceGetSavedSearchesHandler.ServeHTTP(w, r)
+		case WackyTrackyClientServiceSetSavedSearchesProcedure:
+			wackyTrackyClientServiceSetSavedSearchesHandler.ServeHTTP(w, r)
+		case WackyTrackyClientServiceGetTaskMetadataProcedure:
+			wackyTrackyClientServiceGetTaskMetadataHandler.ServeHTTP(w, r)
+		case WackyTrackyClientServiceSetTaskMetadataProcedure:
+			wackyTrackyClientServiceSetTaskMetadataHandler.ServeHTTP(w, r)
 		default:
 			http.NotFound(w, r)
 		}
@@ -348,12 +548,20 @@ func (UnimplementedWackyTrackyClientServiceHandler) ListTasks(context.Context, *
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("wackytracky.clientapi.v1.WackyTrackyClientService.ListTasks is not implemented"))
 }
 
+func (UnimplementedWackyTrackyClientServiceHandler) SearchTasks(context.Context, *connect.Request[v1.SearchTasksRequest]) (*connect.Response[v1.SearchTasksResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("wackytracky.clientapi.v1.WackyTrackyClientService.SearchTasks is not implemented"))
+}
+
 func (UnimplementedWackyTrackyClientServiceHandler) CreateTask(context.Context, *connect.Request[v1.CreateTaskRequest]) (*connect.Response[v1.CreateTaskResponse], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("wackytracky.clientapi.v1.WackyTrackyClientService.CreateTask is not implemented"))
 }
 
-func (UnimplementedWackyTrackyClientServiceHandler) DeleteTask(context.Context, *connect.Request[v1.DeleteTaskRequest]) (*connect.Response[v1.DeleteTaskResponse], error) {
-	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("wackytracky.clientapi.v1.WackyTrackyClientService.DeleteTask is not implemented"))
+func (UnimplementedWackyTrackyClientServiceHandler) UpdateTask(context.Context, *connect.Request[v1.UpdateTaskRequest]) (*connect.Response[v1.UpdateTaskResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("wackytracky.clientapi.v1.WackyTrackyClientService.UpdateTask is not implemented"))
+}
+
+func (UnimplementedWackyTrackyClientServiceHandler) DoneTask(context.Context, *connect.Request[v1.DoneTaskRequest]) (*connect.Response[v1.DoneTaskResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("wackytracky.clientapi.v1.WackyTrackyClientService.DoneTask is not implemented"))
 }
 
 func (UnimplementedWackyTrackyClientServiceHandler) CreateList(context.Context, *connect.Request[v1.CreateListRequest]) (*connect.Response[v1.CreateListResponse], error) {
@@ -368,6 +576,30 @@ func (UnimplementedWackyTrackyClientServiceHandler) UpdateList(context.Context, 
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("wackytracky.clientapi.v1.WackyTrackyClientService.UpdateList is not implemented"))
 }
 
+func (UnimplementedWackyTrackyClientServiceHandler) DeleteList(context.Context, *connect.Request[v1.DeleteListRequest]) (*connect.Response[v1.DeleteListResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("wackytracky.clientapi.v1.WackyTrackyClientService.DeleteList is not implemented"))
+}
+
 func (UnimplementedWackyTrackyClientServiceHandler) GetTags(context.Context, *connect.Request[v1.GetTagsRequest]) (*connect.Response[v1.GetTagsResponse], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("wackytracky.clientapi.v1.WackyTrackyClientService.GetTags is not implemented"))
+}
+
+func (UnimplementedWackyTrackyClientServiceHandler) RepoStatus(context.Context, *connect.Request[v1.RepoStatusRequest]) (*connect.Response[v1.RepoStatusResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("wackytracky.clientapi.v1.WackyTrackyClientService.RepoStatus is not implemented"))
+}
+
+func (UnimplementedWackyTrackyClientServiceHandler) GetSavedSearches(context.Context, *connect.Request[v1.GetSavedSearchesRequest]) (*connect.Response[v1.GetSavedSearchesResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("wackytracky.clientapi.v1.WackyTrackyClientService.GetSavedSearches is not implemented"))
+}
+
+func (UnimplementedWackyTrackyClientServiceHandler) SetSavedSearches(context.Context, *connect.Request[v1.SetSavedSearchesRequest]) (*connect.Response[v1.SetSavedSearchesResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("wackytracky.clientapi.v1.WackyTrackyClientService.SetSavedSearches is not implemented"))
+}
+
+func (UnimplementedWackyTrackyClientServiceHandler) GetTaskMetadata(context.Context, *connect.Request[v1.GetTaskMetadataRequest]) (*connect.Response[v1.GetTaskMetadataResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("wackytracky.clientapi.v1.WackyTrackyClientService.GetTaskMetadata is not implemented"))
+}
+
+func (UnimplementedWackyTrackyClientServiceHandler) SetTaskMetadata(context.Context, *connect.Request[v1.SetTaskMetadataRequest]) (*connect.Response[v1.SetTaskMetadataResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("wackytracky.clientapi.v1.WackyTrackyClientService.SetTaskMetadata is not implemented"))
 }

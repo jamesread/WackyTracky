@@ -63,18 +63,25 @@ func (drv *YamlFileDriver) Connect() error {
 func (drv *YamlFileDriver) Print() {
 }
 
-func (drv *YamlFileDriver) CreateTask(content string) (string, error) {
+func (drv *YamlFileDriver) CreateTask(content string, listId string, parentTaskId string) (string, error) {
 	id := uuid.New().String()
-
-	task := db.DBTask{
-		Content: content,
-		ID:      id,
+	parentType := "list"
+	parentId := listId
+	if parentId == "" {
+		parentId = "inbox"
 	}
-
+	if parentTaskId != "" {
+		parentType = "task"
+		parentId = parentTaskId
+	}
+	task := db.DBTask{
+		ID:         id,
+		Content:    content,
+		ParentId:   parentId,
+		ParentType: parentType,
+	}
 	tasks = append(tasks, task)
-
 	save(filenameTasks, tasks)
-
 	return id, nil
 }
 
@@ -97,7 +104,35 @@ func (drv *YamlFileDriver) GetTasks(listId string) ([]db.DBTask, error) {
 }
 
 func (drv *YamlFileDriver) GetSubtasks(itemId string) ([]db.DBTask, error) {
-	return tasks, nil
+	var out []db.DBTask
+	for _, t := range tasks {
+		if t.ParentType == "task" && t.ParentId == itemId {
+			out = append(out, t)
+		}
+	}
+	return out, nil
+}
+
+func (drv *YamlFileDriver) UpdateList(id string, title string) error {
+	for i := range lists {
+		if lists[i].ID == id {
+			lists[i].Title = title
+			save(filenameLists, lists)
+			return nil
+		}
+	}
+	return nil
+}
+
+func (drv *YamlFileDriver) DeleteList(id string) error {
+	for i, l := range lists {
+		if l.ID == id {
+			lists = append(lists[:i], lists[i+1:]...)
+			save(filenameLists, lists)
+			return nil
+		}
+	}
+	return nil
 }
 
 func (drv *YamlFileDriver) CreateList(title string) error {

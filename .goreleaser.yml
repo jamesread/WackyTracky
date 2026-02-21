@@ -20,43 +20,22 @@ builds:
         -X 'github.com/wacky-tracky/wacky-tracky-server/internal/buildinfo.BuildDate={{.Date}}'
         -X 'github.com/wacky-tracky/wacky-tracky-server/internal/buildinfo.Version={{.Version}}'
 
-dockers:
+dockers_v2:
   - dockerfile: Dockerfile
-    image_templates:
-      - "ghcr.io/wacky-tracky/wacky-tracky-server:{{ .Tag }}-arm64"
-    goarch: arm64
-    use: buildx
-    build_flag_templates:
-      - "--platform=linux/amd64"
-      - "--label=org.opencontainers.image.revision={{.FullCommit}}"
-      - "--label=org.opencontainers.image.version={{.Tag}}"
+    images:
+      - ghcr.io/jamesread/wacky-tracky
+    tags:
+      - "{{ .Version }}"
+      - "{{ if not .IsNightly }}latest{{ end }}"
+    labels:
+      "org.opencontainers.image.revision": "{{.FullCommit}}"
+      "org.opencontainers.image.version": "{{.Version}}"
     extra_files:
       - README.md
       - frontend/dist
-
-  - dockerfile: Dockerfile
-    image_templates:
-      - "ghcr.io/wacky-tracky/wacky-tracky-server:{{ .Tag }}-amd64"
-    goarch: amd64
-    use: buildx
-    build_flag_templates:
-      - "--platform=linux/amd64"
-      - "--label=org.opencontainers.image.revision={{.FullCommit}}"
-      - "--label=org.opencontainers.image.version={{.Tag}}"
-    extra_files:
-      - README.md
-      - frontend/dist
-
-docker_manifests:
-  - name_template: ghcr.io/wacky-tracky/wacky-tracky-server:{{ .Version }}
-    image_templates:
-      - ghcr.io/wacky-tracky/wacky-tracky-server:{{ .Version }}-amd64
-      - ghcr.io/wacky-tracky/wacky-tracky-server:{{ .Version }}-arm64
-
-  - name_template: ghcr.io/wacky-tracky/wacky-tracky-server:latest
-    image_templates:
-      - ghcr.io/wacky-tracky/wacky-tracky-server:{{ .Version }}-amd64
-      - ghcr.io/wacky-tracky/wacky-tracky-server:{{ .Version }}-arm64
+    platforms:
+      - linux/amd64
+      - linux/arm64
 
 
 checksum:
@@ -89,10 +68,10 @@ release:
   footer: |
     ## Container images (from GitHub)
 
-    - `docker pull ghcr.io/wacky-tracky/wacky-tracky-server:{{ .Version }}`
+    - `docker pull ghcr.io/jamesread/wacky-tracky:{{ .Version }}`
 
     ## Upgrade warnings, or breaking changes
 
     - No such issues between the last release and this version.
 
-    Thanks for your interest in wacky-tracky-server!
+    Thanks for your interest in WackyTracky!

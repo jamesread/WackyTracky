@@ -1,0 +1,10 @@
+site_name: WackyTracky Documentation
+docs_dir: source
+repo_url: https://github.com/wacky-tracky/WackyTracky/
+nav:
+  - Home: index.md
+  - Getting started: getting-started.md
+theme:
+    name: material
+    palette:
+      primary: teal

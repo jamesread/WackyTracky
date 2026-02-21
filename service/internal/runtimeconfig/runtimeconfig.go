@@ -13,6 +13,7 @@ type config struct {
 
 type databaseConfig struct {
 	Driver   string
+	Database string // path for drivers like todotxt
 	Hostname string
 	Username string
 	Password string

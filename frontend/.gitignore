@@ -1,2 +1,13 @@
-dist
-node_modules
+# Build / deps
+dist/
+node_modules/
+
+# Env / config (do not commit secrets)
+.env
+.env.*
+!.env.example
+
+# Temp / cache
+*.log
+.cache/
+.coverage

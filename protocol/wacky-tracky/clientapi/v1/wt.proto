@@ -1,0 +1,192 @@
+syntax = "proto3";
+
+package wackytracky.clientapi.v1;
+
+option go_package = "github.com/wacky-tracky/wacky-tracky-server/gen/wacky-tracky/clientapi/v1;clientv1";
+
+message List {
+	string id = 1;
+	string title = 2;
+	int32 count_items = 3;
+}
+
+message GetListsRequest {}
+message GetListsResponse {
+	repeated List lists = 1;
+}
+
+message CreateListRequest {
+	string title = 1;
+}
+
+message CreateListResponse{}
+
+message CreateTaskRequest {
+	string content = 1;
+	string parent_list_id = 2;  // optional; when set, task is added to this list
+	string parent_task_id = 3;  // optional; when set, task is created as subtask of this task
+}
+
+message CreateTaskResponse {
+	Task task = 1;
+}
+
+message UpdateTaskRequest {
+	string id = 1;
+	string content = 2;
+}
+
+message UpdateTaskResponse {
+	Task task = 1;
+}
+
+message DoneTaskRequest {
+	string id = 1;  // task id to mark done
+}
+
+message DoneTaskResponse {}
+
+// Task metadata (e.g. notes) — optional per driver
+message GetTaskMetadataRequest {
+	string task_id = 1;
+}
+message GetTaskMetadataResponse {
+	map<string, string> fields = 1;
+}
+message SetTaskMetadataRequest {
+	string task_id = 1;
+	string field = 2;
+	string value = 3;
+}
+message SetTaskMetadataResponse {}
+
+
+message Tag {
+	string id = 1;
+	string title = 2;
+}
+
+message TagRequest {}
+message TagResponse {}
+
+message GetTagsRequest{}
+message GetTagsResponse{
+	repeated Tag tags = 1;
+}
+
+message Task {
+	string id = 1;
+	string content = 2;
+	string parent_id = 3;
+	string parent_type = 4;
+	int32 count_subitems = 5;
+	repeated string tags = 6;  // parsed from #hashtag in todo.txt lines
+	repeated string contexts = 7;  // parsed from @context in todo.txt lines (e.g. @home @work)
+	string wait_until = 8;  // optional; ISO date-time; task is hidden from list/next-action until this time
+	string priority = 9;  // optional; single letter A–Z; stored as priority:X in todo.txt
+	string due_date = 10;  // optional; ISO date YYYY-MM-DD; stored in metadata like wait
+}
+
+message ListTasksRequest {
+	string parent_id = 1;
+	string parent_type = 2;
+}
+
+// TaskIdList holds ordered child task IDs for a parent in the tree.
+message TaskIdList {
+	repeated string ids = 1;
+}
+
+message ListTasksResponse {
+	repeated Task tasks = 1;
+	// tree: parent ID (list ID for roots) -> ordered child task IDs. Enables client to render hierarchy without extra calls.
+	map<string, TaskIdList> tree = 2;
+}
+
+message SearchTasksRequest {
+	string query = 1;  // freetext search; backends may optionally support it
+}
+
+message SearchTasksResponse {
+	repeated Task tasks = 1;
+}
+
+message UpdateListRequest {
+	string id = 1;
+	string title = 2;
+}
+message UpdateListResponse {}
+
+message DeleteListRequest {
+	string id = 1;
+}
+message DeleteListResponse {}
+
+message InitRequest {}
+message InitResponse {
+	string wallpaper = 1;
+}
+
+message VersionRequest {}
+message VersionResponse {
+	string version = 1;
+	string commit = 2;
+	string date = 3;
+}
+
+message RepoStatusRequest {}
+message RepoStatusResponse {
+	string output = 1;  // git status output for the todotxt directory, or error message
+}
+
+message SavedSearch {
+	string id = 1;
+	string name = 2;
+	string query = 3;
+}
+
+message GetSavedSearchesRequest {}
+message GetSavedSearchesResponse {
+	repeated SavedSearch saved_searches = 1;
+}
+
+message SetSavedSearchesRequest {
+	repeated SavedSearch saved_searches = 1;
+}
+message SetSavedSearchesResponse {}
+
+service WackyTrackyClientService {
+	rpc Version(VersionRequest) returns (VersionResponse) {}
+
+	rpc Init(InitRequest) returns (InitResponse) {}
+
+	rpc GetLists(GetListsRequest) returns (GetListsResponse) {}
+
+	rpc ListTasks(ListTasksRequest) returns (ListTasksResponse) {}
+
+	rpc SearchTasks(SearchTasksRequest) returns (SearchTasksResponse) {}
+
+	rpc CreateTask(CreateTaskRequest) returns (CreateTaskResponse) {}
+
+	rpc UpdateTask(UpdateTaskRequest) returns (UpdateTaskResponse) {}
+
+	rpc DoneTask(DoneTaskRequest) returns (DoneTaskResponse) {}
+
+	rpc CreateList(CreateListRequest) returns (CreateListResponse) {}
+
+	rpc Tag(TagRequest) returns (TagResponse) {}
+
+	rpc UpdateList(UpdateListRequest) returns (UpdateListResponse) {}
+
+	rpc DeleteList(DeleteListRequest) returns (DeleteListResponse) {}
+
+	rpc GetTags(GetTagsRequest) returns (GetTagsResponse) {}
+
+	rpc RepoStatus(RepoStatusRequest) returns (RepoStatusResponse) {}
+
+	rpc GetSavedSearches(GetSavedSearchesRequest) returns (GetSavedSearchesResponse) {}
+	rpc SetSavedSearches(SetSavedSearchesRequest) returns (SetSavedSearchesResponse) {}
+
+	rpc GetTaskMetadata(GetTaskMetadataRequest) returns (GetTaskMetadataResponse) {}
+	rpc SetTaskMetadata(SetTaskMetadataRequest) returns (SetTaskMetadataResponse) {}
+}

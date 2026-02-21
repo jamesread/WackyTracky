@@ -9,10 +9,8 @@ import (
 	"github.com/wacky-tracky/wacky-tracky-server/internal/clientapi"
 	"github.com/wacky-tracky/wacky-tracky-server/internal/frontend"
 
-	log "github.com/sirupsen/logrus"
-
-	//	connectcors "connectrpc.com/cors"
 	cors "github.com/rs/cors"
+	log "github.com/sirupsen/logrus"
 
 	"github.com/wacky-tracky/wacky-tracky-server/internal/db"
 )
@@ -63,16 +61,5 @@ func getWallpapersHandler() http.Handler {
 }
 
 func withCors(h http.Handler) http.Handler {
-	/*
-		middleware := cors.New(cors.Options{
-			AllowedOrigins:   []string{"*"},
-			AllowedMethods:   connectcors.AllowedMethods(),
-			AllowedHeaders:   connectcors.ExposedHeaders(),
-			ExposedHeaders:   connectcors.ExposedHeaders(),
-		})
-
-		log.Infof("Adding CORS middleware: %+v", middleware)
-	*/
-
 	return cors.AllowAll().Handler(h)
 }

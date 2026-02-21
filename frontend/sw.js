@@ -29,7 +29,7 @@ function swFetch(e) {
 self.addEventListener("fetch", swFetch)
 
 self.addEventListener("message", m => {
-  switch (m.data) { 
+  switch (m.data) {
     case "reqGetVersion":
     default:
       this.clients.matchAll().then(clients => {

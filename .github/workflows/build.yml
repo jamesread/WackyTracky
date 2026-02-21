@@ -15,6 +15,10 @@ on:
     branches:
       - main
 
+permissions:
+  contents: write   # semantic-release: create releases and tags
+  packages: write   # push container images to ghcr.io
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -40,6 +44,12 @@ jobs:
           go-version-file: 'service/go.mod'
           cache: true
 
+      - name: Install buf
+        uses: bufbuild/buf-setup-action@v1
+
+      - name: Generate (protocol → service/gen, frontend/js/gen)
+        run: make generate
+
       - name: make frontend
         run: make -w frontend
 
@@ -48,10 +58,13 @@ jobs:
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
-          password: ${{ secrets.CONTAINER_TOKEN }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Test build
         run: make -w service
+
+      - name: Unit tests
+        run: cd service && go test ./...
 
       - name: Install goreleaser
         uses: goreleaser/goreleaser-action@v6
@@ -68,5 +81,5 @@ jobs:
             @semantic-release/git
 
         env:
-          GH_TOKEN: ${{ secrets.CONTAINER_TOKEN }}
-          GITHUB_TOKEN: ${{ secrets.CONTAINER_TOKEN }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

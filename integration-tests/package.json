@@ -1,0 +1,14 @@
+{
+  "name": "wacky-tracky-integration-tests",
+  "version": "1.0.0",
+  "description": "Integration tests for WackyTracky web UI",
+  "type": "module",
+  "devDependencies": {
+    "chai": "^6.2.2",
+    "mocha": "^11.7.5",
+    "selenium-webdriver": "^4.40.0"
+  },
+  "dependencies": {
+    "wait-on": "^9.0.3"
+  }
+}

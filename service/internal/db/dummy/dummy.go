@@ -78,7 +78,23 @@ func (db *Dummy) GetTask(taskId string) (*dbmdl.DBTask, error) {
 }
 
 func (db *Dummy) GetTasks(listId string) ([]dbmdl.DBTask, error) {
-	return db.tasks, nil
+	var out []dbmdl.DBTask
+	for _, t := range db.tasks {
+		if t.ParentType == "list" && t.ParentId == listId {
+			out = append(out, t)
+		}
+	}
+	return out, nil
+}
+
+func (db *Dummy) GetSubtasks(itemId string) ([]dbmdl.DBTask, error) {
+	var out []dbmdl.DBTask
+	for _, t := range db.tasks {
+		if t.ParentType == "task" && t.ParentId == itemId {
+			out = append(out, t)
+		}
+	}
+	return out, nil
 }
 
 func (db *Dummy) GetTags() ([]dbmdl.DBTag, error) {
@@ -89,22 +105,50 @@ func (db *Dummy) GetLists() ([]dbmdl.DBList, error) {
 	return db.lists, nil
 }
 
-func (db *Dummy) CreateList(content string) error {
+func (db *Dummy) CreateList(title string) error {
 	db.lists = append(db.lists, dbmdl.DBList{
 		ID:    uuid.New().String(),
-		Title: content,
+		Title: title,
 	})
-
 	return nil
 }
 
-func (db *Dummy) CreateTask(content string) (string, error) {
+func (db *Dummy) CreateTask(content string, listId string, parentTaskId string) (string, error) {
 	id := uuid.New().String()
-
+	parentType := "list"
+	parentId := listId
+	if listId == "" {
+		parentId = "1"
+	}
+	if parentTaskId != "" {
+		parentType = "task"
+		parentId = parentTaskId
+	}
 	db.tasks = append(db.tasks, dbmdl.DBTask{
-		ID:      id,
-		Content: content,
+		ID:         id,
+		Content:    content,
+		ParentId:   parentId,
+		ParentType: parentType,
 	})
-
 	return id, nil
+}
+
+func (db *Dummy) UpdateList(id string, title string) error {
+	for i := range db.lists {
+		if db.lists[i].ID == id {
+			db.lists[i].Title = title
+			return nil
+		}
+	}
+	return nil
+}
+
+func (db *Dummy) DeleteList(id string) error {
+	for i, l := range db.lists {
+		if l.ID == id {
+			db.lists = append(db.lists[:i], db.lists[i+1:]...)
+			return nil
+		}
+	}
+	return nil
 }

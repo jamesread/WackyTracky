@@ -4,4 +4,3 @@ ci:
 
 dev:
 	npx vite
-

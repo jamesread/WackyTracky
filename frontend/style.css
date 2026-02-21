@@ -214,7 +214,7 @@ aside ul.lists li:last-child {
 	font-size: 12pt;
 	text-decoration: none;
 	padding: .4em;
-	color: 000;;	
+	color: 000;;
 	text-shadow: 1px 1px #ccc;
 	align-items: center;
 }
@@ -461,7 +461,7 @@ div#listContainer {
 ul.taskTags li {
 	margin-right: 1em;
 	display: inline-block;
-	background-color: #efefef; 
+	background-color: #efefef;
 	padding: .1em;
 }
 
@@ -634,7 +634,7 @@ h2.popupMenuButton:hover, h2.hasMenu {
 	}
 
 	div.listControls {
-		display: none;		
+		display: none;
 	}
 
 	content-panel {

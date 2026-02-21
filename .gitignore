@@ -1,12 +1,52 @@
+# Python
 **/*.pyc
+**/__pycache__/
+
+# Editor / OS
 **/*.sw[po]
-wallpapers
-**/sessions
-**/__pycache__
-/wacky-tracky-server
-tmp
-webui
+**/.DS_Store
+**/Thumbs.db
+
+# Sensitive / config (do not commit local config or secrets)
 /config.yaml
-dist/
+service/config.yaml
+**/.env
+**/.env.*
+!**/.env.example
+**/*.local.yaml
+**/secrets.yaml
 wt.crt
 wt.key
+
+# Binaries / build
+/wacky-tracky-server
+**/wacky-tracky-server
+**/*.exe
+**/*.dll
+dist/
+**/dist/
+
+# Go
+**/*.test
+**/coverage.out
+**/coverage.html
+**/coverage.txt
+
+# Temp / runtime
+tmp/
+**/*.tmp
+**/*.log
+**/.cache/
+wallpapers
+**/sessions
+webui
+
+# Project-specific
+integration-tests/screenshots/
+integration-tests/node_modules/
+integration-tests/testdata/
+service/testdata/
+
+# Draft / working files (optional: remove if you want to track these)
+AGENTS-baseline.md
+agent-issues.tmp

@@ -213,7 +213,7 @@ func (api Neo4jDB) GetSubtasks(itemId string) ([]db.DBTask, error) {
 	return ret, nil
 }
 
-func (api Neo4jDB) GetTask(listId string) (*db.DBTask, error) {
+func (api Neo4jDB) GetTask(taskId string) (*db.DBTask, error) {
 	return nil, nil
 }
 
@@ -251,8 +251,26 @@ func (api Neo4jDB) GetTasks(listId string) ([]db.DBTask, error) {
 	return ret, nil
 }
 
-func (api Neo4jDB) CreateTask(title string) (string, error) {
+func (api Neo4jDB) CreateTask(content string, listId string, parentTaskId string) (string, error) {
 	id := uuid.New().String()
-
+	_ = content
+	_ = listId
+	_ = parentTaskId
 	return id, nil
+}
+
+func (api Neo4jDB) CreateList(title string) error {
+	_ = title
+	return nil
+}
+
+func (api Neo4jDB) UpdateList(id string, title string) error {
+	_ = id
+	_ = title
+	return nil
+}
+
+func (api Neo4jDB) DeleteList(id string) error {
+	_ = id
+	return nil
 }

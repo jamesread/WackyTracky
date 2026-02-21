@@ -1,24 +1,61 @@
 import { createRouter, createWebHistory } from 'vue-router';
+import { HomeIcon } from '@hugeicons/core-free-icons';
+import { PinIcon } from '@hugeicons/core-free-icons';
+import { Settings01Icon } from '@hugeicons/core-free-icons';
 
 import Welcome from '../resources/vue/views/Welcome.vue';
 import ListView from '../resources/vue/views/ListView.vue';
+import Options from '../resources/vue/views/Options.vue';
 
 const routes = [
   {
+    name: 'Welcome',
     path: '/',
     component: Welcome,
+    meta: {
+      title: 'Welcome',
+      icon: HomeIcon,
+    },
   },
   {
+    name: 'ListView',
     path: '/lists/:listId',
     component: ListView,
     props: true,
     meta: {
+      title: 'List',
+      icon: PinIcon,
       breadcrumbs: (route) => {
         return [
           { name: 'Home', to: '/' },
           { name: 'List: ' + String(route.params.listId), to: '/lists/:listId' }
         ];
       }
+    }
+  },
+  {
+    name: 'Search',
+    path: '/search',
+    component: ListView,
+    props: (route) => ({ listId: null, searchQuery: route.query.q || '' }),
+    meta: {
+      title: 'Search',
+      icon: PinIcon,
+      breadcrumbs: (route) => {
+        return [
+          { name: 'Home', to: '/' },
+          { name: 'Search: ' + (route.query.q || ''), to: '/search' }
+        ];
+      }
+    }
+  },
+  {
+    name: 'Options',
+    path: '/options',
+    component: Options,
+    meta: {
+      title: 'Options',
+      icon: Settings01Icon,
     }
   }
 ]
