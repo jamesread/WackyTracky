@@ -3,8 +3,15 @@ docs_dir: source
 repo_url: https://github.com/wacky-tracky/WackyTracky/
 nav:
   - Home: index.md
-  - Getting started: getting-started.md
+  - Installation:
+    - Docker Compose: installation/docker-compose.md
+  - Backends:
+    - Overview: backends/index.md
+    - todo.txt: backends/todotxt.md
+    - Neo4j: backends/neo4j.md
+    - YAML files: backends/yamlfiles.md
 theme:
-    name: material
-    palette:
-      primary: teal
+  name: material
+  logo: assets/logo.svg
+  palette:
+    primary: teal

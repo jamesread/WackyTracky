@@ -26,8 +26,8 @@
 
 # Specs (codebase-specific guidance)
 
-- The **specs/** directory contains design decisions and implementation guidance for this codebase. When working on the frontend or on features that touch UX, testing, or dialogs, consult the specs and follow them unless the user instructs otherwise.
-- Specs include: Vue-based dialogs (no window.prompt/confirm/alert), toast feedback for async operations, main task list minimalism, **Go development** (cyclo ≤ 5, codestyle and unit tests must pass; see `specs/go-development.md`), and other product/design decisions. Treat specs as normative for implementation and code review where they apply.
+- The **specs/** directory contains design decisions and implementation guidance for this codebase. When working on the frontend, on features that touch UX, testing, or dialogs, or on the **docs/** directory, consult the specs and follow them unless the user instructs otherwise.
+- Specs include: Vue-based dialogs (no window.prompt/confirm/alert), toast feedback for async operations, main task list minimalism, **Go development** (cyclo ≤ 5, codestyle and unit tests must pass; see `specs/go-development.md`), **user-facing docs** (usage and configuration for entry-level self-hosters; see `specs/docs-user-facing.md`), and other product/design decisions. Treat specs as normative for implementation and code review where they apply.
 
 # repo health
 
