@@ -5,6 +5,7 @@
 		:logo-url="logoUrl"
 		:sidebar-enabled="false"
 		:breadcrumbs="false"
+		:show-branding="!isPwa"
 	>
 		<template #toolbar>
 			<div class="toolbar-row">
@@ -242,6 +243,12 @@ const saveSearchQuery = ref('');
 const saveSearchError = ref('');
 const deleteSearchConfirm = ref(null);
 const pendingParentTaskId = ref(null);
+const isPwa = ref(false);
+let displayModeMqStandalone = null;
+let displayModeMqWco = null;
+function updatePwaDisplayMode() {
+	isPwa.value = displayModeMqStandalone?.matches || displayModeMqWco?.matches || false;
+}
 const DISPLAY_MODE_KEY = 'wackytracky_display_mode';
 const DISPLAY_MODES = ['hierarchy', 'onlyNextAction', 'onlyWaiting'];
 function loadDisplayMode() {
@@ -652,6 +659,11 @@ watch(shortcutsModal, (open) => {
 	}
 });
 onMounted(() => {
+	displayModeMqStandalone = window.matchMedia('(display-mode: standalone)');
+	displayModeMqWco = window.matchMedia('(display-mode: window-controls-overlay)');
+	updatePwaDisplayMode();
+	displayModeMqStandalone.addEventListener('change', updatePwaDisplayMode);
+	displayModeMqWco.addEventListener('change', updatePwaDisplayMode);
 	loadSavedSearches();
 	loadTaskPropertyProperties();
 	getLists();
@@ -673,6 +685,8 @@ onMounted(() => {
 	});
 });
 onUnmounted(() => {
+	if (displayModeMqStandalone) displayModeMqStandalone.removeEventListener('change', updatePwaDisplayMode);
+	if (displayModeMqWco) displayModeMqWco.removeEventListener('change', updatePwaDisplayMode);
 	document.removeEventListener('keydown', onCtrlF);
 	document.removeEventListener('keydown', onCtrlN);
 	document.removeEventListener('keydown', onKeyM);
@@ -757,6 +771,12 @@ onUnmounted(() => {
 	display: flex;
 	align-items: center;
 	gap: 0.5rem;
+}
+
+@media (display-mode: window-controls-overlay) {
+	.user-info {
+		padding-right: calc(100vw - env(titlebar-area-x, 0px) - env(titlebar-area-width, 100vw));
+	}
 }
 .options-btn {
 	display: inline-flex;
