@@ -7,6 +7,7 @@ on:
       - master
     paths:
       - 'docs/**'
+      - 'var/marketing/screenshots/**'
       - '.github/workflows/docs.yml'
   pull_request:
     branches:
@@ -14,6 +15,7 @@ on:
       - master
     paths:
       - 'docs/**'
+      - 'var/marketing/screenshots/**'
       - '.github/workflows/docs.yml'
   workflow_dispatch:
 
@@ -27,6 +29,11 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+
+      - name: Copy marketing screenshots into docs
+        run: |
+          mkdir -p docs/source/assets/screenshots
+          cp -n var/marketing/screenshots/*.png docs/source/assets/screenshots/ 2>/dev/null || true
 
       - name: Deploy docs
         uses: mhausenblas/mkdocs-deploy-gh-pages@master

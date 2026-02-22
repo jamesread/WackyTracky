@@ -4,6 +4,9 @@ cicd: build
 build:
 	go build
 
+test:
+	go test ./...
+
 codestyle:
 	go fmt ./...
 	go vet ./...

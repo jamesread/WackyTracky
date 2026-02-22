@@ -2,6 +2,8 @@
 
 WackyTracky is a minimal, keyboard-friendly task and list tracker. It gives you simple task and list tracking with a clean interface that works well for power users and GTD-style workflows.
 
+![List view — tasks with priorities, tags, contexts, and due dates](assets/screenshots/list-work.png)
+
 ## What you can do
 
 - **Tasks and lists** — Organize tasks into lists, with support for nested tasks, tags, and contexts.

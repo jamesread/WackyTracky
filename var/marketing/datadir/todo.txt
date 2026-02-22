@@ -1,0 +1,15 @@
+(A)  2026-02-18 Launch blog post for new feature +marketing @work #urgent due:2026-02-28 id:t001-work-001 listid:a1b2c3d4-e5f6-4a5b-8c9d-0e1f2a3b4c5d priority:A
+(B)  2026-02-19 Review Q1 roadmap with team +planning @work id:t002-work-002 listid:a1b2c3d4-e5f6-4a5b-8c9d-0e1f2a3b4c5d priority:B
+2026-02-20 Call with design team about homepage refresh @meeting @work id:t003-work-003 listid:a1b2c3d4-e5f6-4a5b-8c9d-0e1f2a3b4c5d
+(C)  2026-02-21 Prepare sprint demo slides +demo @work due:2026-02-25 id:t004-work-004 listid:a1b2c3d4-e5f6-4a5b-8c9d-0e1f2a3b4c5d priority:C
+2026-02-15 Book dentist appointment @home @phone id:t005-personal-001 listid:b2c3d4e5-f6a7-5b6c-9d0e-1f2a3b4c5d6e
+(A)  2026-02-16 Plan weekend hike with friends @home #someday id:t006-personal-002 listid:b2c3d4e5-f6a7-5b6c-9d0e-1f2a3b4c5d6e priority:A
+2026-02-17 Renew passport @errands due:2026-04-01 id:t007-personal-003 listid:b2c3d4e5-f6a7-5b6c-9d0e-1f2a3b4c5d6e
+2026-02-20 Groceries: milk, bread, eggs +shopping @errands id:t008-shop-001 listid:c3d4e5f6-a7b8-6c7d-0e1f-2a3b4c5d6e7f
+(B)  2026-02-19 Research new running shoes +shopping @home id:t009-shop-002 listid:c3d4e5f6-a7b8-6c7d-0e1f-2a3b4c5d6e7f priority:B
+2026-02-18 Order coffee beans subscription +shopping id:t010-shop-003 listid:c3d4e5f6-a7b8-6c7d-0e1f-2a3b4c5d6e7f
+2026-02-10 Read 12 books this year +reading id:t011-goals-001 listid:d4e5f6a7-b8c9-7d8e-1f2a-3b4c5d6e7f8a project:true
+2026-02-12 Choose next book to read +reading id:t012-goals-001a listid:d4e5f6a7-b8c9-7d8e-1f2a-3b4c5d6e7f8a parent:t011-goals-001
+2026-02-14 Finish current book (ch. 8–12) +reading id:t013-goals-001b listid:d4e5f6a7-b8c9-7d8e-1f2a-3b4c5d6e7f8a parent:t011-goals-001
+(A)  2026-02-22 Sync with Sarah about project timeline @meeting @work id:t014-inbox-001 listid:inbox priority:A
+2026-02-21 Draft release notes for v2.0 +release id:t015-inbox-002 listid:inbox

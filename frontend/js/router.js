@@ -18,6 +18,7 @@ const routes = [
     meta: {
       title: 'Welcome',
       icon: HomeIcon,
+      description: 'Choose a list to view or add tasks.',
     },
   },
   {
@@ -44,6 +45,7 @@ const routes = [
     meta: {
       title: 'Search',
       icon: PinIcon,
+      description: 'Search tasks across all lists by text, tags, or contexts.',
       breadcrumbs: (route) => {
         return [
           { name: 'Home', to: '/' },
@@ -59,6 +61,7 @@ const routes = [
     meta: {
       title: 'Options',
       icon: Settings01Icon,
+      description: 'Shortcuts to settings, task properties, and diagnostics.',
     }
   },
   {
@@ -68,6 +71,7 @@ const routes = [
     meta: {
       title: 'TPPs',
       icon: Settings01Icon,
+      description: 'Configure tags and contexts (colors, order).',
     }
   },
   {
@@ -77,6 +81,7 @@ const routes = [
     meta: {
       title: 'Settings',
       icon: Settings01Icon,
+      description: 'Server and client settings.',
     }
   },
   {
@@ -86,6 +91,7 @@ const routes = [
     meta: {
       title: 'Diagnostics',
       icon: Settings01Icon,
+      description: 'Debug and health information.',
     }
   }
 ]

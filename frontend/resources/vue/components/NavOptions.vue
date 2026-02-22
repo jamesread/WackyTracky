@@ -3,7 +3,6 @@
 		<h2 id="nav-options-title" class="nav-options-title">Options</h2>
 		<NavigationGrid
 			filter-type="route"
-			:compact="true"
 			:filter="excludeListLinks"
 		/>
 	</section>

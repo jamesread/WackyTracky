@@ -11,6 +11,17 @@
 
 **AI autonomy:** This project is developed at [Level 3 (semi-autonomous)](https://blog.jread.com/posts/ai-levels-of-autonomy-in-software-engineering/): AI implements features and tests; humans define specs and direction. Specs and architecture are written by a human with 20 years of development experience. Aggressive non-AI static analysis, code-quality checks (e.g. cyclomatic complexity limits), and tests are in place to reinforce project quality.
 
+## Screenshots
+
+**List view** — A list of tasks with priorities, tags, contexts, and due dates.
+![List view](docs/source/assets/screenshots/list-work.png)
+
+**Task options** — Right‑click a task to open the details panel (due date, priority, notes, move to list, mark done).
+![Task options](docs/source/assets/screenshots/task-options.png)
+
+**TPPs** — Configure tags and contexts (labels, colors, order) in Options → TPPs.
+![Task property properties](docs/source/assets/screenshots/tpp.png)
+
 ## Documentation
 
 Full documentation (MkDocs) is published to **GitHub Pages**: [https://jamesread.github.io/WackyTracky/](https://jamesread.github.io/WackyTracky/). The site is built from `docs/` and deployed automatically on push to `main` (see `.github/workflows/docs.yml`).
