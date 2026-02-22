@@ -4,7 +4,7 @@
 
   WackyTracky gives **simple** task and list tracking with a minimal, keyboard-friendly interface.
 
-[![Maturity](https://img.shields.io/badge/maturity-Beta-orange)](#none)
+[![Maturity](https://img.shields.io/badge/maturity-Beta-orange)](#misc)
 [![Discord](https://img.shields.io/discord/846737624960860180?label=Discord%20Server)](https://discord.gg/jhYWWpNJ3v)
 [![AI Autonomy Level](https://img.shields.io/badge/AI%20Autonomy-Level%203%20(semi--autonomous)-blue)](#none)
 
