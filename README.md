@@ -6,10 +6,9 @@
 
 [![Maturity](https://img.shields.io/badge/maturity-Beta-orange)](#none)
 [![Discord](https://img.shields.io/discord/846737624960860180?label=Discord%20Server)](https://discord.gg/jhYWWpNJ3v)
+[![AI Autonomy Level](https://img.shields.io/badge/AI%20Autonomy-Level%203%20(semi--autonomous)-blue)](#none)
 
 </div>
-
-**AI autonomy:** This project is developed at [Level 3 (semi-autonomous)](https://blog.jread.com/posts/ai-levels-of-autonomy-in-software-engineering/): AI implements features and tests; humans define specs and direction. Specs and architecture are written by a human with 20 years of development experience. Aggressive non-AI static analysis, code-quality checks (e.g. cyclomatic complexity limits), and tests are in place to reinforce project quality.
 
 ## Screenshots
 
@@ -48,6 +47,17 @@ volumes:
 
 Then run: `docker compose up -d`. The web UI and API are served on port 8080 by default (adjust the image’s listen port in your config if needed). Place a `config.yaml` in the same directory as your `docker-compose.yml` if you mount it; see the [documentation](https://jamesread.github.io/WackyTracky/) for config options.
 
+## No-Nonsense Software Principles
+
+This project follows these principles:
+
+* **Open Source & Free Software**: following the [Open Source Definition](https://opensource.org/osd) and the [Free Software Definition](https://www.gnu.org/philosophy/free-sw.html). All code and assets are available under the [AGPL-3.0 License](LICENSE).
+* **Independent**: No company owns the code or is responsible for the projects' governance.
+* **Inclusive**: No "core", "pro", "premium" or "enterprise" version. The only version is the one you can download and run, and it has all the features.
+* **Invisible**: No usage tracking, no user tracking, no ads, and no telemetry.
+* **Internal**: No internet connection required for any functionality.
+
 ## Misc
 
+* **AI autonomy:** This project is developed at [Level 3 (semi-autonomous)](https://blog.jread.com/posts/ai-levels-of-autonomy-in-software-engineering/): AI implements features and tests; humans define specs and direction. Specs and architecture are written by a human with 20 years of development experience. Aggressive non-AI static analysis, code-quality checks (e.g. cyclomatic complexity limits), and tests are in place to reinforce project quality.
 * **Backend:** The service supports multiple database drivers (MySQL, Neo4j, YAML files, and [todo.txt](http://todotxt.org)) for different task systems. The **todotxt** driver is the one that by far receives the most focus and testing at the moment.
