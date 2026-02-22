@@ -14,13 +14,13 @@
 ## Screenshots
 
 **List view** — A list of tasks with priorities, tags, contexts, and due dates.
-![List view](docs/source/assets/screenshots/list-work.png)
+![List view](var/marketing/screenshots/list-work.png)
 
 **Task options** — Right‑click a task to open the details panel (due date, priority, notes, move to list, mark done).
-![Task options](docs/source/assets/screenshots/task-options.png)
+![Task options](var/marketing/screenshots/task-options.png)
 
 **TPPs** — Configure tags and contexts (labels, colors, order) in Options → TPPs.
-![Task property properties](docs/source/assets/screenshots/tpp.png)
+![Task property properties](var/marketing/screenshots/tpp.png)
 
 ## Documentation
 
