@@ -10,6 +10,10 @@ nav:
     - todo.txt: backends/todotxt.md
     - Neo4j: backends/neo4j.md
     - YAML files: backends/yamlfiles.md
+  - API:
+    - Overview: api/index.md
+    - Reference: api/reference.md
+    - Search: api/search.md
 theme:
   name: material
   logo: assets/logo.svg

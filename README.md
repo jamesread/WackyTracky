@@ -21,7 +21,7 @@
 * **Flexible**: Use "Getting Things Done" or similar - flexible system for tags (#bob) and contexts (@home), and priorities (A-Z).
 * **Durable**: Given the app is open source and self-hosted, you can run it for years without worrying about the company going out of business or changing the product.
 * **Portable**: The project recommends the todotxt backend, which stores data in plain text files that can be easily moved, edited, and backed up. You can also switch to a different backend if needed.
-* **Powerful**: vim key bindings, git integration.
+* **Powerful**: vim key bindings, git integration, REST/gRPC API.
 
 ## Additional Screenshots
 
