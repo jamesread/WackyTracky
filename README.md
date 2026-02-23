@@ -10,6 +10,8 @@
 [![Discord](https://img.shields.io/discord/846737624960860180?label=Discord%20Server)](https://discord.gg/jhYWWpNJ3v)
 [![AI Autonomy Level](https://img.shields.io/badge/AI%20Autonomy-Level%203%20(semi--autonomous)-blue)](#misc)
 
+![Docs](https://jamesread.github.io/WackyTracky/) &bull; [Docker Compose Install](#deploy-with-docker-compose)
+
 </div>
 
 ## Screenshots
@@ -22,6 +24,13 @@
 
 **TPPs** — Configure tags and contexts (labels, colors, order) in Options → TPPs.
 ![Task property properties](var/marketing/screenshots/tpp.png)
+
+## Features & Benefits
+
+* **Flexible**: Use "Getting Things Done" or similar - flexible system for tags (#bob) and contexts (@home), and priorities (A-Z).
+* **Durable**: Given the app is open source and self-hosted, you can run it for years without worrying about the company going out of business or changing the product.
+* **Portable**: The project recommends the todotxt backend, which stores data in plain text files that can be easily moved, edited, and backed up. You can also switch to a different backend if needed.
+* **Powerful**: vim key bindings, git integration.
 
 ## Documentation
 
