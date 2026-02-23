@@ -2,7 +2,9 @@
   <img alt = "project logo" src = "var/logo.png" width = "128" />
   <h1>WackyTracky</h1>
 
-  WackyTracky gives **simple** task and list tracking with a minimal, keyboard-friendly interface.
+  Task tracking that gives power users full control over how they work.
+
+  Web app, with desktop support that includes vim key bindings, and mobile support with offline+sync from a progressive web app (installable on your phone). The backend supports multiple database drivers, but the main focus is on the popular plain-text format [todo.txt](http://todotxt.org).
 
 [![Maturity](https://img.shields.io/badge/maturity-Beta-orange)](#misc)
 [![Discord](https://img.shields.io/discord/846737624960860180?label=Discord%20Server)](https://discord.gg/jhYWWpNJ3v)
