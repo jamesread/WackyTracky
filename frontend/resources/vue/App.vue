@@ -217,6 +217,7 @@ import Header from 'picocrank/vue/components/Header.vue';
 import Navigation from 'picocrank/vue/components/Navigation.vue';
 import { GitBranchIcon, PinIcon, Settings01Icon, Folder01Icon, PlayIcon, AlarmClockIcon } from '@hugeicons/core-free-icons';
 import { useOffline } from './composables/useOffline.js';
+import { useSettings } from './composables/useSettings.js';
 import {
 	addOfflineTask,
 	setOfflineEdit,
@@ -233,6 +234,7 @@ import {
 const router = useRouter();
 const route = useRoute();
 const { isOnline } = useOffline();
+const { useMonospaceFont, zenMode, hideFooter } = useSettings();
 const navigation = ref(null);
 const headerRef = ref(null);
 const taskInputRef = ref(null);
@@ -861,6 +863,27 @@ watch(shortcutsModal, (open) => {
 		document.removeEventListener('keydown', onShortcutsKeydown);
 	}
 });
+watch(useMonospaceFont, (enabled) => {
+	if (enabled) {
+		document.body.classList.add('monospace-font');
+	} else {
+		document.body.classList.remove('monospace-font');
+	}
+}, { immediate: true });
+watch(zenMode, (enabled) => {
+	if (enabled) {
+		document.body.classList.add('zen-mode');
+	} else {
+		document.body.classList.remove('zen-mode');
+	}
+}, { immediate: true });
+watch(hideFooter, (enabled) => {
+	if (enabled) {
+		document.body.classList.add('hide-footer');
+	} else {
+		document.body.classList.remove('hide-footer');
+	}
+}, { immediate: true });
 onMounted(() => {
 	displayModeMqStandalone = window.matchMedia('(display-mode: standalone)');
 	displayModeMqWco = window.matchMedia('(display-mode: window-controls-overlay)');

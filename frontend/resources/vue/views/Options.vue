@@ -25,6 +25,51 @@
 				How due dates and "wait until" times are shown in the task list and details.
 			</p>
 		</div>
+		<div class="options-section">
+			<label for="options-monospace-font" class="options-label">
+				<input
+					id="options-monospace-font"
+					v-model="useMonospaceFont"
+					type="checkbox"
+					class="options-checkbox"
+					aria-describedby="options-monospace-font-desc"
+				/>
+				Use monospace font
+			</label>
+			<p id="options-monospace-font-desc" class="options-hint">
+				Apply monospace font across the entire UI.
+			</p>
+		</div>
+		<div class="options-section">
+			<label for="options-zen-mode" class="options-label">
+				<input
+					id="options-zen-mode"
+					v-model="zenMode"
+					type="checkbox"
+					class="options-checkbox"
+					aria-describedby="options-zen-mode-desc"
+				/>
+				Zen mode
+			</label>
+			<p id="options-zen-mode-desc" class="options-hint">
+				Apply minimal styling for a distraction-free experience.
+			</p>
+		</div>
+		<div class="options-section">
+			<label for="options-hide-footer" class="options-label">
+				<input
+					id="options-hide-footer"
+					v-model="hideFooter"
+					type="checkbox"
+					class="options-checkbox"
+					aria-describedby="options-hide-footer-desc"
+				/>
+				Hide footer
+			</label>
+			<p id="options-hide-footer-desc" class="options-hint">
+				Hide the footer element at the bottom of the page.
+			</p>
+		</div>
 	</Section>
 </template>
 
@@ -37,6 +82,9 @@ const openShortcutsDialog = inject('openShortcutsDialog', () => {});
 const {
 	dateTimeDisplayFormat,
 	dateTimeFormatOptions,
+	useMonospaceFont,
+	zenMode,
+	hideFooter,
 } = useSettings();
 </script>
 
@@ -79,5 +127,8 @@ const {
 }
 .options-btn:hover {
 	background: #f0f0f0;
+}
+.options-checkbox {
+	margin-right: 0.5rem;
 }
 </style>

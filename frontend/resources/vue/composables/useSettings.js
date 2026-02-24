@@ -4,6 +4,9 @@ const STORAGE_KEY = 'wackytracky_settings';
 
 const DEFAULTS = {
 	dateTimeDisplayFormat: 'short', // 'locale' | 'short' | 'iso'
+	useMonospaceFont: false,
+	zenMode: false,
+	hideFooter: false,
 };
 
 function loadFromStorage() {
@@ -44,6 +47,27 @@ export function useSettings() {
 		get: () => settings.value.dateTimeDisplayFormat ?? DEFAULTS.dateTimeDisplayFormat,
 		set: (v) => {
 			settings.value = { ...settings.value, dateTimeDisplayFormat: v };
+		},
+	});
+
+	const useMonospaceFont = computed({
+		get: () => settings.value.useMonospaceFont ?? DEFAULTS.useMonospaceFont,
+		set: (v) => {
+			settings.value = { ...settings.value, useMonospaceFont: v };
+		},
+	});
+
+	const zenMode = computed({
+		get: () => settings.value.zenMode ?? DEFAULTS.zenMode,
+		set: (v) => {
+			settings.value = { ...settings.value, zenMode: v };
+		},
+	});
+
+	const hideFooter = computed({
+		get: () => settings.value.hideFooter ?? DEFAULTS.hideFooter,
+		set: (v) => {
+			settings.value = { ...settings.value, hideFooter: v };
 		},
 	});
 
@@ -104,6 +128,9 @@ export function useSettings() {
 		settings,
 		updateSetting,
 		dateTimeDisplayFormat,
+		useMonospaceFont,
+		zenMode,
+		hideFooter,
 		formatDateDisplay,
 		dateTimeFormatOptions: [
 			{ value: 'short', label: 'Short (e.g. Jan 15, 2:30 PM)' },

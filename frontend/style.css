@@ -37,6 +37,13 @@ body, input, button {
 	display: flex;
 }
 
+body.monospace-font,
+body.monospace-font *,
+body.monospace-font input,
+body.monospace-font button {
+	font-family: monospace !important;
+}
+
 div.projectContainer {
 	border: 1px solid black;
 }
@@ -740,6 +747,18 @@ h3 {
 
 main {
 	margin-top: 4em;
+}
+
+body.zen-mode main {
+	padding: 0;
+}
+
+body.zen-mode section {
+	padding: 0;
+}
+
+body.hide-footer footer {
+	display: none;
 }
 
 div.subListItems {
