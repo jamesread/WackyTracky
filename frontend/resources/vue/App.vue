@@ -215,6 +215,7 @@ import { useRouter, useRoute } from 'vue-router';
 import { HugeiconsIcon } from '@hugeicons/vue';
 import Header from 'picocrank/vue/components/Header.vue';
 import Navigation from 'picocrank/vue/components/Navigation.vue';
+import NavOptions from './components/NavOptions.vue';
 import { GitBranchIcon, PinIcon, Settings01Icon, Folder01Icon, PlayIcon, AlarmClockIcon } from '@hugeicons/core-free-icons';
 import { useOffline } from './composables/useOffline.js';
 import { useSettings } from './composables/useSettings.js';
@@ -234,7 +235,7 @@ import {
 const router = useRouter();
 const route = useRoute();
 const { isOnline } = useOffline();
-const { useMonospaceFont, zenMode, hideFooter } = useSettings();
+const { useMonospaceFont, zenMode, hideFooter, syncSettingsFromStorage } = useSettings();
 const navigation = ref(null);
 const headerRef = ref(null);
 const taskInputRef = ref(null);
@@ -456,9 +457,20 @@ function confirmDeleteSearch() {
 
 const logoUrl = new URL('../images/logos/wacky-tracky.png', import.meta.url).href;
 
+const currentListTitle = ref('');
+const selectedTaskForSubtask = ref(null);
+provide('currentListTitle', currentListTitle);
+provide('selectedTaskForSubtask', selectedTaskForSubtask);
 const toolbarPlaceholder = computed(() => {
 	if (searchMode.value) return 'Search tasks...';
-	return editingTaskId.value ? 'Editing task below…' : 'Add a task...';
+	if (editingTaskId.value) return 'Editing task below…';
+	const sel = selectedTaskForSubtask.value;
+	if (sel?.content) {
+		const name = String(sel.content).length > 50 ? String(sel.content).slice(0, 47) + '…' : sel.content;
+		return `Add a subtask to ${name}`;
+	}
+	const name = (currentListTitle.value ?? '').trim();
+	return name ? `Add a task to ${name}` : 'Add a task...';
 });
 
 const toolbarInputValue = computed(() => {
@@ -605,7 +617,7 @@ async function submitTask() {
 	const content = (taskDraft.value || '').trim();
 	if (!content) return;
 	const listId = route.params.listId || '';
-	const parentTaskId = pendingParentTaskId.value || '';
+	const parentTaskId = selectedTaskForSubtask.value?.id ?? pendingParentTaskId.value ?? '';
 	if (!isOnline.value) {
 		const cached = getCachedInbox();
 		const inboxId = cached?.listId ?? INBOX_LIST_ID;
@@ -885,6 +897,13 @@ watch(hideFooter, (enabled) => {
 	}
 }, { immediate: true });
 onMounted(() => {
+	syncSettingsFromStorage();
+	if (useMonospaceFont.value) document.body.classList.add('monospace-font');
+	else document.body.classList.remove('monospace-font');
+	if (zenMode.value) document.body.classList.add('zen-mode');
+	else document.body.classList.remove('zen-mode');
+	if (hideFooter.value) document.body.classList.add('hide-footer');
+	else document.body.classList.remove('hide-footer');
 	displayModeMqStandalone = window.matchMedia('(display-mode: standalone)');
 	displayModeMqWco = window.matchMedia('(display-mode: window-controls-overlay)');
 	updatePwaDisplayMode();

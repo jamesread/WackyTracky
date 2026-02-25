@@ -28,15 +28,18 @@ function saveToStorage(settings) {
 	}
 }
 
+// Singleton so all components share the same state; toggles in Options immediately
+// affect watchers in App.vue (e.g. monospace font, zen mode, hide footer).
+const settings = ref(loadFromStorage());
+watch(settings, (val) => saveToStorage(val), { deep: true });
+
+/** Re-read settings from localStorage and update the shared ref (e.g. on app mount). */
+export function syncSettingsFromStorage() {
+	settings.value = loadFromStorage();
+}
+
 /** Client-side settings backed by localStorage. */
 export function useSettings() {
-	const settings = ref(loadFromStorage());
-
-	watch(
-		settings,
-		(val) => saveToStorage(val),
-		{ deep: true }
-	);
 
 	function updateSetting(key, value) {
 		if (!(key in DEFAULTS)) return;
@@ -127,6 +130,7 @@ export function useSettings() {
 	return {
 		settings,
 		updateSetting,
+		syncSettingsFromStorage,
 		dateTimeDisplayFormat,
 		useMonospaceFont,
 		zenMode,

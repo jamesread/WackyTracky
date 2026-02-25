@@ -1,5 +1,6 @@
 import './buildid.js'
 import 'femtocrank/style.css';
+import './style.css';
 
 import { Bootloader } from './js/modules/Bootloader.js'
 import { createApp } from 'vue'

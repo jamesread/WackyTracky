@@ -1,5 +1,5 @@
 <template>
-	<Section :title="sectionTitle">
+	<Section :title="sectionTitle" :padding="!zenMode">
 		<template #toolbar>
 			<button v-if="listId && !searchQuery && isOnline" type="button" class="list-options-btn list-options-btn-icon" aria-label="List options" @click="openListOptions">
 				<HugeiconsIcon :icon="MoreVerticalIcon" width="1.1em" height="1.1em" />
@@ -18,7 +18,7 @@
 			<p class="list-search-error-reason">{{ searchError }}</p>
 		</div>
 		<div v-else-if="!items.length" class="list-empty">
-			<p>{{ searchQuery ? 'No matching tasks.' : 'This list is empty.' }}</p>
+			<p>{{ emptyStateMessage }}</p>
 		</div>
 		<div v-else class="task-list-container">
 			<ul>
@@ -210,7 +210,7 @@
 	import { getCachedList, getOfflineTasks, getOfflineEdits, INBOX_LIST_ID } from '../../../js/modules/offlineStorage.js';
 
 	const router = useRouter();
-	const { formatDateDisplay } = useSettings();
+	const { formatDateDisplay, zenMode } = useSettings();
 	const items = ref([]);
 	const allItems = ref([]);
 	const hiddenTagNames = ref([]);
@@ -256,6 +256,14 @@
 	const isOnline = inject('isOnline', ref(true));
 	const cacheInbox = inject('cacheInbox', () => {});
 
+	const currentListTitle = inject('currentListTitle');
+	if (currentListTitle) {
+		watch(listTitle, (v) => { currentListTitle.value = (v ?? '').trim(); }, { immediate: true });
+		onUnmounted(() => { currentListTitle.value = ''; });
+	}
+
+	const selectedTaskForSubtask = inject('selectedTaskForSubtask');
+
 	const focusedIndex = ref(0);
 	const ddLastKey = ref(null);
 	const ddLastTime = ref(0);
@@ -265,6 +273,12 @@
 	const sectionTitle = computed(() => {
 		if (props.searchQuery) return 'Search results';
 		return listTitle.value || 'Tasks';
+	});
+	const emptyStateMessage = computed(() => {
+		if (props.searchQuery) return 'No matching tasks.';
+		const filtering = (displayMode.value === 'onlyNextAction' || displayMode.value === 'onlyWaiting') && allItems.value.length > 0;
+		if (filtering) return `${allItems.value.length} items filtered`;
+		return 'This list is empty.';
 	});
 	const currentEditingId = computed(() => editingTaskId?.value ?? null);
 	const currentEditingDraft = computed(() => editingDraft?.value ?? '');
@@ -634,9 +648,7 @@
 				e.preventDefault();
 				ddLastKey.value = null;
 				const row = items.value[focusedIndex.value];
-				if (row) {
-					pendingDoneTask.value = row.task;
-				}
+				if (row) doneTask(row.task.id);
 				return;
 			}
 			ddLastKey.value = 'd';
@@ -1035,7 +1047,17 @@
 	});
 	onUnmounted(() => {
 		document.removeEventListener('keydown', onListKeydown);
+		if (selectedTaskForSubtask) selectedTaskForSubtask.value = null;
 	});
+	watch([focusedIndex, items], () => {
+		if (!selectedTaskForSubtask) return;
+		if (focusedIndex.value < 0 || !items.value.length) {
+			selectedTaskForSubtask.value = null;
+			return;
+		}
+		const row = items.value[focusedIndex.value];
+		selectedTaskForSubtask.value = row ? { id: row.task.id, content: row.task.content || '' } : null;
+	}, { immediate: true });
 	watch([() => props.listId, () => props.searchQuery], load);
 	watch(() => props.listId, (id) => {
 		if (id) fetchListTitle();
