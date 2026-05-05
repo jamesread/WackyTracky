@@ -1,39 +1,46 @@
 {
-  "name": "wacky-tracky-client-html5",
-  "version": "1.0.0",
-  "description": "wacky-tracky ===",
-  "private": true,
-  "directories": {
-    "test": "test"
-  },
-  "scripts": {
-    "test": "nodeunit",
-    "build": "make"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+ssh://git@github.com/wacky-tracky/wacky-tracky-client-html5.git"
-  },
-  "author": "jamesread",
-  "license": "GPL-3.0",
-  "bugs": {
-    "url": "https://github.com/wacky-tracky/wacky-tracky-client-html5/issues"
-  },
-  "homepage": "https://github.com/wacky-tracky/wacky-tracky-client-html5#readme",
-  "devDependencies": {
-    "eslint": "^10.0.1",
-    "vite": "^7.3.2",
-    "vite-plugin-pwa": "^1.2.0"
-  },
-  "browserslist": [
-    "since 2019-01"
+	"name": "wacky-tracky-client-html5",
+	"version": "1.0.0",
+	"description": "wacky-tracky ===",
+	"private": true,
+	"directories": {
+		"test": "test"
+	},
+	"scripts": {
+		"test": "nodeunit",
+		"build": "make"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+ssh://git@github.com/wacky-tracky/wacky-tracky-client-html5.git"
+	},
+	"author": "jamesread",
+	"license": "GPL-3.0",
+	"bugs": {
+		"url": "https://github.com/wacky-tracky/wacky-tracky-client-html5/issues"
+	},
+	"homepage": "https://github.com/wacky-tracky/wacky-tracky-client-html5#readme",
+	"devDependencies": {
+		"eslint": "^10.3.0",
+		"vite": "^8.0.10",
+		"vite-plugin-pwa": "^1.3.0"
+	},
+	"browserslist": [
+		"since 2019-01"
   ],
   "dependencies": {
-    "@bufbuild/protobuf": "^2.11.0",
-    "@connectrpc/connect": "^2.1.1",
-    "@connectrpc/connect-web": "^2.1.1",
-    "@vitejs/plugin-vue": "^6.0.4",
-    "picocrank": "^1.14.0",
-    "vue-router": "^5.0.3"
+	  "@bufbuild/protobuf": "^2.12.0",
+	  "@connectrpc/connect": "^2.1.1",
+	  "@connectrpc/connect-web": "^2.1.1",
+	  "@vitejs/plugin-vue": "^6.0.6",
+	  "picocrank": "^1.14.1",
+	  "vue-router": "^5.0.6"
+  },
+  "overrides": {
+	  "workbox-build": {
+		  "@rollup/plugin-terser": {
+			  "serialize-javascript": "7.0.5"
+		  }
+	  }
   }
 }
