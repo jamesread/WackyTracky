@@ -16,9 +16,11 @@ WORKDIR /app
 # Defaults so config.yaml is optional: todotxt driver with /app/data as tasks dir.
 ENV DATABASE_DRIVER=todotxt
 ENV DATABASE_DATABASE=/app/data
+ENV HOME=/home/wt
 
-RUN microdnf install -y git && microdnf clean all
-RUN mkdir -p /config /app/data
-VOLUME ["/config", "/app/data"]
+RUN microdnf install -y git openssh-clients && microdnf clean all
+RUN mkdir -p /config /app/data /home/wt/.ssh \
+	&& chmod 700 /home/wt/.ssh
+VOLUME ["/config", "/app/data", "/home/wt"]
 
 ENTRYPOINT [ "/app/wt" ]

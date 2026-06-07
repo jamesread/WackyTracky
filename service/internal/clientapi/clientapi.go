@@ -15,6 +15,7 @@ import (
 	"github.com/wacky-tracky/wacky-tracky-server/internal/buildinfo"
 	dbmdl "github.com/wacky-tracky/wacky-tracky-server/internal/db/model"
 	"github.com/wacky-tracky/wacky-tracky-server/internal/db/todotxt"
+	"github.com/wacky-tracky/wacky-tracky-server/internal/gitsync"
 	"github.com/wacky-tracky/wacky-tracky-server/internal/ruleeval"
 )
 
@@ -405,6 +406,19 @@ func (api *wackyTrackyClientService) RepoStatus(ctx context.Context, req *connec
 		}
 	}
 	return connect.NewResponse(&pb.RepoStatusResponse{Output: out}), nil
+}
+
+func (api *wackyTrackyClientService) RepoSync(ctx context.Context, req *connect.Request[pb.RepoSyncRequest]) (*connect.Response[pb.RepoSyncResponse], error) {
+	_ = req
+	res := gitsync.Result{Success: false, Message: "Git sync is only available with the todo.txt backend"}
+	if t, ok := api.dbconn.(*todotxt.TodoTxt); ok {
+		res = gitsync.Sync(ctx, t.Dir(), req.Msg.GetServerName())
+	}
+	return connect.NewResponse(&pb.RepoSyncResponse{
+		Success: res.Success,
+		Message: res.Message,
+		Steps:   res.Steps,
+	}), nil
 }
 
 func (api *wackyTrackyClientService) GetSavedSearches(ctx context.Context, req *connect.Request[pb.GetSavedSearchesRequest]) (*connect.Response[pb.GetSavedSearchesResponse], error) {

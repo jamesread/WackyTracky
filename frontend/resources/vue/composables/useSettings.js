@@ -7,6 +7,7 @@ const DEFAULTS = {
 	useMonospaceFont: false,
 	zenMode: false,
 	hideFooter: false,
+	serverName: '',
 };
 
 function loadFromStorage() {
@@ -74,6 +75,13 @@ export function useSettings() {
 		},
 	});
 
+	const serverName = computed({
+		get: () => settings.value.serverName ?? DEFAULTS.serverName,
+		set: (v) => {
+			settings.value = { ...settings.value, serverName: v };
+		},
+	});
+
 	/** Format a date or datetime string for display (due dates, wait until, etc.). */
 	function formatDateDisplay(isoStr) {
 		if (!isoStr) return '';
@@ -135,6 +143,7 @@ export function useSettings() {
 		useMonospaceFont,
 		zenMode,
 		hideFooter,
+		serverName,
 		formatDateDisplay,
 		dateTimeFormatOptions: [
 			{ value: 'short', label: 'Short (e.g. Jan 15, 2:30 PM)' },

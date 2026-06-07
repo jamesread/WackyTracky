@@ -188,6 +188,15 @@ message RepoStatusResponse {
 	string output = 1;  // git status output for the todotxt directory, or error message
 }
 
+message RepoSyncRequest {
+	string server_name = 1;
+}
+message RepoSyncResponse {
+	bool success = 1;
+	string message = 2;
+	repeated string steps = 3;
+}
+
 message SavedSearch {
 	string id = 1;
 	string name = 2;
@@ -234,6 +243,7 @@ service WackyTrackyClientService {
 	rpc GetTags(GetTagsRequest) returns (GetTagsResponse) {}
 
 	rpc RepoStatus(RepoStatusRequest) returns (RepoStatusResponse) {}
+	rpc RepoSync(RepoSyncRequest) returns (RepoSyncResponse) {}
 
 	rpc GetSavedSearches(GetSavedSearchesRequest) returns (GetSavedSearchesResponse) {}
 	rpc SetSavedSearches(SetSavedSearchesRequest) returns (SetSavedSearchesResponse) {}

@@ -78,6 +78,9 @@ const (
 	// WackyTrackyClientServiceRepoStatusProcedure is the fully-qualified name of the
 	// WackyTrackyClientService's RepoStatus RPC.
 	WackyTrackyClientServiceRepoStatusProcedure = "/wackytracky.clientapi.v1.WackyTrackyClientService/RepoStatus"
+	// WackyTrackyClientServiceRepoSyncProcedure is the fully-qualified name of the
+	// WackyTrackyClientService's RepoSync RPC.
+	WackyTrackyClientServiceRepoSyncProcedure = "/wackytracky.clientapi.v1.WackyTrackyClientService/RepoSync"
 	// WackyTrackyClientServiceGetSavedSearchesProcedure is the fully-qualified name of the
 	// WackyTrackyClientService's GetSavedSearches RPC.
 	WackyTrackyClientServiceGetSavedSearchesProcedure = "/wackytracky.clientapi.v1.WackyTrackyClientService/GetSavedSearches"
@@ -122,6 +125,7 @@ type WackyTrackyClientServiceClient interface {
 	DeleteList(context.Context, *connect.Request[v1.DeleteListRequest]) (*connect.Response[v1.DeleteListResponse], error)
 	GetTags(context.Context, *connect.Request[v1.GetTagsRequest]) (*connect.Response[v1.GetTagsResponse], error)
 	RepoStatus(context.Context, *connect.Request[v1.RepoStatusRequest]) (*connect.Response[v1.RepoStatusResponse], error)
+	RepoSync(context.Context, *connect.Request[v1.RepoSyncRequest]) (*connect.Response[v1.RepoSyncResponse], error)
 	GetSavedSearches(context.Context, *connect.Request[v1.GetSavedSearchesRequest]) (*connect.Response[v1.GetSavedSearchesResponse], error)
 	SetSavedSearches(context.Context, *connect.Request[v1.SetSavedSearchesRequest]) (*connect.Response[v1.SetSavedSearchesResponse], error)
 	GetTaskMetadata(context.Context, *connect.Request[v1.GetTaskMetadataRequest]) (*connect.Response[v1.GetTaskMetadataResponse], error)
@@ -234,6 +238,12 @@ func NewWackyTrackyClientServiceClient(httpClient connect.HTTPClient, baseURL st
 			connect.WithSchema(wackyTrackyClientServiceMethods.ByName("RepoStatus")),
 			connect.WithClientOptions(opts...),
 		),
+		repoSync: connect.NewClient[v1.RepoSyncRequest, v1.RepoSyncResponse](
+			httpClient,
+			baseURL+WackyTrackyClientServiceRepoSyncProcedure,
+			connect.WithSchema(wackyTrackyClientServiceMethods.ByName("RepoSync")),
+			connect.WithClientOptions(opts...),
+		),
 		getSavedSearches: connect.NewClient[v1.GetSavedSearchesRequest, v1.GetSavedSearchesResponse](
 			httpClient,
 			baseURL+WackyTrackyClientServiceGetSavedSearchesProcedure,
@@ -302,6 +312,7 @@ type wackyTrackyClientServiceClient struct {
 	deleteList                *connect.Client[v1.DeleteListRequest, v1.DeleteListResponse]
 	getTags                   *connect.Client[v1.GetTagsRequest, v1.GetTagsResponse]
 	repoStatus                *connect.Client[v1.RepoStatusRequest, v1.RepoStatusResponse]
+	repoSync                  *connect.Client[v1.RepoSyncRequest, v1.RepoSyncResponse]
 	getSavedSearches          *connect.Client[v1.GetSavedSearchesRequest, v1.GetSavedSearchesResponse]
 	setSavedSearches          *connect.Client[v1.SetSavedSearchesRequest, v1.SetSavedSearchesResponse]
 	getTaskMetadata           *connect.Client[v1.GetTaskMetadataRequest, v1.GetTaskMetadataResponse]
@@ -387,6 +398,11 @@ func (c *wackyTrackyClientServiceClient) RepoStatus(ctx context.Context, req *co
 	return c.repoStatus.CallUnary(ctx, req)
 }
 
+// RepoSync calls wackytracky.clientapi.v1.WackyTrackyClientService.RepoSync.
+func (c *wackyTrackyClientServiceClient) RepoSync(ctx context.Context, req *connect.Request[v1.RepoSyncRequest]) (*connect.Response[v1.RepoSyncResponse], error) {
+	return c.repoSync.CallUnary(ctx, req)
+}
+
 // GetSavedSearches calls wackytracky.clientapi.v1.WackyTrackyClientService.GetSavedSearches.
 func (c *wackyTrackyClientServiceClient) GetSavedSearches(ctx context.Context, req *connect.Request[v1.GetSavedSearchesRequest]) (*connect.Response[v1.GetSavedSearchesResponse], error) {
 	return c.getSavedSearches.CallUnary(ctx, req)
@@ -447,6 +463,7 @@ type WackyTrackyClientServiceHandler interface {
 	DeleteList(context.Context, *connect.Request[v1.DeleteListRequest]) (*connect.Response[v1.DeleteListResponse], error)
 	GetTags(context.Context, *connect.Request[v1.GetTagsRequest]) (*connect.Response[v1.GetTagsResponse], error)
 	RepoStatus(context.Context, *connect.Request[v1.RepoStatusRequest]) (*connect.Response[v1.RepoStatusResponse], error)
+	RepoSync(context.Context, *connect.Request[v1.RepoSyncRequest]) (*connect.Response[v1.RepoSyncResponse], error)
 	GetSavedSearches(context.Context, *connect.Request[v1.GetSavedSearchesRequest]) (*connect.Response[v1.GetSavedSearchesResponse], error)
 	SetSavedSearches(context.Context, *connect.Request[v1.SetSavedSearchesRequest]) (*connect.Response[v1.SetSavedSearchesResponse], error)
 	GetTaskMetadata(context.Context, *connect.Request[v1.GetTaskMetadataRequest]) (*connect.Response[v1.GetTaskMetadataResponse], error)
@@ -554,6 +571,12 @@ func NewWackyTrackyClientServiceHandler(svc WackyTrackyClientServiceHandler, opt
 		connect.WithSchema(wackyTrackyClientServiceMethods.ByName("RepoStatus")),
 		connect.WithHandlerOptions(opts...),
 	)
+	wackyTrackyClientServiceRepoSyncHandler := connect.NewUnaryHandler(
+		WackyTrackyClientServiceRepoSyncProcedure,
+		svc.RepoSync,
+		connect.WithSchema(wackyTrackyClientServiceMethods.ByName("RepoSync")),
+		connect.WithHandlerOptions(opts...),
+	)
 	wackyTrackyClientServiceGetSavedSearchesHandler := connect.NewUnaryHandler(
 		WackyTrackyClientServiceGetSavedSearchesProcedure,
 		svc.GetSavedSearches,
@@ -634,6 +657,8 @@ func NewWackyTrackyClientServiceHandler(svc WackyTrackyClientServiceHandler, opt
 			wackyTrackyClientServiceGetTagsHandler.ServeHTTP(w, r)
 		case WackyTrackyClientServiceRepoStatusProcedure:
 			wackyTrackyClientServiceRepoStatusHandler.ServeHTTP(w, r)
+		case WackyTrackyClientServiceRepoSyncProcedure:
+			wackyTrackyClientServiceRepoSyncHandler.ServeHTTP(w, r)
 		case WackyTrackyClientServiceGetSavedSearchesProcedure:
 			wackyTrackyClientServiceGetSavedSearchesHandler.ServeHTTP(w, r)
 		case WackyTrackyClientServiceSetSavedSearchesProcedure:
@@ -717,6 +742,10 @@ func (UnimplementedWackyTrackyClientServiceHandler) GetTags(context.Context, *co
 
 func (UnimplementedWackyTrackyClientServiceHandler) RepoStatus(context.Context, *connect.Request[v1.RepoStatusRequest]) (*connect.Response[v1.RepoStatusResponse], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("wackytracky.clientapi.v1.WackyTrackyClientService.RepoStatus is not implemented"))
+}
+
+func (UnimplementedWackyTrackyClientServiceHandler) RepoSync(context.Context, *connect.Request[v1.RepoSyncRequest]) (*connect.Response[v1.RepoSyncResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("wackytracky.clientapi.v1.WackyTrackyClientService.RepoSync is not implemented"))
 }
 
 func (UnimplementedWackyTrackyClientServiceHandler) GetSavedSearches(context.Context, *connect.Request[v1.GetSavedSearchesRequest]) (*connect.Response[v1.GetSavedSearchesResponse], error) {

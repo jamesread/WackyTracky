@@ -6,6 +6,22 @@
 			<button type="button" class="options-btn" @click="openShortcutsDialog">Open shortcuts</button>
 		</div>
 		<div class="options-section">
+			<h3 class="options-subheading">Git sync</h3>
+			<label for="options-server-name" class="options-label">Server name</label>
+			<input
+				id="options-server-name"
+				v-model="serverName"
+				type="text"
+				class="options-text-input"
+				placeholder="e.g. homelab"
+				aria-describedby="options-server-name-desc"
+				autocomplete="off"
+			/>
+			<p id="options-server-name-desc" class="options-hint">
+				Used in git commit messages when you sync from the header: <code>wt sync: &lt;server name&gt;</code>.
+			</p>
+		</div>
+		<div class="options-section">
 			<label for="options-datetime-format" class="options-label">Date/time display format</label>
 			<select
 				id="options-datetime-format"
@@ -85,6 +101,7 @@ const {
 	useMonospaceFont,
 	zenMode,
 	hideFooter,
+	serverName,
 } = useSettings();
 </script>
 
@@ -101,6 +118,17 @@ const {
 .options-select {
 	padding: 0.4rem 0.6rem;
 	min-width: 12rem;
+	border: 1px solid #ccc;
+	border-radius: 0.35rem;
+	font-size: 0.95rem;
+	background: var(--femtocrank-bg, #fff);
+}
+.options-text-input {
+	display: block;
+	padding: 0.4rem 0.6rem;
+	min-width: 12rem;
+	max-width: 24rem;
+	width: 100%;
 	border: 1px solid #ccc;
 	border-radius: 0.35rem;
 	font-size: 0.95rem;

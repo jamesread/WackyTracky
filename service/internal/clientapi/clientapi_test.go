@@ -67,3 +67,16 @@ func TestClientAPI_Version(t *testing.T) {
 	require.NotNil(t, resp)
 	assert.NotEmpty(t, resp.Msg.Version)
 }
+
+func TestClientAPI_RepoSync_WithDummyDB(t *testing.T) {
+	db := &dummy.Dummy{}
+	require.NoError(t, db.Connect())
+	api := GetNewClientAPI(db)
+
+	req := connect.NewRequest(&pb.RepoSyncRequest{})
+	resp, err := api.RepoSync(context.Background(), req)
+	require.NoError(t, err)
+	require.NotNil(t, resp)
+	assert.False(t, resp.Msg.Success)
+	assert.Contains(t, resp.Msg.Message, "todo.txt backend")
+}

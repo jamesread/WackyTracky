@@ -64,8 +64,11 @@
 					<HugeiconsIcon :icon="displayModeIcon" width="1.1em" height="1.1em" />
 					<span class="display-mode-label">{{ displayModeLabel }}</span>
 				</button>
-				<button type="button" class="options-btn repo-status-btn" :disabled="!isOnline" @click="showRepoStatus" title="Git status of todotxt directory (requires network)" aria-label="Repo status">
+				<button type="button" class="options-btn repo-status-btn" :disabled="!isOnline || repoSyncRunning" @click="showRepoStatus" title="Git status of todotxt directory (requires network)" aria-label="Repo status">
 					<HugeiconsIcon :icon="GitBranchIcon" width="1.1em" height="1.1em" />
+				</button>
+				<button type="button" class="options-btn repo-sync-btn" :disabled="!isOnline || repoSyncRunning" @click="startRepoSync" title="Git add, commit, and push todotxt directory (requires network)" aria-label="Sync to git remote">
+					<HugeiconsIcon :icon="CloudUploadIcon" width="1.1em" height="1.1em" />
 				</button>
 				<button type="button" class="options-btn options-settings-btn" @click="goToOptions" title="Options" aria-label="Options">
 					<HugeiconsIcon :icon="Settings01Icon" width="1.1em" height="1.1em" />
@@ -82,6 +85,19 @@
 			<pre class="repo-status-output">{{ repoStatusOutput }}</pre>
 			<div class="repo-status-actions">
 				<button type="button" class="repo-status-close" @click="repoStatusModal = null">Close</button>
+			</div>
+		</div>
+	</div>
+	<div v-if="repoSyncModal" class="repo-status-overlay">
+		<div class="repo-status-dialog repo-sync-dialog" role="dialog" aria-labelledby="repo-sync-title" aria-modal="true">
+			<h2 id="repo-sync-title" class="repo-status-title">Sync to git remote</h2>
+			<p class="repo-sync-step">{{ repoSyncStepLabel }}</p>
+			<div class="repo-sync-progress-track" role="progressbar" :aria-valuenow="repoSyncProgress" aria-valuemin="0" aria-valuemax="100" aria-label="Sync progress">
+				<div class="repo-sync-progress-bar" :style="{ width: repoSyncProgress + '%' }"></div>
+			</div>
+			<pre v-if="repoSyncLog" class="repo-status-output repo-sync-log">{{ repoSyncLog }}</pre>
+			<div class="repo-status-actions">
+				<button type="button" class="repo-status-close" :disabled="repoSyncRunning" @click="closeRepoSyncModal">Close</button>
 			</div>
 		</div>
 	</div>
@@ -216,7 +232,7 @@ import { HugeiconsIcon } from '@hugeicons/vue';
 import Header from 'picocrank/vue/components/Header.vue';
 import Navigation from 'picocrank/vue/components/Navigation.vue';
 import NavOptions from './components/NavOptions.vue';
-import { GitBranchIcon, PinIcon, Settings01Icon, Folder01Icon, PlayIcon, AlarmClockIcon } from '@hugeicons/core-free-icons';
+import { GitBranchIcon, CloudUploadIcon, PinIcon, Settings01Icon, Folder01Icon, PlayIcon, AlarmClockIcon } from '@hugeicons/core-free-icons';
 import { useOffline } from './composables/useOffline.js';
 import { useSettings } from './composables/useSettings.js';
 import {
@@ -235,7 +251,7 @@ import {
 const router = useRouter();
 const route = useRoute();
 const { isOnline } = useOffline();
-const { useMonospaceFont, zenMode, hideFooter, syncSettingsFromStorage } = useSettings();
+const { useMonospaceFont, zenMode, hideFooter, serverName, syncSettingsFromStorage } = useSettings();
 const navigation = ref(null);
 const headerRef = ref(null);
 const taskInputRef = ref(null);
@@ -264,6 +280,19 @@ function toastErrorReason(e) {
 const submittingTask = ref(false);
 const repoStatusModal = ref(false);
 const repoStatusOutput = ref('');
+const repoSyncModal = ref(false);
+const repoSyncRunning = ref(false);
+const repoSyncProgress = ref(0);
+const repoSyncStepLabel = ref('');
+const repoSyncLog = ref('');
+const repoSyncSteps = [
+	'Validating repository',
+	'Fetching remote updates',
+	'Staging changes',
+	'Committing changes',
+	'Pushing to remote',
+];
+let repoSyncProgressTimer = null;
 const navOptionsOpen = ref(false);
 const shortcutsModal = ref(false);
 const shortcutsCloseRef = ref(null);
@@ -814,6 +843,68 @@ async function showRepoStatus() {
 	}
 }
 
+function stopRepoSyncProgress() {
+	if (repoSyncProgressTimer) {
+		clearInterval(repoSyncProgressTimer);
+		repoSyncProgressTimer = null;
+	}
+}
+
+function closeRepoSyncModal() {
+	if (repoSyncRunning.value) return;
+	stopRepoSyncProgress();
+	repoSyncModal.value = false;
+}
+
+function startRepoSyncProgress() {
+	stopRepoSyncProgress();
+	repoSyncProgress.value = 5;
+	repoSyncStepLabel.value = repoSyncSteps[0] + '…';
+	let stepIndex = 0;
+	repoSyncProgressTimer = setInterval(() => {
+		stepIndex = Math.min(stepIndex + 1, repoSyncSteps.length - 1);
+		repoSyncProgress.value = Math.min(90, 5 + stepIndex * 18);
+		repoSyncStepLabel.value = repoSyncSteps[stepIndex] + '…';
+	}, 700);
+}
+
+async function startRepoSync() {
+	repoSyncModal.value = true;
+	repoSyncRunning.value = true;
+	repoSyncLog.value = '';
+	repoSyncProgress.value = 0;
+	startRepoSyncProgress();
+	try {
+		const res = await window.client.repoSync({ serverName: serverName.value.trim() });
+		stopRepoSyncProgress();
+		repoSyncProgress.value = 100;
+		repoSyncStepLabel.value = res.success ? 'Complete' : 'Failed';
+		const steps = (res.steps || []).map((step) => '✓ ' + step).join('\n');
+		const message = (res.message || '').trim();
+		repoSyncLog.value = [steps, message].filter(Boolean).join('\n\n');
+		if (res.success) {
+			showToast(message || 'Changes pushed to remote');
+			repoSyncRunning.value = false;
+			setTimeout(() => {
+				if (repoSyncModal.value) {
+					stopRepoSyncProgress();
+					repoSyncModal.value = false;
+				}
+			}, 1200);
+			return;
+		}
+		showToast(message || 'Git sync failed', 'error');
+	} catch (e) {
+		stopRepoSyncProgress();
+		repoSyncProgress.value = 100;
+		repoSyncStepLabel.value = 'Failed';
+		repoSyncLog.value = 'Error: ' + (e?.message || String(e));
+		showToast('Git sync failed: ' + toastErrorReason(e), 'error');
+	} finally {
+		repoSyncRunning.value = false;
+	}
+}
+
 function goHome() {
 	router.push('/');
 }
@@ -933,6 +1024,7 @@ onMounted(() => {
 	document.addEventListener('click', onSavedSearchSelectClickOutside);
 });
 onUnmounted(() => {
+	stopRepoSyncProgress();
 	if (displayModeMqStandalone) displayModeMqStandalone.removeEventListener('change', updatePwaDisplayMode);
 	if (displayModeMqWco) displayModeMqWco.removeEventListener('change', updatePwaDisplayMode);
 	window.removeEventListener('online', syncOfflineChanges);
@@ -1196,6 +1288,30 @@ function onSavedSearchSelectClickOutside(e) {
 }
 .repo-status-close:hover {
 	background: #f0f0f0;
+}
+.repo-sync-dialog {
+	min-width: 26rem;
+}
+.repo-sync-step {
+	margin: 0 0 0.75rem 0;
+	font-size: 0.95rem;
+	color: #444;
+}
+.repo-sync-progress-track {
+	height: 0.5rem;
+	background: #e8e8e8;
+	border-radius: 999px;
+	overflow: hidden;
+	margin-bottom: 1rem;
+}
+.repo-sync-progress-bar {
+	height: 100%;
+	background: #2f855a;
+	border-radius: 999px;
+	transition: width 0.35s ease;
+}
+.repo-sync-log {
+	min-height: 4rem;
 }
 .toast {
 	position: fixed;

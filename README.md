@@ -51,8 +51,11 @@ services:
       - ./config.yaml:/app/config.yaml
       # Persist todotxt data (set database.database in config to /app/data/todotxt or similar)
       - todotxt-data:/app/data
+      # Persist SSH keys and other home-dir files for git push/pull (HOME=/home/wt)
+      - wt-home:/home/wt
 volumes:
   todotxt-data:
+  wt-home:
 ```
 
 Then run: `docker compose up -d`. The web UI and API are served on port 8080 by default (adjust the image’s listen port in your config if needed). Place a `config.yaml` in the same directory as your `docker-compose.yml` if you mount it; see the [documentation](https://jamesread.github.io/WackyTracky/) for config options.

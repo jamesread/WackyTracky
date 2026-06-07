@@ -2241,6 +2241,110 @@ func (x *RepoStatusResponse) GetOutput() string {
 	return ""
 }
 
+type RepoSyncRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	ServerName    string                 `protobuf:"bytes,1,opt,name=server_name,json=serverName,proto3" json:"server_name,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *RepoSyncRequest) Reset() {
+	*x = RepoSyncRequest{}
+	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[47]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *RepoSyncRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*RepoSyncRequest) ProtoMessage() {}
+
+func (x *RepoSyncRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[47]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use RepoSyncRequest.ProtoReflect.Descriptor instead.
+func (*RepoSyncRequest) Descriptor() ([]byte, []int) {
+	return file_wacky_tracky_clientapi_v1_wt_proto_rawDescGZIP(), []int{47}
+}
+
+func (x *RepoSyncRequest) GetServerName() string {
+	if x != nil {
+		return x.ServerName
+	}
+	return ""
+}
+
+type RepoSyncResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Success       bool                   `protobuf:"varint,1,opt,name=success,proto3" json:"success,omitempty"`
+	Message       string                 `protobuf:"bytes,2,opt,name=message,proto3" json:"message,omitempty"`
+	Steps         []string               `protobuf:"bytes,3,rep,name=steps,proto3" json:"steps,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *RepoSyncResponse) Reset() {
+	*x = RepoSyncResponse{}
+	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[48]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *RepoSyncResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*RepoSyncResponse) ProtoMessage() {}
+
+func (x *RepoSyncResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[48]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use RepoSyncResponse.ProtoReflect.Descriptor instead.
+func (*RepoSyncResponse) Descriptor() ([]byte, []int) {
+	return file_wacky_tracky_clientapi_v1_wt_proto_rawDescGZIP(), []int{48}
+}
+
+func (x *RepoSyncResponse) GetSuccess() bool {
+	if x != nil {
+		return x.Success
+	}
+	return false
+}
+
+func (x *RepoSyncResponse) GetMessage() string {
+	if x != nil {
+		return x.Message
+	}
+	return ""
+}
+
+func (x *RepoSyncResponse) GetSteps() []string {
+	if x != nil {
+		return x.Steps
+	}
+	return nil
+}
+
 type SavedSearch struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
@@ -2252,7 +2356,7 @@ type SavedSearch struct {
 
 func (x *SavedSearch) Reset() {
 	*x = SavedSearch{}
-	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[47]
+	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[49]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2264,7 +2368,7 @@ func (x *SavedSearch) String() string {
 func (*SavedSearch) ProtoMessage() {}
 
 func (x *SavedSearch) ProtoReflect() protoreflect.Message {
-	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[47]
+	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[49]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2277,7 +2381,7 @@ func (x *SavedSearch) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SavedSearch.ProtoReflect.Descriptor instead.
 func (*SavedSearch) Descriptor() ([]byte, []int) {
-	return file_wacky_tracky_clientapi_v1_wt_proto_rawDescGZIP(), []int{47}
+	return file_wacky_tracky_clientapi_v1_wt_proto_rawDescGZIP(), []int{49}
 }
 
 func (x *SavedSearch) GetId() string {
@@ -2309,7 +2413,7 @@ type GetSavedSearchesRequest struct {
 
 func (x *GetSavedSearchesRequest) Reset() {
 	*x = GetSavedSearchesRequest{}
-	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[48]
+	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[50]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2321,7 +2425,7 @@ func (x *GetSavedSearchesRequest) String() string {
 func (*GetSavedSearchesRequest) ProtoMessage() {}
 
 func (x *GetSavedSearchesRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[48]
+	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[50]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2334,7 +2438,7 @@ func (x *GetSavedSearchesRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetSavedSearchesRequest.ProtoReflect.Descriptor instead.
 func (*GetSavedSearchesRequest) Descriptor() ([]byte, []int) {
-	return file_wacky_tracky_clientapi_v1_wt_proto_rawDescGZIP(), []int{48}
+	return file_wacky_tracky_clientapi_v1_wt_proto_rawDescGZIP(), []int{50}
 }
 
 type GetSavedSearchesResponse struct {
@@ -2346,7 +2450,7 @@ type GetSavedSearchesResponse struct {
 
 func (x *GetSavedSearchesResponse) Reset() {
 	*x = GetSavedSearchesResponse{}
-	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[49]
+	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[51]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2358,7 +2462,7 @@ func (x *GetSavedSearchesResponse) String() string {
 func (*GetSavedSearchesResponse) ProtoMessage() {}
 
 func (x *GetSavedSearchesResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[49]
+	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[51]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2371,7 +2475,7 @@ func (x *GetSavedSearchesResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetSavedSearchesResponse.ProtoReflect.Descriptor instead.
 func (*GetSavedSearchesResponse) Descriptor() ([]byte, []int) {
-	return file_wacky_tracky_clientapi_v1_wt_proto_rawDescGZIP(), []int{49}
+	return file_wacky_tracky_clientapi_v1_wt_proto_rawDescGZIP(), []int{51}
 }
 
 func (x *GetSavedSearchesResponse) GetSavedSearches() []*SavedSearch {
@@ -2390,7 +2494,7 @@ type SetSavedSearchesRequest struct {
 
 func (x *SetSavedSearchesRequest) Reset() {
 	*x = SetSavedSearchesRequest{}
-	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[50]
+	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[52]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2402,7 +2506,7 @@ func (x *SetSavedSearchesRequest) String() string {
 func (*SetSavedSearchesRequest) ProtoMessage() {}
 
 func (x *SetSavedSearchesRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[50]
+	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[52]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2415,7 +2519,7 @@ func (x *SetSavedSearchesRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SetSavedSearchesRequest.ProtoReflect.Descriptor instead.
 func (*SetSavedSearchesRequest) Descriptor() ([]byte, []int) {
-	return file_wacky_tracky_clientapi_v1_wt_proto_rawDescGZIP(), []int{50}
+	return file_wacky_tracky_clientapi_v1_wt_proto_rawDescGZIP(), []int{52}
 }
 
 func (x *SetSavedSearchesRequest) GetSavedSearches() []*SavedSearch {
@@ -2433,7 +2537,7 @@ type SetSavedSearchesResponse struct {
 
 func (x *SetSavedSearchesResponse) Reset() {
 	*x = SetSavedSearchesResponse{}
-	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[51]
+	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[53]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2445,7 +2549,7 @@ func (x *SetSavedSearchesResponse) String() string {
 func (*SetSavedSearchesResponse) ProtoMessage() {}
 
 func (x *SetSavedSearchesResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[51]
+	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[53]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2458,7 +2562,7 @@ func (x *SetSavedSearchesResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SetSavedSearchesResponse.ProtoReflect.Descriptor instead.
 func (*SetSavedSearchesResponse) Descriptor() ([]byte, []int) {
-	return file_wacky_tracky_clientapi_v1_wt_proto_rawDescGZIP(), []int{51}
+	return file_wacky_tracky_clientapi_v1_wt_proto_rawDescGZIP(), []int{53}
 }
 
 var File_wacky_tracky_clientapi_v1_wt_proto protoreflect.FileDescriptor
@@ -2603,7 +2707,14 @@ const file_wacky_tracky_clientapi_v1_wt_proto_rawDesc = "" +
 	"\x04date\x18\x03 \x01(\tR\x04date\"\x13\n" +
 	"\x11RepoStatusRequest\",\n" +
 	"\x12RepoStatusResponse\x12\x16\n" +
-	"\x06output\x18\x01 \x01(\tR\x06output\"G\n" +
+	"\x06output\x18\x01 \x01(\tR\x06output\"2\n" +
+	"\x0fRepoSyncRequest\x12\x1f\n" +
+	"\vserver_name\x18\x01 \x01(\tR\n" +
+	"serverName\"\\\n" +
+	"\x10RepoSyncResponse\x12\x18\n" +
+	"\asuccess\x18\x01 \x01(\bR\asuccess\x12\x18\n" +
+	"\amessage\x18\x02 \x01(\tR\amessage\x12\x14\n" +
+	"\x05steps\x18\x03 \x03(\tR\x05steps\"G\n" +
 	"\vSavedSearch\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x12\x14\n" +
@@ -2613,7 +2724,7 @@ const file_wacky_tracky_clientapi_v1_wt_proto_rawDesc = "" +
 	"\x0esaved_searches\x18\x01 \x03(\v2%.wackytracky.clientapi.v1.SavedSearchR\rsavedSearches\"g\n" +
 	"\x17SetSavedSearchesRequest\x12L\n" +
 	"\x0esaved_searches\x18\x01 \x03(\v2%.wackytracky.clientapi.v1.SavedSearchR\rsavedSearches\"\x1a\n" +
-	"\x18SetSavedSearchesResponse2\xfe\x13\n" +
+	"\x18SetSavedSearchesResponse2\xe3\x14\n" +
 	"\x18WackyTrackyClientService\x12`\n" +
 	"\aVersion\x12(.wackytracky.clientapi.v1.VersionRequest\x1a).wackytracky.clientapi.v1.VersionResponse\"\x00\x12W\n" +
 	"\x04Init\x12%.wackytracky.clientapi.v1.InitRequest\x1a&.wackytracky.clientapi.v1.InitResponse\"\x00\x12c\n" +
@@ -2635,7 +2746,8 @@ const file_wacky_tracky_clientapi_v1_wt_proto_rawDesc = "" +
 	"DeleteList\x12+.wackytracky.clientapi.v1.DeleteListRequest\x1a,.wackytracky.clientapi.v1.DeleteListResponse\"\x00\x12`\n" +
 	"\aGetTags\x12(.wackytracky.clientapi.v1.GetTagsRequest\x1a).wackytracky.clientapi.v1.GetTagsResponse\"\x00\x12i\n" +
 	"\n" +
-	"RepoStatus\x12+.wackytracky.clientapi.v1.RepoStatusRequest\x1a,.wackytracky.clientapi.v1.RepoStatusResponse\"\x00\x12{\n" +
+	"RepoStatus\x12+.wackytracky.clientapi.v1.RepoStatusRequest\x1a,.wackytracky.clientapi.v1.RepoStatusResponse\"\x00\x12c\n" +
+	"\bRepoSync\x12).wackytracky.clientapi.v1.RepoSyncRequest\x1a*.wackytracky.clientapi.v1.RepoSyncResponse\"\x00\x12{\n" +
 	"\x10GetSavedSearches\x121.wackytracky.clientapi.v1.GetSavedSearchesRequest\x1a2.wackytracky.clientapi.v1.GetSavedSearchesResponse\"\x00\x12{\n" +
 	"\x10SetSavedSearches\x121.wackytracky.clientapi.v1.SetSavedSearchesRequest\x1a2.wackytracky.clientapi.v1.SetSavedSearchesResponse\"\x00\x12x\n" +
 	"\x0fGetTaskMetadata\x120.wackytracky.clientapi.v1.GetTaskMetadataRequest\x1a1.wackytracky.clientapi.v1.GetTaskMetadataResponse\"\x00\x12x\n" +
@@ -2658,7 +2770,7 @@ func file_wacky_tracky_clientapi_v1_wt_proto_rawDescGZIP() []byte {
 	return file_wacky_tracky_clientapi_v1_wt_proto_rawDescData
 }
 
-var file_wacky_tracky_clientapi_v1_wt_proto_msgTypes = make([]protoimpl.MessageInfo, 57)
+var file_wacky_tracky_clientapi_v1_wt_proto_msgTypes = make([]protoimpl.MessageInfo, 59)
 var file_wacky_tracky_clientapi_v1_wt_proto_goTypes = []any{
 	(*List)(nil),                              // 0: wackytracky.clientapi.v1.List
 	(*GetListsRequest)(nil),                   // 1: wackytracky.clientapi.v1.GetListsRequest
@@ -2707,31 +2819,33 @@ var file_wacky_tracky_clientapi_v1_wt_proto_goTypes = []any{
 	(*VersionResponse)(nil),                   // 44: wackytracky.clientapi.v1.VersionResponse
 	(*RepoStatusRequest)(nil),                 // 45: wackytracky.clientapi.v1.RepoStatusRequest
 	(*RepoStatusResponse)(nil),                // 46: wackytracky.clientapi.v1.RepoStatusResponse
-	(*SavedSearch)(nil),                       // 47: wackytracky.clientapi.v1.SavedSearch
-	(*GetSavedSearchesRequest)(nil),           // 48: wackytracky.clientapi.v1.GetSavedSearchesRequest
-	(*GetSavedSearchesResponse)(nil),          // 49: wackytracky.clientapi.v1.GetSavedSearchesResponse
-	(*SetSavedSearchesRequest)(nil),           // 50: wackytracky.clientapi.v1.SetSavedSearchesRequest
-	(*SetSavedSearchesResponse)(nil),          // 51: wackytracky.clientapi.v1.SetSavedSearchesResponse
-	nil,                                       // 52: wackytracky.clientapi.v1.GetTaskMetadataResponse.FieldsEntry
-	nil,                                       // 53: wackytracky.clientapi.v1.TaskPropertyProps.PropsEntry
-	nil,                                       // 54: wackytracky.clientapi.v1.GetTaskPropertyPropertiesResponse.TagPropertiesEntry
-	nil,                                       // 55: wackytracky.clientapi.v1.GetTaskPropertyPropertiesResponse.ContextPropertiesEntry
-	nil,                                       // 56: wackytracky.clientapi.v1.ListTasksResponse.TreeEntry
+	(*RepoSyncRequest)(nil),                   // 47: wackytracky.clientapi.v1.RepoSyncRequest
+	(*RepoSyncResponse)(nil),                  // 48: wackytracky.clientapi.v1.RepoSyncResponse
+	(*SavedSearch)(nil),                       // 49: wackytracky.clientapi.v1.SavedSearch
+	(*GetSavedSearchesRequest)(nil),           // 50: wackytracky.clientapi.v1.GetSavedSearchesRequest
+	(*GetSavedSearchesResponse)(nil),          // 51: wackytracky.clientapi.v1.GetSavedSearchesResponse
+	(*SetSavedSearchesRequest)(nil),           // 52: wackytracky.clientapi.v1.SetSavedSearchesRequest
+	(*SetSavedSearchesResponse)(nil),          // 53: wackytracky.clientapi.v1.SetSavedSearchesResponse
+	nil,                                       // 54: wackytracky.clientapi.v1.GetTaskMetadataResponse.FieldsEntry
+	nil,                                       // 55: wackytracky.clientapi.v1.TaskPropertyProps.PropsEntry
+	nil,                                       // 56: wackytracky.clientapi.v1.GetTaskPropertyPropertiesResponse.TagPropertiesEntry
+	nil,                                       // 57: wackytracky.clientapi.v1.GetTaskPropertyPropertiesResponse.ContextPropertiesEntry
+	nil,                                       // 58: wackytracky.clientapi.v1.ListTasksResponse.TreeEntry
 }
 var file_wacky_tracky_clientapi_v1_wt_proto_depIdxs = []int32{
 	0,  // 0: wackytracky.clientapi.v1.GetListsResponse.lists:type_name -> wackytracky.clientapi.v1.List
 	31, // 1: wackytracky.clientapi.v1.CreateTaskResponse.task:type_name -> wackytracky.clientapi.v1.Task
 	31, // 2: wackytracky.clientapi.v1.UpdateTaskResponse.task:type_name -> wackytracky.clientapi.v1.Task
-	52, // 3: wackytracky.clientapi.v1.GetTaskMetadataResponse.fields:type_name -> wackytracky.clientapi.v1.GetTaskMetadataResponse.FieldsEntry
-	53, // 4: wackytracky.clientapi.v1.TaskPropertyProps.props:type_name -> wackytracky.clientapi.v1.TaskPropertyProps.PropsEntry
-	54, // 5: wackytracky.clientapi.v1.GetTaskPropertyPropertiesResponse.tag_properties:type_name -> wackytracky.clientapi.v1.GetTaskPropertyPropertiesResponse.TagPropertiesEntry
-	55, // 6: wackytracky.clientapi.v1.GetTaskPropertyPropertiesResponse.context_properties:type_name -> wackytracky.clientapi.v1.GetTaskPropertyPropertiesResponse.ContextPropertiesEntry
+	54, // 3: wackytracky.clientapi.v1.GetTaskMetadataResponse.fields:type_name -> wackytracky.clientapi.v1.GetTaskMetadataResponse.FieldsEntry
+	55, // 4: wackytracky.clientapi.v1.TaskPropertyProps.props:type_name -> wackytracky.clientapi.v1.TaskPropertyProps.PropsEntry
+	56, // 5: wackytracky.clientapi.v1.GetTaskPropertyPropertiesResponse.tag_properties:type_name -> wackytracky.clientapi.v1.GetTaskPropertyPropertiesResponse.TagPropertiesEntry
+	57, // 6: wackytracky.clientapi.v1.GetTaskPropertyPropertiesResponse.context_properties:type_name -> wackytracky.clientapi.v1.GetTaskPropertyPropertiesResponse.ContextPropertiesEntry
 	26, // 7: wackytracky.clientapi.v1.GetTagsResponse.tags:type_name -> wackytracky.clientapi.v1.Tag
 	31, // 8: wackytracky.clientapi.v1.ListTasksResponse.tasks:type_name -> wackytracky.clientapi.v1.Task
-	56, // 9: wackytracky.clientapi.v1.ListTasksResponse.tree:type_name -> wackytracky.clientapi.v1.ListTasksResponse.TreeEntry
+	58, // 9: wackytracky.clientapi.v1.ListTasksResponse.tree:type_name -> wackytracky.clientapi.v1.ListTasksResponse.TreeEntry
 	31, // 10: wackytracky.clientapi.v1.SearchTasksResponse.tasks:type_name -> wackytracky.clientapi.v1.Task
-	47, // 11: wackytracky.clientapi.v1.GetSavedSearchesResponse.saved_searches:type_name -> wackytracky.clientapi.v1.SavedSearch
-	47, // 12: wackytracky.clientapi.v1.SetSavedSearchesRequest.saved_searches:type_name -> wackytracky.clientapi.v1.SavedSearch
+	49, // 11: wackytracky.clientapi.v1.GetSavedSearchesResponse.saved_searches:type_name -> wackytracky.clientapi.v1.SavedSearch
+	49, // 12: wackytracky.clientapi.v1.SetSavedSearchesRequest.saved_searches:type_name -> wackytracky.clientapi.v1.SavedSearch
 	17, // 13: wackytracky.clientapi.v1.GetTaskPropertyPropertiesResponse.TagPropertiesEntry.value:type_name -> wackytracky.clientapi.v1.TaskPropertyProps
 	17, // 14: wackytracky.clientapi.v1.GetTaskPropertyPropertiesResponse.ContextPropertiesEntry.value:type_name -> wackytracky.clientapi.v1.TaskPropertyProps
 	33, // 15: wackytracky.clientapi.v1.ListTasksResponse.TreeEntry.value:type_name -> wackytracky.clientapi.v1.TaskIdList
@@ -2750,39 +2864,41 @@ var file_wacky_tracky_clientapi_v1_wt_proto_depIdxs = []int32{
 	39, // 28: wackytracky.clientapi.v1.WackyTrackyClientService.DeleteList:input_type -> wackytracky.clientapi.v1.DeleteListRequest
 	29, // 29: wackytracky.clientapi.v1.WackyTrackyClientService.GetTags:input_type -> wackytracky.clientapi.v1.GetTagsRequest
 	45, // 30: wackytracky.clientapi.v1.WackyTrackyClientService.RepoStatus:input_type -> wackytracky.clientapi.v1.RepoStatusRequest
-	48, // 31: wackytracky.clientapi.v1.WackyTrackyClientService.GetSavedSearches:input_type -> wackytracky.clientapi.v1.GetSavedSearchesRequest
-	50, // 32: wackytracky.clientapi.v1.WackyTrackyClientService.SetSavedSearches:input_type -> wackytracky.clientapi.v1.SetSavedSearchesRequest
-	13, // 33: wackytracky.clientapi.v1.WackyTrackyClientService.GetTaskMetadata:input_type -> wackytracky.clientapi.v1.GetTaskMetadataRequest
-	15, // 34: wackytracky.clientapi.v1.WackyTrackyClientService.SetTaskMetadata:input_type -> wackytracky.clientapi.v1.SetTaskMetadataRequest
-	18, // 35: wackytracky.clientapi.v1.WackyTrackyClientService.GetTaskPropertyProperties:input_type -> wackytracky.clientapi.v1.GetTaskPropertyPropertiesRequest
-	20, // 36: wackytracky.clientapi.v1.WackyTrackyClientService.SetTaskPropertyProperty:input_type -> wackytracky.clientapi.v1.SetTaskPropertyPropertyRequest
-	22, // 37: wackytracky.clientapi.v1.WackyTrackyClientService.RuleStatus:input_type -> wackytracky.clientapi.v1.RuleStatusRequest
-	24, // 38: wackytracky.clientapi.v1.WackyTrackyClientService.RuleTest:input_type -> wackytracky.clientapi.v1.RuleTestRequest
-	44, // 39: wackytracky.clientapi.v1.WackyTrackyClientService.Version:output_type -> wackytracky.clientapi.v1.VersionResponse
-	42, // 40: wackytracky.clientapi.v1.WackyTrackyClientService.Init:output_type -> wackytracky.clientapi.v1.InitResponse
-	2,  // 41: wackytracky.clientapi.v1.WackyTrackyClientService.GetLists:output_type -> wackytracky.clientapi.v1.GetListsResponse
-	34, // 42: wackytracky.clientapi.v1.WackyTrackyClientService.ListTasks:output_type -> wackytracky.clientapi.v1.ListTasksResponse
-	36, // 43: wackytracky.clientapi.v1.WackyTrackyClientService.SearchTasks:output_type -> wackytracky.clientapi.v1.SearchTasksResponse
-	6,  // 44: wackytracky.clientapi.v1.WackyTrackyClientService.CreateTask:output_type -> wackytracky.clientapi.v1.CreateTaskResponse
-	8,  // 45: wackytracky.clientapi.v1.WackyTrackyClientService.UpdateTask:output_type -> wackytracky.clientapi.v1.UpdateTaskResponse
-	10, // 46: wackytracky.clientapi.v1.WackyTrackyClientService.DoneTask:output_type -> wackytracky.clientapi.v1.DoneTaskResponse
-	12, // 47: wackytracky.clientapi.v1.WackyTrackyClientService.MoveTask:output_type -> wackytracky.clientapi.v1.MoveTaskResponse
-	4,  // 48: wackytracky.clientapi.v1.WackyTrackyClientService.CreateList:output_type -> wackytracky.clientapi.v1.CreateListResponse
-	28, // 49: wackytracky.clientapi.v1.WackyTrackyClientService.Tag:output_type -> wackytracky.clientapi.v1.TagResponse
-	38, // 50: wackytracky.clientapi.v1.WackyTrackyClientService.UpdateList:output_type -> wackytracky.clientapi.v1.UpdateListResponse
-	40, // 51: wackytracky.clientapi.v1.WackyTrackyClientService.DeleteList:output_type -> wackytracky.clientapi.v1.DeleteListResponse
-	30, // 52: wackytracky.clientapi.v1.WackyTrackyClientService.GetTags:output_type -> wackytracky.clientapi.v1.GetTagsResponse
-	46, // 53: wackytracky.clientapi.v1.WackyTrackyClientService.RepoStatus:output_type -> wackytracky.clientapi.v1.RepoStatusResponse
-	49, // 54: wackytracky.clientapi.v1.WackyTrackyClientService.GetSavedSearches:output_type -> wackytracky.clientapi.v1.GetSavedSearchesResponse
-	51, // 55: wackytracky.clientapi.v1.WackyTrackyClientService.SetSavedSearches:output_type -> wackytracky.clientapi.v1.SetSavedSearchesResponse
-	14, // 56: wackytracky.clientapi.v1.WackyTrackyClientService.GetTaskMetadata:output_type -> wackytracky.clientapi.v1.GetTaskMetadataResponse
-	16, // 57: wackytracky.clientapi.v1.WackyTrackyClientService.SetTaskMetadata:output_type -> wackytracky.clientapi.v1.SetTaskMetadataResponse
-	19, // 58: wackytracky.clientapi.v1.WackyTrackyClientService.GetTaskPropertyProperties:output_type -> wackytracky.clientapi.v1.GetTaskPropertyPropertiesResponse
-	21, // 59: wackytracky.clientapi.v1.WackyTrackyClientService.SetTaskPropertyProperty:output_type -> wackytracky.clientapi.v1.SetTaskPropertyPropertyResponse
-	23, // 60: wackytracky.clientapi.v1.WackyTrackyClientService.RuleStatus:output_type -> wackytracky.clientapi.v1.RuleStatusResponse
-	25, // 61: wackytracky.clientapi.v1.WackyTrackyClientService.RuleTest:output_type -> wackytracky.clientapi.v1.RuleTestResponse
-	39, // [39:62] is the sub-list for method output_type
-	16, // [16:39] is the sub-list for method input_type
+	47, // 31: wackytracky.clientapi.v1.WackyTrackyClientService.RepoSync:input_type -> wackytracky.clientapi.v1.RepoSyncRequest
+	50, // 32: wackytracky.clientapi.v1.WackyTrackyClientService.GetSavedSearches:input_type -> wackytracky.clientapi.v1.GetSavedSearchesRequest
+	52, // 33: wackytracky.clientapi.v1.WackyTrackyClientService.SetSavedSearches:input_type -> wackytracky.clientapi.v1.SetSavedSearchesRequest
+	13, // 34: wackytracky.clientapi.v1.WackyTrackyClientService.GetTaskMetadata:input_type -> wackytracky.clientapi.v1.GetTaskMetadataRequest
+	15, // 35: wackytracky.clientapi.v1.WackyTrackyClientService.SetTaskMetadata:input_type -> wackytracky.clientapi.v1.SetTaskMetadataRequest
+	18, // 36: wackytracky.clientapi.v1.WackyTrackyClientService.GetTaskPropertyProperties:input_type -> wackytracky.clientapi.v1.GetTaskPropertyPropertiesRequest
+	20, // 37: wackytracky.clientapi.v1.WackyTrackyClientService.SetTaskPropertyProperty:input_type -> wackytracky.clientapi.v1.SetTaskPropertyPropertyRequest
+	22, // 38: wackytracky.clientapi.v1.WackyTrackyClientService.RuleStatus:input_type -> wackytracky.clientapi.v1.RuleStatusRequest
+	24, // 39: wackytracky.clientapi.v1.WackyTrackyClientService.RuleTest:input_type -> wackytracky.clientapi.v1.RuleTestRequest
+	44, // 40: wackytracky.clientapi.v1.WackyTrackyClientService.Version:output_type -> wackytracky.clientapi.v1.VersionResponse
+	42, // 41: wackytracky.clientapi.v1.WackyTrackyClientService.Init:output_type -> wackytracky.clientapi.v1.InitResponse
+	2,  // 42: wackytracky.clientapi.v1.WackyTrackyClientService.GetLists:output_type -> wackytracky.clientapi.v1.GetListsResponse
+	34, // 43: wackytracky.clientapi.v1.WackyTrackyClientService.ListTasks:output_type -> wackytracky.clientapi.v1.ListTasksResponse
+	36, // 44: wackytracky.clientapi.v1.WackyTrackyClientService.SearchTasks:output_type -> wackytracky.clientapi.v1.SearchTasksResponse
+	6,  // 45: wackytracky.clientapi.v1.WackyTrackyClientService.CreateTask:output_type -> wackytracky.clientapi.v1.CreateTaskResponse
+	8,  // 46: wackytracky.clientapi.v1.WackyTrackyClientService.UpdateTask:output_type -> wackytracky.clientapi.v1.UpdateTaskResponse
+	10, // 47: wackytracky.clientapi.v1.WackyTrackyClientService.DoneTask:output_type -> wackytracky.clientapi.v1.DoneTaskResponse
+	12, // 48: wackytracky.clientapi.v1.WackyTrackyClientService.MoveTask:output_type -> wackytracky.clientapi.v1.MoveTaskResponse
+	4,  // 49: wackytracky.clientapi.v1.WackyTrackyClientService.CreateList:output_type -> wackytracky.clientapi.v1.CreateListResponse
+	28, // 50: wackytracky.clientapi.v1.WackyTrackyClientService.Tag:output_type -> wackytracky.clientapi.v1.TagResponse
+	38, // 51: wackytracky.clientapi.v1.WackyTrackyClientService.UpdateList:output_type -> wackytracky.clientapi.v1.UpdateListResponse
+	40, // 52: wackytracky.clientapi.v1.WackyTrackyClientService.DeleteList:output_type -> wackytracky.clientapi.v1.DeleteListResponse
+	30, // 53: wackytracky.clientapi.v1.WackyTrackyClientService.GetTags:output_type -> wackytracky.clientapi.v1.GetTagsResponse
+	46, // 54: wackytracky.clientapi.v1.WackyTrackyClientService.RepoStatus:output_type -> wackytracky.clientapi.v1.RepoStatusResponse
+	48, // 55: wackytracky.clientapi.v1.WackyTrackyClientService.RepoSync:output_type -> wackytracky.clientapi.v1.RepoSyncResponse
+	51, // 56: wackytracky.clientapi.v1.WackyTrackyClientService.GetSavedSearches:output_type -> wackytracky.clientapi.v1.GetSavedSearchesResponse
+	53, // 57: wackytracky.clientapi.v1.WackyTrackyClientService.SetSavedSearches:output_type -> wackytracky.clientapi.v1.SetSavedSearchesResponse
+	14, // 58: wackytracky.clientapi.v1.WackyTrackyClientService.GetTaskMetadata:output_type -> wackytracky.clientapi.v1.GetTaskMetadataResponse
+	16, // 59: wackytracky.clientapi.v1.WackyTrackyClientService.SetTaskMetadata:output_type -> wackytracky.clientapi.v1.SetTaskMetadataResponse
+	19, // 60: wackytracky.clientapi.v1.WackyTrackyClientService.GetTaskPropertyProperties:output_type -> wackytracky.clientapi.v1.GetTaskPropertyPropertiesResponse
+	21, // 61: wackytracky.clientapi.v1.WackyTrackyClientService.SetTaskPropertyProperty:output_type -> wackytracky.clientapi.v1.SetTaskPropertyPropertyResponse
+	23, // 62: wackytracky.clientapi.v1.WackyTrackyClientService.RuleStatus:output_type -> wackytracky.clientapi.v1.RuleStatusResponse
+	25, // 63: wackytracky.clientapi.v1.WackyTrackyClientService.RuleTest:output_type -> wackytracky.clientapi.v1.RuleTestResponse
+	40, // [40:64] is the sub-list for method output_type
+	16, // [16:40] is the sub-list for method input_type
 	16, // [16:16] is the sub-list for extension type_name
 	16, // [16:16] is the sub-list for extension extendee
 	0,  // [0:16] is the sub-list for field type_name
@@ -2799,7 +2915,7 @@ func file_wacky_tracky_clientapi_v1_wt_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_wacky_tracky_clientapi_v1_wt_proto_rawDesc), len(file_wacky_tracky_clientapi_v1_wt_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   57,
+			NumMessages:   59,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
