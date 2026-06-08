@@ -12,6 +12,10 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+func isCI() bool {
+	return os.Getenv("CI") != ""
+}
+
 func TestCommitMessage(t *testing.T) {
 	assert.Equal(t, "wt sync: homelab", commitMessage("homelab"))
 	assert.Equal(t, "wt sync: homelab", commitMessage("  homelab  "))
@@ -40,6 +44,10 @@ func TestSync_AlreadyUpToDate(t *testing.T) {
 }
 
 func TestSync_CommitAndPush(t *testing.T) {
+	if isCI() {
+		t.Skip("Skipping push test in CI environment")
+	}
+
 	dir, remote := initRepoWithRemote(t)
 	runGit(t, dir, "push", "-u", "origin", "main")
 	require.NoError(t, os.WriteFile(filepath.Join(dir, "todo.txt"), []byte("new task\n"), 0o644))
@@ -61,6 +69,10 @@ func TestSync_MergeConflict(t *testing.T) {
 }
 
 func TestSync_BehindRemote(t *testing.T) {
+	if isCI() {
+		t.Skip("Skipping behind remote test in CI environment")
+	}
+
 	dir, remote := initRepoWithRemote(t)
 	runGit(t, dir, "push", "-u", "origin", "main")
 
