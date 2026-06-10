@@ -185,8 +185,10 @@
 						<dd>Mark task done</dd>
 						<dt><kbd>y</kbd> <kbd>y</kbd></dt>
 						<dd>Yank (copy) task</dd>
+						<dt><kbd>x</kbd> <kbd>x</kbd></dt>
+						<dd>Cut task (paste moves it as a subtask of the focused row)</dd>
 						<dt><kbd>p</kbd></dt>
-						<dd>Paste (create task from yanked content)</dd>
+						<dd>Paste (create task from clipboard; cut removes the original)</dd>
 						<dt><kbd>w</kbd> or <kbd>W</kbd></dt>
 						<dd>Set wait until</dd>
 						<dt><kbd>u</kbd> or <kbd>U</kbd></dt>

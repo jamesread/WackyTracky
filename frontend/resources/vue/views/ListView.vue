@@ -26,7 +26,7 @@
 					v-for="(row, index) in items"
 					:key="row.task.id"
 					class="task-row"
-					:class="{ 'task-row-editing': currentEditingId === row.task.id, 'task-row-focused': !currentEditingId && focusedIndex === index, 'task-row-subtask': displayMode === 'hierarchy' && row.depth > 0, 'task-row-project': displayMode === 'hierarchy' && row.task.countSubitems > 0, 'task-row-yanked': yankedTask && row.task.id === yankedTask.id, 'task-row-waiting': isFutureWait(row.task), 'task-row-offline-only': isOfflineTask(row.task) }"
+					:class="{ 'task-row-editing': currentEditingId === row.task.id, 'task-row-focused': !currentEditingId && focusedIndex === index, 'task-row-subtask': displayMode === 'hierarchy' && row.depth > 0, 'task-row-project': displayMode === 'hierarchy' && row.task.countSubitems > 0, 'task-row-yanked': clipboardTask?.mode === 'yank' && row.task.id === clipboardTask.id, 'task-row-cut': clipboardTask?.mode === 'cut' && row.task.id === clipboardTask.id, 'task-row-waiting': isFutureWait(row.task), 'task-row-offline-only': isOfflineTask(row.task) }"
 					:style="displayMode === 'hierarchy' && row.depth > 0 ? { marginLeft: row.depth * 2.25 + 'rem' } : {}"
 					@dblclick="currentEditingId !== row.task.id && injectedStartEdit(row.task)"
 					@contextmenu.prevent="onTaskContextMenu(row.task)"
@@ -172,7 +172,7 @@
 				<p class="confirm-message">{{ doneConfirmMessage }}</p>
 				<div class="confirm-actions">
 					<button type="button" class="confirm-btn confirm-cancel" @click="pendingDoneTask = null">Cancel</button>
-					<button type="button" class="task-details-done-btn good" @click="confirmDone">
+					<button ref="doneConfirmBtnRef" type="button" class="task-details-done-btn good" @click="confirmDone">
 						Done
 						<HugeiconsIcon :icon="CheckmarkBadge01Icon" width="1.25em" height="1.25em" />
 					</button>
@@ -219,6 +219,7 @@
 	const searchError = ref(null);
 	const collapsedParentIds = ref([]);
 	const pendingDoneTask = ref(null);
+	const doneConfirmBtnRef = ref(null);
 	const taskDetailsTask = ref(null);
 	const notesDraft = ref('');
 	const taskNotesLoadError = ref(false);
@@ -268,7 +269,7 @@
 	const ddLastKey = ref(null);
 	const ddLastTime = ref(0);
 	const DD_TIMEOUT_MS = 500;
-	const yankedTask = ref(null);
+	const clipboardTask = ref(null);
 
 	const sectionTitle = computed(() => {
 		if (props.searchQuery) return 'Search results';
@@ -604,6 +605,11 @@
 			closeDueDialog();
 			return;
 		}
+		if (pendingDoneTask.value && e.key === 'Escape') {
+			e.preventDefault();
+			pendingDoneTask.value = null;
+			return;
+		}
 		if (e.target.closest('input, textarea, select, [contenteditable="true"]')) return;
 		if (listOptionsOpen.value || pendingDoneTask.value || taskDetailsTask.value || taskForWait.value || taskForDue.value) return;
 		if (currentEditingId.value) return;
@@ -667,10 +673,22 @@
 				e.preventDefault();
 				ddLastKey.value = null;
 				const row = items.value[focusedIndex.value];
-				if (row) yankedTask.value = { id: row.task.id, content: row.task.content };
+				if (row) clipboardTask.value = { id: row.task.id, content: row.task.content, mode: 'yank' };
 				return;
 			}
 			ddLastKey.value = 'y';
+			ddLastTime.value = Date.now();
+			return;
+		}
+		if (e.key === 'x') {
+			if (ddLastKey.value === 'x' && Date.now() - ddLastTime.value < DD_TIMEOUT_MS) {
+				e.preventDefault();
+				ddLastKey.value = null;
+				const row = items.value[focusedIndex.value];
+				if (row) clipboardTask.value = { id: row.task.id, content: row.task.content, mode: 'cut' };
+				return;
+			}
+			ddLastKey.value = 'x';
 			ddLastTime.value = Date.now();
 			return;
 		}
@@ -691,20 +709,36 @@
 		if (e.key === 'p') {
 			e.preventDefault();
 			ddLastKey.value = null;
-			if (yankedTask.value && isOnline.value && window.client) {
+			if (clipboardTask.value && isOnline.value && window.client) {
+				const clip = clipboardTask.value;
 				const row = items.value[focusedIndex.value];
 				const parentTaskId = row ? row.task.id : '';
+				if (clip.mode === 'cut' && parentTaskId === clip.id) {
+					showToast('Cannot paste a cut task under itself', 'error');
+					return;
+				}
 				window.client.createTask({
-					content: yankedTask.value.content,
+					content: clip.content,
 					parentListId: props.listId || '',
 					parentTaskId,
-				}).then(() => {
+				}).then(async () => {
+					if (clip.mode === 'cut') {
+						try {
+							await window.client.doneTask({ id: clip.id });
+							clipboardTask.value = null;
+							showToast('Task moved');
+						} catch (err) {
+							const reason = err?.message || String(err);
+							showToast('Task pasted but could not remove original: ' + reason, 'error');
+						}
+					} else {
+						showToast('Task added');
+					}
 					if (refreshTrigger) refreshTrigger.value++;
-					showToast('Task added');
+					load();
 				}).catch((err) => {
 					const reason = err?.message || String(err);
 					showToast('Could not add task: ' + reason, 'error');
-					// yanked content kept so user can retry
 				});
 			}
 			return;
@@ -1041,6 +1075,10 @@
 		}
 	}
 
+	watch(pendingDoneTask, (task) => {
+		if (task) nextTick(() => doneConfirmBtnRef.value?.focus());
+	});
+
 	onMounted(() => {
 		load();
 		document.addEventListener('keydown', onListKeydown);
@@ -1227,6 +1265,11 @@
 	li.task-row-yanked {
 		border-left: 3px solid #2563eb;
 		background-color: #eff6ff;
+	}
+	li.task-row-cut {
+		border-left: 3px dashed #d97706;
+		background-color: #fffbeb;
+		opacity: 0.88;
 	}
 
 	.task-project-indicator {
