@@ -3,11 +3,12 @@
 	"version": "1.0.0",
 	"description": "wacky-tracky ===",
 	"private": true,
+	"type": "module",
 	"directories": {
 		"test": "test"
 	},
 	"scripts": {
-		"test": "nodeunit",
+		"test": "node --test \"test/**/*.test.js\"",
 		"build": "make"
 	},
 	"repository": {

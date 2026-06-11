@@ -35,6 +35,7 @@
 	import { ref, onMounted, watch, inject } from 'vue';
 	import CreateListDialog from '../components/CreateListDialog.vue';
 	import { getCachedInbox, INBOX_LIST_ID } from '../../../js/modules/offlineStorage.js';
+	import { describeApiError } from '../../../js/modules/apiError.js';
 
 	const lists = ref([]);
 	const loading = ref(true);
@@ -64,9 +65,9 @@
 			const res = await window.client.getLists();
 			lists.value = res.lists || [];
 		} catch (e) {
-			const reason = e?.message || String(e);
-			loadError.value = 'Could not load lists. Please try again.';
-			showToast('Could not load lists: ' + reason, 'error');
+			const message = describeApiError(e, 'Could not load lists');
+			loadError.value = message;
+			showToast(message, 'error');
 		} finally {
 			loading.value = false;
 		}

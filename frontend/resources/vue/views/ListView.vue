@@ -208,6 +208,7 @@
 	import Section from 'picocrank/vue/components/Section.vue';
 	import { useSettings } from '../composables/useSettings.js';
 	import { getCachedList, getOfflineTasks, getOfflineEdits, INBOX_LIST_ID } from '../../../js/modules/offlineStorage.js';
+	import { describeApiError } from '../../../js/modules/apiError.js';
 
 	const router = useRouter();
 	const { formatDateDisplay, zenMode } = useSettings();
@@ -562,10 +563,10 @@
 			const res = await window.client.searchTasks({ query: q });
 			items.value = (res.tasks || []).map((t) => ({ task: t, depth: 0 }));
 		} catch (e) {
-			const reason = e?.message || String(e);
-			searchError.value = reason;
+			const message = describeApiError(e, 'Search failed');
+			searchError.value = message;
 			items.value = [];
-			showToast('Search failed. Please try again.', 'error');
+			showToast(message, 'error');
 		}
 	}
 
