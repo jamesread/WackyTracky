@@ -95,6 +95,15 @@ Task IDs come from `ListTasks` or `SearchTasks` responses.
 
 The full list of RPCs and request/response message types is in the [API reference](reference.md).
 
+## Machine-readable spec (OpenAPI)
+
+A generated OpenAPI 3.1 description of every procedure and message is available at [`openapi.yaml`](openapi.yaml). It is produced from the Protocol Buffers definition, so it always matches the running API. Use it to:
+
+- Feed the API to tools like Swagger UI, Redoc, or Postman.
+- Let an LLM or code generator discover endpoints, request/response shapes, and field types without reading prose.
+
+Regenerate it with `make` in the `protocol/` directory.
+
 ## Code generation
 
 The API is defined with Protocol Buffers in `protocol/wacky-tracky/clientapi/v1/wt.proto`. You can generate client code using:

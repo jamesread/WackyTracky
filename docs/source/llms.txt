@@ -1,0 +1,24 @@
+# WackyTracky
+
+> WackyTracky is a minimal, keyboard-friendly, self-hosted task and list tracker. It exposes a Connect RPC API (HTTP + JSON): every procedure is a `POST` with a JSON body to `/api/wackytracky.clientapi.v1.WackyTrackyClientService/<Method>`. The default backend stores tasks in plain-text [todo.txt](http://todotxt.org) format.
+
+To call the API: send `POST` requests with `Content-Type: application/json`. Empty requests use the body `{}`. JSON field names are camelCase (e.g. `parent_list_id` becomes `parentListId`). On error the server returns a 4xx/5xx status and a Connect error JSON payload.
+
+## API
+
+- [API overview](api/index.md): Base URL, the Connect protocol, authentication, and copy-paste `curl` quick-start examples (Version, GetLists, CreateTask, SearchTasks, DoneTask).
+- [API reference](api/reference.md): Every RPC with its request/response message and all fields, plus shared types (List, Task, Tag, SavedSearch).
+- [OpenAPI spec](api/openapi.yaml): Machine-readable OpenAPI 3.1 description generated from the Protocol Buffers definition. Best entry point for tools and code generators.
+- [Search syntax](api/search.md): Query syntax for `SearchTasks` (plain terms, `#tag`, `@context`, `-term` to exclude).
+
+## Usage and configuration
+
+- [Install with Docker Compose](installation/docker-compose.md): Recommended way to run the server, including config and volumes.
+- [Backends overview](backends/index.md): Choosing a storage backend.
+- [todo.txt backend](backends/todotxt.md): Default plain-text backend (recommended).
+- [Neo4j backend](backends/neo4j.md): Graph database backend.
+- [YAML files backend](backends/yamlfiles.md): YAML file backend.
+
+## Source
+
+- [wt.proto](https://github.com/wacky-tracky/WackyTracky/blob/main/protocol/wacky-tracky/clientapi/v1/wt.proto): Protocol Buffers definition — the source of truth for the API. The OpenAPI spec is generated from this file.

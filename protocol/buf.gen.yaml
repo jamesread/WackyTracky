@@ -11,3 +11,12 @@ plugins:
   - remote: buf.build/bufbuild/es
     out: ../frontend/js/gen/
     opt: target=ts
+
+  # OpenAPI spec for the Connect JSON/HTTP API, published with the docs so
+  # humans and LLMs can discover endpoints and message shapes.
+  - remote: buf.build/community/sudorandom-connect-openapi
+    out: ../docs/source/api
+    opt:
+      - format=yaml
+      - path=openapi.yaml
+      - path-prefix=/api
