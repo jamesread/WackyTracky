@@ -7,7 +7,10 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"github.com/wacky-tracky/wacky-tracky-server/internal/buildinfo"
+	"github.com/wacky-tracky/wacky-tracky-server/internal/clientapi"
+	"github.com/wacky-tracky/wacky-tracky-server/internal/db"
 	"github.com/wacky-tracky/wacky-tracky-server/internal/httpserver"
+	"github.com/wacky-tracky/wacky-tracky-server/internal/mcpserver"
 	"github.com/wacky-tracky/wacky-tracky-server/internal/runtimeconfig"
 )
 
@@ -16,8 +19,22 @@ var root = &cobra.Command{
 	Run: mainRoot,
 }
 
+var mcpCmd = &cobra.Command{
+	Use:   "mcp",
+	Short: "Run an MCP (Model Context Protocol) server over stdio",
+	Long:  "Serves WackyTracky task operations as MCP tools over stdio, for use by LLM clients such as Claude Desktop or Cursor. Uses the same backend and config as the HTTP server.",
+	Run:   mainMCP,
+}
+
 func mainRoot(cmd *cobra.Command, args []string) {
 	httpserver.StartServer()
+}
+
+func mainMCP(cmd *cobra.Command, args []string) {
+	svc := clientapi.GetNewClientAPI(db.GetNewDatabaseConnection())
+	if err := mcpserver.New(svc).Serve(); err != nil {
+		log.Fatalf("MCP server error: %v", err)
+	}
 }
 
 func disableLogTimestamps() {
@@ -71,6 +88,8 @@ func main() {
 	}).Info("wacky-tracky")
 
 	initViperConfig()
+
+	root.AddCommand(mcpCmd)
 
 	root.Execute()
 }

@@ -10,6 +10,7 @@ To call the API: send `POST` requests with `Content-Type: application/json`. Emp
 - [API reference](api/reference.md): Every RPC with its request/response message and all fields, plus shared types (List, Task, Tag, SavedSearch).
 - [OpenAPI spec](api/openapi.yaml): Machine-readable OpenAPI 3.1 description generated from the Protocol Buffers definition. Best entry point for tools and code generators.
 - [Search syntax](api/search.md): Query syntax for `SearchTasks` (plain terms, `#tag`, `@context`, `-term` to exclude).
+- [MCP server](api/mcp.md): Run WackyTracky as a Model Context Protocol server over stdio (`wt mcp`) so LLM assistants can read and manage tasks via tools (list_lists, list_tasks, search_tasks, create_task, update_task, complete_task, create_list).
 
 ## Usage and configuration
 

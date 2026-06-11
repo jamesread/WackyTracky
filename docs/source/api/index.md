@@ -104,6 +104,10 @@ A generated OpenAPI 3.1 description of every procedure and message is available 
 
 Regenerate it with `make` in the `protocol/` directory.
 
+## MCP server (for LLM assistants)
+
+To let an LLM assistant (Claude Desktop, Cursor, etc.) read and manage your tasks directly, WackyTracky can run as an [MCP server](mcp.md) over stdio.
+
 ## Code generation
 
 The API is defined with Protocol Buffers in `protocol/wacky-tracky/clientapi/v1/wt.proto`. You can generate client code using:
