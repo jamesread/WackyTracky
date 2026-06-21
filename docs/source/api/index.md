@@ -97,16 +97,20 @@ The full list of RPCs and request/response message types is in the [API referenc
 
 ## Machine-readable spec (OpenAPI)
 
-A generated OpenAPI 3.1 description of every procedure and message is available at [`openapi.yaml`](openapi.yaml). It is produced from the Protocol Buffers definition, so it always matches the running API. Use it to:
+A generated OpenAPI 3.1 description of every procedure and message is available at [`openapi.yaml`](openapi.yaml). When the server is running, the same spec is also served at **`GET /openapi`** on your instance (e.g. `http://localhost:8080/openapi`). It is produced from the Protocol Buffers definition, so it always matches the running API. Use it to:
 
 - Feed the API to tools like Swagger UI, Redoc, or Postman.
 - Let an LLM or code generator discover endpoints, request/response shapes, and field types without reading prose.
 
 Regenerate it with `make` in the `protocol/` directory.
 
+## LLM discovery (`llms.txt`)
+
+Running servers expose **`GET /llms.txt`** (e.g. `http://localhost:8080/llms.txt`) with a short guide for LLMs and automation: where to find the OpenAPI spec, how to call the HTTP API, and how to use the MCP server.
+
 ## MCP server (for LLM assistants)
 
-To let an LLM assistant (Claude Desktop, Cursor, etc.) read and manage your tasks directly, WackyTracky can run as an [MCP server](mcp.md) over stdio.
+To let an LLM assistant (Claude Desktop, Cursor, etc.) read and manage your tasks directly, WackyTracky exposes an [MCP server](mcp.md). When the HTTP server is running, connect at **`/mcp`** (Streamable HTTP). For local subprocess clients, use `wt mcp` over stdio.
 
 ## Code generation
 

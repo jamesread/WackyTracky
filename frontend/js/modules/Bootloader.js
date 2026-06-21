@@ -15,7 +15,9 @@ export class Bootloader {
 
   setupClient() {
     const baseUrl = '/api/'
-    window.transport = createConnectTransport({ baseUrl })
+    const fetchWithCredentials = (input, init) =>
+      fetch(input, { ...init, credentials: 'include' })
+    window.transport = createConnectTransport({ baseUrl, fetch: fetchWithCredentials })
     window.client = createClient(WackyTrackyClientService, window.transport)
   }
 

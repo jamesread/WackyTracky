@@ -2,17 +2,35 @@
 
 WackyTracky can run as an [MCP](https://modelcontextprotocol.io) server, letting an LLM assistant (for example Claude Desktop or Cursor) read and manage your tasks for you — "add "buy milk" to my shopping list", "what's on my work list?", "mark task X done".
 
-The MCP server runs over **stdio**: your LLM client launches the WackyTracky binary as a subprocess. It uses the **same backend and configuration** as the normal server, so it reads and writes the same tasks (e.g. your todo.txt files).
+The MCP server uses the **same backend and configuration** as the normal server, so it reads and writes the same tasks (e.g. your todo.txt files).
 
-## Running it
+## HTTP (Streamable HTTP)
+
+When the WackyTracky HTTP server is running, MCP is available at **`/mcp`** on the same origin (for example `http://localhost:8080/mcp`). This is the recommended transport when your instance is reachable over the network.
+
+Configure your MCP client with the URL and any credentials your deployment requires:
+
+```json
+{
+  "mcpServers": {
+    "wacky-tracky": {
+      "url": "http://localhost:8080/mcp"
+    }
+  }
+}
+```
+
+If HTTP authentication is enabled on your instance, add the same `Authorization` header you would use for the Connect API.
+
+## Stdio (local subprocess)
+
+For clients that launch a local MCP subprocess, run the binary with the `mcp` argument:
 
 ```bash
 wt mcp
 ```
 
 This starts the server on standard input/output and waits for an MCP client to connect. You normally don't run this by hand — your LLM client launches it for you (see below). It reads `config.yaml` from the usual locations (current directory, `../`, or `/config`).
-
-## Configuring your LLM client
 
 Point your client at the WackyTracky binary with the `mcp` argument. Most clients use a JSON config like this:
 

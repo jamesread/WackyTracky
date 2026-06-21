@@ -1,0 +1,40 @@
+# WackyTracky
+
+> Minimal, keyboard-friendly, self-hosted task and list tracker. Integrate via the Connect RPC API, OpenAPI spec, or MCP server.
+
+WackyTracky exposes machine-readable integration endpoints on the same base URL as the web application.
+
+When HTTP authentication is enabled on a deployment, include credentials on API and MCP requests (for example `Authorization: Basic ...`). The MCP server and Connect API share the same authentication.
+
+## API
+
+- [Connect RPC API](/api): Connect/gRPC-over-HTTP JSON API (prefix `/api`)
+- [OpenAPI spec](/openapi): OpenAPI 3.1 YAML description of the Connect RPC API
+
+Every procedure is a POST with a JSON body:
+
+POST /api/wackytracky.clientapi.v1.WackyTrackyClientService/<MethodName>
+Content-Type: application/json
+
+- Empty requests use the body `{}`.
+- JSON field names are camelCase (Protocol Buffers snake_case becomes camelCase, e.g. `parent_list_id` → `parentListId`).
+- On error the server returns a 4xx/5xx status and a Connect error JSON payload.
+
+Common procedures: Version, GetLists, ListTasks, CreateTask, UpdateTask, DoneTask, SearchTasks, CreateList.
+
+Search query syntax for SearchTasks: plain terms, `#tag`, `@context`, and `-term` to exclude.
+
+## MCP
+
+- [MCP server](/mcp): Model Context Protocol (Streamable HTTP) endpoint for AI assistants and agents
+
+Available MCP tools: list_lists, list_tasks, search_tasks, create_task, update_task, complete_task, create_list.
+
+For local stdio clients (Claude Desktop, Cursor with a subprocess), run `wt mcp` instead of connecting over HTTP.
+
+## Documentation
+
+- [GitHub repository](https://github.com/wacky-tracky/WackyTracky): Source code, issues, and releases
+- [README](https://github.com/wacky-tracky/WackyTracky#readme): Project overview and setup
+- [AGENTS.md](https://github.com/wacky-tracky/WackyTracky/blob/main/AGENTS.md): AI agent integration guide and MCP tool reference
+- [API docs](https://github.com/wacky-tracky/WackyTracky/tree/main/docs/source/api): Human-readable API reference and deployment guides

@@ -79,6 +79,11 @@ func TestMCPRegistersWithoutPanic(t *testing.T) {
 	assert.NotNil(t, srv)
 }
 
+func TestHTTPHandler(t *testing.T) {
+	h := New(&fakeService{}).HTTPHandler()
+	assert.NotNil(t, h)
+}
+
 func TestHandleListLists(t *testing.T) {
 	res, err := New(&fakeService{}).handleListLists(context.Background(), callWith(nil))
 	require.NoError(t, err)

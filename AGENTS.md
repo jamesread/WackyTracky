@@ -1,3 +1,74 @@
+# AI & agent integration
+
+WackyTracky exposes machine-readable discovery endpoints on the same base URL as the web app:
+
+| Surface | Path | Purpose |
+|---------|------|---------|
+| `llms.txt` | `/llms.txt` | Human/LLM-readable index of integration options |
+| OpenAPI | `/openapi` | OpenAPI 3.1 YAML spec for the Connect RPC API |
+| MCP | `/mcp` | Model Context Protocol (Streamable HTTP) for AI assistants |
+
+## Authentication
+
+Most deployments run without HTTP authentication. When authentication is enabled, MCP and the Connect API use the same credentials (for example `Authorization: Basic ...`).
+
+## Connect RPC API
+
+Base path: `/api`
+
+Every procedure is a POST with a JSON body to:
+
+`/api/wackytracky.clientapi.v1.WackyTrackyClientService/<MethodName>`
+
+Use the [OpenAPI spec](docs/source/api/openapi.yaml) (also at `GET /openapi` on a running server) for request/response schemas. For non-MCP integrations, prefer calling the Connect API directly or generating clients from OpenAPI.
+
+## MCP server
+
+**HTTP (recommended when the server is reachable):**
+
+```json
+{
+  "mcpServers": {
+    "wacky-tracky": {
+      "url": "https://your-host/mcp"
+    }
+  }
+}
+```
+
+Add an `Authorization` header when HTTP authentication is enabled on your instance.
+
+**Stdio (local subprocess):**
+
+```json
+{
+  "mcpServers": {
+    "wacky-tracky": {
+      "command": "wt",
+      "args": ["mcp"]
+    }
+  }
+}
+```
+
+The stdio server uses the same backend and configuration as the HTTP server (`config.yaml`, environment variables).
+
+### MCP tools
+
+| Tool | Parameters | Description |
+|------|------------|-------------|
+| `list_lists` | — | List all task lists with IDs, titles, and item counts |
+| `list_tasks` | `list_id` (required) | List tasks in a list, including subtasks |
+| `search_tasks` | `query` (required) | Search across lists (`#tag`, `@context`, `-term` to exclude) |
+| `create_task` | `content` (required), `list_id`, `parent_task_id` | Create a todo.txt-style task |
+| `update_task` | `id`, `content` (required) | Replace a task's content |
+| `complete_task` | `id` (required) | Mark a task done |
+| `create_list` | `title` (required) | Create a new list |
+
+Tools return JSON (camelCase fields) matching the Connect API responses.
+
+---
+
 # Commits (hard requirement)
 
 - **Use [Conventional Commits](https://www.conventionalcommits.org/)** for every commit. Commit messages must follow the format: `type(scope): description` (e.g. `feat(api): add task search`, `fix(frontend): toast on save error`). Types include but are not limited to: `feat`, `fix`, `docs`, `style`, `refactor`, `test`, `ci`, `chore`. This is enforced by the commit-msg hook (conventional-pre-commit); the build and release pipeline depend on it.

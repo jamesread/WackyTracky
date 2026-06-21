@@ -8,9 +8,10 @@ To call the API: send `POST` requests with `Content-Type: application/json`. Emp
 
 - [API overview](api/index.md): Base URL, the Connect protocol, authentication, and copy-paste `curl` quick-start examples (Version, GetLists, CreateTask, SearchTasks, DoneTask).
 - [API reference](api/reference.md): Every RPC with its request/response message and all fields, plus shared types (List, Task, Tag, SavedSearch).
-- [OpenAPI spec](api/openapi.yaml): Machine-readable OpenAPI 3.1 description generated from the Protocol Buffers definition. Best entry point for tools and code generators.
+- [OpenAPI spec](api/openapi.yaml): Machine-readable OpenAPI 3.1 description generated from the Protocol Buffers definition. Best entry point for tools and code generators. A running server also serves the same file at `GET /openapi`.
+- Running server: `GET /llms.txt` on your WackyTracky instance summarizes the OpenAPI spec, HTTP API, and MCP server for LLM clients.
 - [Search syntax](api/search.md): Query syntax for `SearchTasks` (plain terms, `#tag`, `@context`, `-term` to exclude).
-- [MCP server](api/mcp.md): Run WackyTracky as a Model Context Protocol server over stdio (`wt mcp`) so LLM assistants can read and manage tasks via tools (list_lists, list_tasks, search_tasks, create_task, update_task, complete_task, create_list).
+- [MCP server](api/mcp.md): Connect at `/mcp` (Streamable HTTP) on a running server, or run `wt mcp` over stdio for local LLM clients. Tools: list_lists, list_tasks, search_tasks, create_task, update_task, complete_task, create_list.
 
 ## Usage and configuration
 

@@ -35,8 +35,24 @@ func findWebUIDir() string {
 	return "./webui"
 }
 
+var reservedPathPrefixes = []string{"/api", "/metrics", "/wallpapers", "/mcp"}
+
+func hasReservedPrefix(p string) bool {
+	for _, prefix := range reservedPathPrefixes {
+		if strings.HasPrefix(p, prefix) {
+			return true
+		}
+	}
+	return false
+}
+
 func isReservedPath(p string) bool {
-	return strings.HasPrefix(p, "/api") || strings.HasPrefix(p, "/metrics") || strings.HasPrefix(p, "/wallpapers")
+	switch path.Clean(p) {
+	case "/openapi", "/llms.txt":
+		return true
+	default:
+		return hasReservedPrefix(p)
+	}
 }
 
 // isSPARoute returns true for paths that are client-side routes (no static file).
@@ -64,6 +80,26 @@ func regularFileExists(localPath string) bool {
 
 func getOrHead(r *http.Request) bool {
 	return r.Method == http.MethodGet || r.Method == http.MethodHead
+}
+
+// isServiceWorkerAsset reports paths that must not be cached by intermediaries or
+// an old browser service worker, so updates and auth cookies stay in sync.
+func isServiceWorkerAsset(p string) bool {
+	switch path.Clean(p) {
+	case "/sw.js", "/pwa-sw.js", "/registerSW.js":
+		return true
+	default:
+		return strings.HasPrefix(path.Clean(p), "/workbox-")
+	}
+}
+
+func noStoreServiceWorkerAssets(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if getOrHead(r) && isServiceWorkerAsset(r.URL.Path) {
+			w.Header().Set("Cache-Control", "no-store, no-cache, must-revalidate")
+		}
+		next.ServeHTTP(w, r)
+	})
 }
 
 // spaFallback wraps a file server and serves index.html for GET/HEAD when the
@@ -99,5 +135,5 @@ func GetNewHandler() http.Handler {
 	}).Infof("WebUI directory found")
 
 	fs := http.FileServer(http.Dir(webuiDir))
-	return spaFallback(webuiDir, fs)
+	return noStoreServiceWorkerAssets(spaFallback(webuiDir, fs))
 }

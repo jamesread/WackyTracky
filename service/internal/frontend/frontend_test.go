@@ -25,6 +25,9 @@ func TestIsSPARoute(t *testing.T) {
 		{"/api/foo", false},
 		{"/metrics", false},
 		{"/wallpapers/x", false},
+		{"/openapi", false},
+		{"/llms.txt", false},
+		{"/mcp", false},
 		{"/index.html", false},
 		{"/assets/main.js", false},
 		{"/favicon.ico", false},
@@ -68,4 +71,27 @@ func TestSPAFallback_ServesFileWhenExists(t *testing.T) {
 
 	assert.Equal(t, http.StatusOK, rec.Code)
 	assert.Equal(t, "static", rec.Body.String())
+}
+
+func TestIsServiceWorkerAsset(t *testing.T) {
+	assert.True(t, isServiceWorkerAsset("/sw.js"))
+	assert.True(t, isServiceWorkerAsset("/pwa-sw.js"))
+	assert.True(t, isServiceWorkerAsset("/registerSW.js"))
+	assert.True(t, isServiceWorkerAsset("/workbox-efbd304a.js"))
+	assert.False(t, isServiceWorkerAsset("/assets/index.js"))
+}
+
+func TestNoStoreServiceWorkerAssets_SetsCacheControl(t *testing.T) {
+	next := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusOK)
+		_, _ = w.Write([]byte("ok"))
+	})
+	handler := noStoreServiceWorkerAssets(next)
+
+	req := httptest.NewRequest(http.MethodGet, "http://test/pwa-sw.js", nil)
+	rec := httptest.NewRecorder()
+	handler.ServeHTTP(rec, req)
+
+	assert.Equal(t, http.StatusOK, rec.Code)
+	assert.Equal(t, "no-store, no-cache, must-revalidate", rec.Header().Get("Cache-Control"))
 }

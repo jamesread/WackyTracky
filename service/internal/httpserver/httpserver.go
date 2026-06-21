@@ -6,8 +6,10 @@ import (
 	"net/http"
 
 	"github.com/prometheus/client_golang/prometheus/promhttp"
+	"github.com/wacky-tracky/wacky-tracky-server/internal/apidocs"
 	"github.com/wacky-tracky/wacky-tracky-server/internal/clientapi"
 	"github.com/wacky-tracky/wacky-tracky-server/internal/frontend"
+	"github.com/wacky-tracky/wacky-tracky-server/internal/mcpserver"
 
 	cors "github.com/rs/cors"
 	log "github.com/sirupsen/logrus"
@@ -30,6 +32,9 @@ func StartServer() {
 	mux.HandleFunc("/api"+apiPath, func(w http.ResponseWriter, r *http.Request) {
 		apiHandler.ServeHTTP(w, r)
 	})
+	mux.Handle("/openapi", apidocs.OpenAPIHandler())
+	mux.Handle("/llms.txt", apidocs.LLMsTxtHandler())
+	mux.Handle("/mcp", mcpserver.New(api).HTTPHandler())
 	mux.Handle("/", http.StripPrefix("/", frontend.GetNewHandler()))
 	mux.Handle("/metrics", promhttp.Handler())
 	mux.Handle("/wallpapers", getWallpapersHandler())

@@ -301,6 +301,31 @@ Returns `git status` output for the todo.txt data directory (todo.txt backend). 
 
 ---
 
+### RepoSync
+
+Runs a conservative `git add`, `git commit`, and `git push` for the todo.txt data directory (todo.txt backend). The operation aborts without modifying the repository when merge conflicts, an in-progress merge/rebase/cherry-pick, detached HEAD, missing upstream, or being behind the remote is detected.
+
+| Procedure | `RepoSync` |
+|-----------|------------|
+| **Request** | `RepoSyncRequest` |
+| **Response** | `RepoSyncResponse` |
+
+**RepoSyncRequest**
+
+| Field        | Type   | Description |
+|--------------|--------|-------------|
+| server_name  | string | Optional label included in the git commit message (`wt sync: <server name>`) |
+
+**RepoSyncResponse**
+
+| Field   | Type     | Description |
+|---------|----------|-------------|
+| success | bool     | Whether the sync completed successfully |
+| message | string   | Summary message or error reason |
+| steps   | string[] | Completed steps (e.g. validated, staged, committed, pushed) |
+
+---
+
 ### GetSavedSearches
 
 Returns the user’s saved searches (names and queries).

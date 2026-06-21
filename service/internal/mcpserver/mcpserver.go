@@ -6,6 +6,7 @@ package mcpserver
 
 import (
 	"context"
+	"net/http"
 
 	"connectrpc.com/connect"
 	"github.com/mark3labs/mcp-go/mcp"
@@ -42,9 +43,17 @@ func New(svc ClientService) *Server {
 
 // MCP builds an MCP server with all WackyTracky tools registered.
 func (s *Server) MCP() *server.MCPServer {
-	srv := server.NewMCPServer("wacky-tracky", buildinfo.Version, server.WithToolCapabilities(false))
+	srv := server.NewMCPServer("wacky-tracky", buildinfo.Version,
+		server.WithToolCapabilities(false),
+		server.WithRecovery(),
+	)
 	s.registerTools(srv)
 	return srv
+}
+
+// HTTPHandler returns a Streamable HTTP handler for /mcp on the main server.
+func (s *Server) HTTPHandler() http.Handler {
+	return server.NewStreamableHTTPServer(s.MCP(), server.WithEndpointPath("/mcp"))
 }
 
 // Serve runs the MCP server over stdio until the client disconnects.

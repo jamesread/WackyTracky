@@ -58,7 +58,7 @@ jobs:
         run: make -w service
 
       - name: Unit tests
-        run: cd service && go test ./...
+        run: make -wC service test
 
       - name: Install goreleaser
         uses: goreleaser/goreleaser-action@v6
