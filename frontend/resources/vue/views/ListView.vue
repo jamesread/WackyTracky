@@ -30,6 +30,10 @@
 					:style="displayMode === 'hierarchy' && row.depth > 0 ? { marginLeft: row.depth * 2.25 + 'rem' } : {}"
 					@dblclick="currentEditingId !== row.task.id && injectedStartEdit(row.task)"
 					@contextmenu.prevent="onTaskContextMenu(row.task)"
+					@touchstart.passive="onRowTouchStart(row, index, $event)"
+					@touchmove="onRowTouchMove"
+					@touchend="onRowTouchEnd"
+					@touchcancel="onRowTouchEnd"
 					@click="onRowClick(row, index)"
 				>
 					<template v-if="currentEditingId === row.task.id">
@@ -545,7 +549,65 @@
 		updateItems();
 	}
 
+	const LONG_PRESS_MS = 500;
+	const LONG_PRESS_MOVE_TOLERANCE_PX = 10;
+	let longPressTimer = null;
+	let longPressStart = null;
+	let longPressSuppressedClick = false;
+
+	function isTouchLikeDevice() {
+		return window.matchMedia('(pointer: coarse)').matches || 'ontouchstart' in window;
+	}
+
+	function clearLongPressTimer() {
+		if (longPressTimer) {
+			clearTimeout(longPressTimer);
+			longPressTimer = null;
+		}
+	}
+
+	function onRowTouchStart(row, index, e) {
+		if (!isTouchLikeDevice() || currentEditingId.value) return;
+		clearLongPressTimer();
+		longPressSuppressedClick = false;
+		const touch = e.changedTouches[0];
+		if (!touch) return;
+		longPressStart = { x: touch.clientX, y: touch.clientY };
+		longPressTimer = setTimeout(() => {
+			longPressTimer = null;
+			longPressStart = null;
+			longPressSuppressedClick = true;
+			focusedIndex.value = index;
+			onTaskContextMenu(row.task);
+		}, LONG_PRESS_MS);
+	}
+
+	function onRowTouchMove(e) {
+		if (!longPressStart) return;
+		const touch = e.changedTouches[0];
+		if (!touch) return;
+		const dx = Math.abs(touch.clientX - longPressStart.x);
+		const dy = Math.abs(touch.clientY - longPressStart.y);
+		if (dx > LONG_PRESS_MOVE_TOLERANCE_PX || dy > LONG_PRESS_MOVE_TOLERANCE_PX) {
+			clearLongPressTimer();
+			longPressStart = null;
+		}
+	}
+
+	function onRowTouchEnd() {
+		clearLongPressTimer();
+		longPressStart = null;
+	}
+
 	function onRowClick(row, index) {
+		if (longPressSuppressedClick) {
+			longPressSuppressedClick = false;
+			return;
+		}
+		if (isTouchLikeDevice() && focusedIndex.value === index) {
+			focusedIndex.value = -1;
+			return;
+		}
 		if (row.task.countSubitems > 0) {
 			toggleCollapse(row.task.id);
 		}
@@ -1085,6 +1147,7 @@
 		document.addEventListener('keydown', onListKeydown);
 	});
 	onUnmounted(() => {
+		clearLongPressTimer();
 		document.removeEventListener('keydown', onListKeydown);
 		if (selectedTaskForSubtask) selectedTaskForSubtask.value = null;
 	});
@@ -1245,6 +1308,7 @@
 		box-shadow: none;
 		border-bottom: 1px solid #e5e5e5;
 		cursor: pointer;
+		-webkit-touch-callout: none;
 	}
 	li.task-row:hover {
 		background-color: #f9f9f9;
@@ -1301,6 +1365,8 @@
 	.task-content {
 		flex: 1;
 		min-width: 0;
+		user-select: none;
+		-webkit-user-select: none;
 	}
 
 	.task-inline-edit-row {

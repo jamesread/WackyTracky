@@ -20,6 +20,17 @@
 			<p id="options-server-name-desc" class="options-hint">
 				Used in git commit messages when you sync from the header: <code>wt sync: &lt;server name&gt;</code>.
 			</p>
+			<button
+				type="button"
+				class="options-btn"
+				:disabled="!isOnline || repoSyncRunning"
+				@click="showRepoStatus"
+			>
+				Show git status
+			</button>
+			<p class="options-hint">
+				View <code>git status</code> output for the todo.txt data directory (requires network).
+			</p>
 		</div>
 		<div class="options-section">
 			<label for="options-datetime-format" class="options-label">Date/time display format</label>
@@ -95,6 +106,9 @@ import Section from 'picocrank/vue/components/Section.vue';
 import { useSettings } from '../composables/useSettings.js';
 
 const openShortcutsDialog = inject('openShortcutsDialog', () => {});
+const showRepoStatus = inject('showRepoStatus', () => {});
+const isOnline = inject('isOnline', { value: true });
+const repoSyncRunning = inject('repoSyncRunning', { value: false });
 const {
 	dateTimeDisplayFormat,
 	dateTimeFormatOptions,
@@ -153,8 +167,12 @@ const {
 	font-size: 0.95rem;
 	cursor: pointer;
 }
-.options-btn:hover {
+.options-btn:hover:not(:disabled) {
 	background: #f0f0f0;
+}
+.options-btn:disabled {
+	opacity: 0.6;
+	cursor: not-allowed;
 }
 .options-checkbox {
 	margin-right: 0.5rem;

@@ -64,9 +64,6 @@
 					<HugeiconsIcon :icon="displayModeIcon" width="1.1em" height="1.1em" />
 					<span class="display-mode-label">{{ displayModeLabel }}</span>
 				</button>
-				<button type="button" class="options-btn repo-status-btn" :disabled="!isOnline || repoSyncRunning" @click="showRepoStatus" title="Git status of todotxt directory (requires network)" aria-label="Repo status">
-					<HugeiconsIcon :icon="GitBranchIcon" width="1.1em" height="1.1em" />
-				</button>
 				<button type="button" class="options-btn repo-sync-btn" :disabled="!isOnline || repoSyncRunning" @click="startRepoSync" title="Git add, commit, and push todotxt directory (requires network)" aria-label="Sync to git remote">
 					<HugeiconsIcon :icon="CloudUploadIcon" width="1.1em" height="1.1em" />
 				</button>
@@ -234,7 +231,7 @@ import { HugeiconsIcon } from '@hugeicons/vue';
 import Header from 'picocrank/vue/components/Header.vue';
 import Navigation from 'picocrank/vue/components/Navigation.vue';
 import NavOptions from './components/NavOptions.vue';
-import { GitBranchIcon, CloudUploadIcon, PinIcon, Settings01Icon, Folder01Icon, PlayIcon, AlarmClockIcon } from '@hugeicons/core-free-icons';
+import { CloudUploadIcon, PinIcon, Settings01Icon, Folder01Icon, PlayIcon, AlarmClockIcon } from '@hugeicons/core-free-icons';
 import { useOffline } from './composables/useOffline.js';
 import { useSettings } from './composables/useSettings.js';
 import {
@@ -722,6 +719,8 @@ provide('openShortcutsDialog', openShortcutsDialog);
 provide('taskPropertyProperties', taskPropertyProperties);
 provide('refreshTaskPropertyProperties', loadTaskPropertyProperties);
 provide('isOnline', isOnline);
+provide('repoSyncRunning', repoSyncRunning);
+provide('showRepoStatus', showRepoStatus);
 provide('cacheInbox', cacheList);
 
 function cacheList(listId, listTitle, data) {
