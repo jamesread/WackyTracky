@@ -4,6 +4,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -112,4 +113,50 @@ func TestConfigureGitCommand_UsesSymlinkedKey(t *testing.T) {
 func TestShellEscape(t *testing.T) {
 	assert.Equal(t, "'plain'", shellEscape("plain"))
 	assert.Equal(t, "'it'\\''s'", shellEscape("it's"))
+}
+
+func gitAvailable() bool {
+	_, err := exec.LookPath("git")
+	return err == nil
+}
+
+func TestEnsureGitIdentity_SkipsOutsideContainer(t *testing.T) {
+	if !gitAvailable() {
+		t.Skip("git not available")
+	}
+
+	homeDir := t.TempDir()
+	t.Setenv("HOME", homeDir)
+
+	require.NoError(t, ensureGitIdentity())
+	_, err := os.Stat(filepath.Join(homeDir, ".gitconfig"))
+	assert.True(t, os.IsNotExist(err))
+}
+
+func TestSetGlobalGitConfig(t *testing.T) {
+	if !gitAvailable() {
+		t.Skip("git not available")
+	}
+
+	homeDir := t.TempDir()
+	t.Setenv("HOME", homeDir)
+
+	require.NoError(t, setGlobalGitConfig("user.name", gitUserName))
+	require.NoError(t, setGlobalGitConfig("user.email", gitUserEmail))
+
+	name, err := exec.Command("git", "config", "--global", "--get", "user.name").Output()
+	require.NoError(t, err)
+	assert.Equal(t, gitUserName, strings.TrimSpace(string(name)))
+
+	email, err := exec.Command("git", "config", "--global", "--get", "user.email").Output()
+	require.NoError(t, err)
+	assert.Equal(t, gitUserEmail, strings.TrimSpace(string(email)))
+}
+
+func TestIsContainerHome(t *testing.T) {
+	t.Setenv("HOME", "/tmp/not-container")
+	assert.False(t, isContainerHome())
+
+	t.Setenv("HOME", containerHome)
+	assert.True(t, isContainerHome())
 }

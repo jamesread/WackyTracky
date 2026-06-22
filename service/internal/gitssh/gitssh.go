@@ -12,8 +12,11 @@ import (
 )
 
 const (
-	keyBaseName = "wackytracky_git_sync"
-	keyComment  = "wacky-tracky-git-sync"
+	keyBaseName   = "wackytracky_git_sync"
+	keyComment    = "wacky-tracky-git-sync"
+	containerHome = "/home/wt"
+	gitUserName   = "wt"
+	gitUserEmail  = "wt@container"
 )
 
 type SetupResult struct {
@@ -56,6 +59,9 @@ func Setup(configDir string) (SetupResult, error) {
 }
 
 func SetupAndLog() {
+	if err := ensureGitIdentity(); err != nil {
+		log.Warnf("Git identity setup failed: %v", err)
+	}
 	dir := ResolveConfigDir()
 	res, err := Setup(dir)
 	if err != nil {
@@ -186,4 +192,30 @@ func keyFingerprint(publicKey string) (string, error) {
 
 func shellEscape(value string) string {
 	return "'" + strings.ReplaceAll(value, "'", "'\\''") + "'"
+}
+
+func ensureGitIdentity() error {
+	if !isContainerHome() {
+		return nil
+	}
+	if err := setGlobalGitConfig("user.name", gitUserName); err != nil {
+		return err
+	}
+	return setGlobalGitConfig("user.email", gitUserEmail)
+}
+
+func isContainerHome() bool {
+	home, err := os.UserHomeDir()
+	if err != nil {
+		return false
+	}
+	return home == containerHome
+}
+
+func setGlobalGitConfig(key, value string) error {
+	cmd := exec.Command("git", "config", "--global", key, value)
+	if out, err := cmd.CombinedOutput(); err != nil {
+		return fmt.Errorf("git config --global %s: %s: %w", key, strings.TrimSpace(string(out)), err)
+	}
+	return nil
 }
