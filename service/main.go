@@ -9,6 +9,7 @@ import (
 	"github.com/wacky-tracky/wacky-tracky-server/internal/buildinfo"
 	"github.com/wacky-tracky/wacky-tracky-server/internal/clientapi"
 	"github.com/wacky-tracky/wacky-tracky-server/internal/db"
+	"github.com/wacky-tracky/wacky-tracky-server/internal/gitssh"
 	"github.com/wacky-tracky/wacky-tracky-server/internal/httpserver"
 	"github.com/wacky-tracky/wacky-tracky-server/internal/mcpserver"
 	"github.com/wacky-tracky/wacky-tracky-server/internal/runtimeconfig"
@@ -88,6 +89,7 @@ func main() {
 	}).Info("wacky-tracky")
 
 	initViperConfig()
+	gitssh.SetupAndLog()
 
 	root.AddCommand(mcpCmd)
 

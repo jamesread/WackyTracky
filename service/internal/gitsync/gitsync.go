@@ -8,6 +8,8 @@ import (
 	"path/filepath"
 	"strconv"
 	"strings"
+
+	"github.com/wacky-tracky/wacky-tracky-server/internal/gitssh"
 )
 
 type Result struct {
@@ -22,6 +24,7 @@ type gitRunner struct {
 
 func (r *gitRunner) run(ctx context.Context, args ...string) (string, error) {
 	cmd := exec.CommandContext(ctx, "git", append([]string{"-C", r.dir}, args...)...)
+	gitssh.ConfigureGitCommand(cmd)
 	b, err := cmd.CombinedOutput()
 	out := strings.TrimSpace(string(b))
 	if err != nil {
