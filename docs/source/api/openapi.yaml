@@ -319,6 +319,41 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/wackytracky.clientapi.v1.GetTaskPropertyPropertiesResponse'
+  /api/wackytracky.clientapi.v1.WackyTrackyClientService/GitSyncSSHKey:
+    post:
+      tags:
+        - wackytracky.clientapi.v1.WackyTrackyClientService
+      summary: GitSyncSSHKey
+      operationId: wackytracky.clientapi.v1.WackyTrackyClientService.GitSyncSSHKey
+      parameters:
+        - name: Connect-Protocol-Version
+          in: header
+          required: true
+          schema:
+            $ref: '#/components/schemas/connect-protocol-version'
+        - name: Connect-Timeout-Ms
+          in: header
+          schema:
+            $ref: '#/components/schemas/connect-timeout-header'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/wackytracky.clientapi.v1.GitSyncSSHKeyRequest'
+        required: true
+      responses:
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/connect.error'
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/wackytracky.clientapi.v1.GitSyncSSHKeyResponse'
   /api/wackytracky.clientapi.v1.WackyTrackyClientService/Init:
     post:
       tags:
@@ -1093,6 +1128,27 @@ components:
           title: value
           $ref: '#/components/schemas/wackytracky.clientapi.v1.TaskPropertyProps'
       title: TagPropertiesEntry
+      additionalProperties: false
+    wackytracky.clientapi.v1.GitSyncSSHKeyRequest:
+      type: object
+      title: GitSyncSSHKeyRequest
+      additionalProperties: false
+    wackytracky.clientapi.v1.GitSyncSSHKeyResponse:
+      type: object
+      properties:
+        publicKey:
+          type: string
+          title: public_key
+          description: OpenSSH authorized_keys line (ssh-ed25519 AAAA... comment)
+        fingerprint:
+          type: string
+          title: fingerprint
+          description: SHA256 fingerprint from ssh-keygen -lf
+        message:
+          type: string
+          title: message
+          description: set when the key is unavailable
+      title: GitSyncSSHKeyResponse
       additionalProperties: false
     wackytracky.clientapi.v1.InitRequest:
       type: object

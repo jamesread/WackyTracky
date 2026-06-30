@@ -368,6 +368,16 @@ func normalizePriority(p string) string {
 	return p
 }
 
+func taskPriority(t *Task) string {
+	if p := normalizePriority(t.Metadata["priority"]); p != "" {
+		return p
+	}
+	if len(t.Priority) >= 2 && isValidPriorityChar(t.Priority[1]) {
+		return normalizePriority(string(t.Priority[1]))
+	}
+	return ""
+}
+
 func taskToDB(t *Task, subcount int32, waitUntil, dueDate string) db.DBTask {
 	id := t.Metadata["id"]
 	if id == "" {
@@ -387,7 +397,6 @@ func taskToDB(t *Task, subcount int32, waitUntil, dueDate string) db.DBTask {
 	copy(tags, t.Tags)
 	contexts := make([]string, len(t.Contexts))
 	copy(contexts, t.Contexts)
-	priority := normalizePriority(t.Metadata["priority"])
 	return db.DBTask{
 		ID:            id,
 		Content:       content,
@@ -397,9 +406,21 @@ func taskToDB(t *Task, subcount int32, waitUntil, dueDate string) db.DBTask {
 		Tags:          tags,
 		Contexts:      contexts,
 		WaitUntil:     strings.TrimSpace(waitUntil),
-		Priority:      priority,
+		Priority:      taskPriority(t),
 		DueDate:       strings.TrimSpace(dueDate),
 	}
+}
+
+func (d *TodoTxt) resolveTaskMetadataField(t *Task, field string) string {
+	if v := strings.TrimSpace(d.getTaskMetadataField(t.Metadata["id"], field)); v != "" {
+		return v
+	}
+	return strings.TrimSpace(t.Metadata[field])
+}
+
+func (d *TodoTxt) dbTaskFromTask(t *Task) db.DBTask {
+	id := t.Metadata["id"]
+	return taskToDB(t, countSubtasks(d.tasks, id), d.resolveTaskMetadataField(t, "wait"), d.resolveTaskMetadataField(t, "due"))
 }
 
 func countSubtasks(tasks []*Task, taskID string) int32 {
@@ -453,7 +474,7 @@ func (d *TodoTxt) GetTask(id string) (*db.DBTask, error) {
 	defer d.mu.RUnlock()
 	for _, t := range d.tasks {
 		if t.Metadata["id"] == id {
-			ret := taskToDB(t, countSubtasks(d.tasks, id), d.getTaskMetadataField(id, "wait"), d.getTaskMetadataField(id, "due"))
+			ret := d.dbTaskFromTask(t)
 			return &ret, nil
 		}
 	}
@@ -479,7 +500,7 @@ func (d *TodoTxt) GetTasks(listId string) ([]db.DBTask, error) {
 		if !isRootTaskInList(t, listId) {
 			continue
 		}
-		out = append(out, taskToDB(t, countSubtasks(d.tasks, t.Metadata["id"]), d.getTaskMetadataField(t.Metadata["id"], "wait"), d.getTaskMetadataField(t.Metadata["id"], "due")))
+		out = append(out, d.dbTaskFromTask(t))
 	}
 	return out, nil
 }
@@ -495,7 +516,7 @@ func (d *TodoTxt) GetSubtasks(itemId string) ([]db.DBTask, error) {
 		if t.Metadata["parent"] != itemId {
 			continue
 		}
-		out = append(out, taskToDB(t, countSubtasks(d.tasks, t.Metadata["id"]), d.getTaskMetadataField(t.Metadata["id"], "wait"), d.getTaskMetadataField(t.Metadata["id"], "due")))
+		out = append(out, d.dbTaskFromTask(t))
 	}
 	return out, nil
 }
@@ -539,35 +560,32 @@ func (d *TodoTxt) ensureParentHasProject(parentTaskId string) {
 	}
 }
 
-func mergeContentMetaInto(meta map[string]string, contentMeta map[string]string) {
-	for k, v := range contentMeta {
-		if k == "id" || k == "listid" || k == "parent" {
-			continue
-		}
-		meta[k] = v
+func taskFromCreateContent(content string) *Task {
+	t := ParseLine(content)
+	if t == nil {
+		t = &Task{Metadata: make(map[string]string)}
 	}
+	if t.Metadata == nil {
+		t.Metadata = make(map[string]string)
+	}
+	return t
 }
 
 func (d *TodoTxt) CreateTask(content string, listId string, parentTaskId string) (string, error) {
 	d.mu.Lock()
 	defer d.mu.Unlock()
+	t := taskFromCreateContent(content)
 	id := uuid.New().String()
 	if listId == "" {
 		listId = defaultListID
 	}
-	meta := map[string]string{"id": id, "listid": listId}
+	t.Metadata["id"] = id
+	t.Metadata["listid"] = listId
 	if parentTaskId != "" {
-		meta["parent"] = parentTaskId
+		t.Metadata["parent"] = parentTaskId
 		d.ensureParentHasProject(parentTaskId)
-	}
-	desc, projects, contexts, tags, contentMeta := ParseContent(content)
-	mergeContentMetaInto(meta, contentMeta)
-	t := &Task{
-		Description: desc,
-		Projects:    projects,
-		Contexts:    contexts,
-		Tags:        tags,
-		Metadata:    meta,
+	} else {
+		delete(t.Metadata, "parent")
 	}
 	d.tasks = append(d.tasks, t)
 	if err := d.saveTasks(); err != nil {
@@ -672,7 +690,7 @@ func (d *TodoTxt) SearchTasks(query string) ([]db.DBTask, error) {
 		if !taskMatchesQuery(searchable, include, exclude) {
 			continue
 		}
-		out = append(out, taskToDB(t, countSubtasks(d.tasks, t.Metadata["id"]), d.getTaskMetadataField(t.Metadata["id"], "wait"), d.getTaskMetadataField(t.Metadata["id"], "due")))
+		out = append(out, d.dbTaskFromTask(t))
 	}
 	return out, nil
 }

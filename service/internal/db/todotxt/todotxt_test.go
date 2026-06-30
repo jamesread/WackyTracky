@@ -78,6 +78,27 @@ func TestTodoTxt_CreateTaskAndGetTasks(t *testing.T) {
 	}
 }
 
+func TestTodoTxt_CreateTaskReturnsInlineMetadata(t *testing.T) {
+	_, cleanup := setTodotxtDir(t)
+	defer cleanup()
+
+	d := &TodoTxt{}
+	require.NoError(t, d.Connect())
+
+	id, err := d.CreateTask("(B) finish report due:2025-12-31 wait:2025-06-01 @work #urgent", "inbox", "")
+	require.NoError(t, err)
+
+	task, err := d.GetTask(id)
+	require.NoError(t, err)
+	require.NotNil(t, task)
+	assert.Equal(t, "B", task.Priority)
+	assert.Equal(t, "2025-12-31", task.DueDate)
+	assert.Equal(t, "2025-06-01", task.WaitUntil)
+	assert.Equal(t, []string{"work"}, task.Contexts)
+	assert.Equal(t, []string{"urgent"}, task.Tags)
+	assert.Equal(t, "finish report", task.Content)
+}
+
 func TestTodoTxt_SearchTasks(t *testing.T) {
 	dir, cleanup := setTodotxtDir(t)
 	defer cleanup()

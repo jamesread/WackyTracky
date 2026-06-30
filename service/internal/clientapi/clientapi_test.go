@@ -9,6 +9,8 @@ import (
 	"github.com/stretchr/testify/require"
 	pb "github.com/wacky-tracky/wacky-tracky-server/gen/wacky-tracky/clientapi/v1"
 	"github.com/wacky-tracky/wacky-tracky-server/internal/db/dummy"
+	"github.com/wacky-tracky/wacky-tracky-server/internal/db/todotxt"
+	. "github.com/wacky-tracky/wacky-tracky-server/internal/runtimeconfig"
 )
 
 func TestGetNewClientAPI_WithDummyDB(t *testing.T) {
@@ -79,4 +81,23 @@ func TestClientAPI_RepoSync_WithDummyDB(t *testing.T) {
 	require.NotNil(t, resp)
 	assert.False(t, resp.Msg.Success)
 	assert.Contains(t, resp.Msg.Message, "todo.txt backend")
+}
+
+func TestClientAPI_CreateTaskReturnsParsedMetadata(t *testing.T) {
+	dir := t.TempDir()
+	orig := RuntimeConfig.Database.Database
+	RuntimeConfig.Database.Database = dir
+	t.Cleanup(func() { RuntimeConfig.Database.Database = orig })
+
+	api := GetNewClientAPI(&todotxt.TodoTxt{})
+
+	resp, err := api.CreateTask(context.Background(), connect.NewRequest(&pb.CreateTaskRequest{
+		Content:      "ship feature due:2025-07-15",
+		ParentListId: "inbox",
+	}))
+	require.NoError(t, err)
+	require.NotNil(t, resp.Msg.Task)
+	assert.NotEmpty(t, resp.Msg.Task.Id)
+	assert.Equal(t, "2025-07-15", resp.Msg.Task.DueDate)
+	assert.Equal(t, "ship feature", resp.Msg.Task.Content)
 }
