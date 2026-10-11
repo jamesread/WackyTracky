@@ -4,7 +4,7 @@ service:
 	$(MAKE) -wC service
 
 frontend:
-	$(MAKE) -wC frontend
+	$(MAKE) -wC frontend ci
 
 generate:
 	$(MAKE) -C protocol
