@@ -33,6 +33,7 @@ dockers_v2:
     extra_files:
       - README.md
       - frontend/dist
+      - database/sqlite/migrations
     platforms:
       - linux/amd64
       - linux/arm64
