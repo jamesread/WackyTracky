@@ -2,11 +2,13 @@ import { defineConfig } from 'vite';
 import vue from '@vitejs/plugin-vue';
 import { VitePWA } from 'vite-plugin-pwa';
 
+const backendPort = process.env.PORT || '8080';
+
 export default defineConfig({
   server: {
     proxy: {
       '/api': {
-        target: 'http://localhost:8080',
+        target: `http://localhost:${backendPort}`,
         changeOrigin: true,
         secure: false,
       },

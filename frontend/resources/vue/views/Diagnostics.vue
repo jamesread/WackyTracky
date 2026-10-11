@@ -1,32 +1,82 @@
 <template>
-	<section class="diagnostics-view">
-		<h2 class="diagnostics-heading">Diagnostics</h2>
+	<Section
+		title="Diagnostics"
+		:icon="Settings01Icon"
+		subtitle="Debug and health information."
+		:padding="true"
+	>
+		<template #toolbar>
+			<button
+				type="button"
+				class="inline-icon neutral"
+				aria-label="Refresh all"
+				title="Refresh all"
+				:disabled="serverLoading"
+				@click="refreshAll"
+			>
+				<HugeiconsIcon
+					:icon="Refresh01Icon"
+					width="1em"
+					height="1em"
+					:strokeWidth="iconStrokeWidth"
+					aria-hidden="true"
+				/>
+			</button>
+		</template>
 
-		<div class="diagnostics-section">
-			<h3 class="diagnostics-section-title">Server diagnostics</h3>
-			<button type="button" class="diagnostics-refresh-btn" @click="refreshServer">Refresh</button>
-			<pre class="diagnostics-output" aria-label="Server diagnostics">{{ serverOutput }}</pre>
-		</div>
+		<div class="diagnostics-stack">
+			<ReadOnlyTextArea
+				v-model="serverOutput"
+				label="Server diagnostics"
+				:rows="8"
+				placeholder="No server data yet."
+			>
+				<template #actions>
+					<button
+						type="button"
+						class="neutral"
+						:disabled="serverLoading"
+						@click="refreshServer"
+					>
+						{{ serverLoading ? 'Refreshing…' : 'Refresh' }}
+					</button>
+				</template>
+			</ReadOnlyTextArea>
 
-		<div class="diagnostics-section">
-			<h3 class="diagnostics-section-title">Browser diagnostics</h3>
-			<button type="button" class="diagnostics-refresh-btn" @click="refreshBrowser">Refresh</button>
-			<pre class="diagnostics-output" aria-label="Browser diagnostics">{{ browserOutput }}</pre>
+			<ReadOnlyTextArea
+				v-model="browserOutput"
+				label="Browser diagnostics"
+				:rows="10"
+				placeholder="No browser data yet."
+			>
+				<template #actions>
+					<button type="button" class="neutral" @click="refreshBrowser">
+						Refresh
+					</button>
+				</template>
+			</ReadOnlyTextArea>
 		</div>
-	</section>
+	</Section>
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { onMounted, ref } from 'vue';
+import Section from 'picocrank/vue/components/Section.vue';
+import ReadOnlyTextArea from 'picocrank/vue/components/ReadOnlyTextArea.vue';
+import { HugeiconsIcon } from '@hugeicons/vue';
+import { Refresh01Icon, Settings01Icon } from '@hugeicons/core-free-icons';
 
+const iconStrokeWidth = 2.5;
 const serverOutput = ref('');
 const browserOutput = ref('');
+const serverLoading = ref(false);
 
 function formatKv(lines) {
 	return lines.filter(Boolean).join('\n');
 }
 
 async function refreshServer() {
+	serverLoading.value = true;
 	serverOutput.value = 'Loading…';
 	const lines = [];
 	try {
@@ -39,6 +89,8 @@ async function refreshServer() {
 		serverOutput.value = lines.length ? formatKv(lines) : 'No server data available.';
 	} catch (e) {
 		serverOutput.value = formatKv(['error: ' + (e?.message || String(e))]);
+	} finally {
+		serverLoading.value = false;
 	}
 }
 
@@ -56,44 +108,19 @@ function refreshBrowser() {
 	lines.push('location: ' + (window?.location?.href ?? ''));
 	browserOutput.value = formatKv(lines);
 }
+
+async function refreshAll() {
+	refreshBrowser();
+	await refreshServer();
+}
+
+onMounted(refreshAll);
 </script>
 
 <style scoped>
-.diagnostics-view {
-	padding: 1.25rem;
-}
-
-.diagnostics-heading {
-	margin: 0 0 1.25rem 0;
-	font-size: 1.25rem;
-}
-
-.diagnostics-section {
-	margin-bottom: 2rem;
-}
-
-.diagnostics-section-title {
-	margin: 0 0 0.5rem 0;
-	font-size: 1.1rem;
-	font-weight: 600;
-}
-
-.diagnostics-refresh-btn {
-	margin-bottom: 0.5rem;
-	padding: 0.4rem 0.75rem;
-	font-size: 0.9rem;
-	cursor: pointer;
-}
-
-.diagnostics-output {
-	margin: 0;
-	padding: 0.75rem;
-	background: var(--femtocrank-bg-muted, #f5f5f5);
-	border: 1px solid var(--border-color, #e1e5e9);
-	border-radius: 0.35rem;
-	font-size: 0.85rem;
-	white-space: pre-wrap;
-	word-break: break-all;
-	min-height: 4rem;
+.diagnostics-stack {
+	display: flex;
+	flex-direction: column;
+	gap: 1.5rem;
 }
 </style>

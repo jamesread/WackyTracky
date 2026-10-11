@@ -10,7 +10,7 @@ WackyTracky exposes machine-readable discovery endpoints on the same base URL as
 
 ## Authentication
 
-Most deployments run without HTTP authentication. When authentication is enabled, MCP and the Connect API use the same credentials (for example `Authorization: Basic ...`).
+IAM (users, sessions, API keys, RBAC) uses a **separate SQLite** database (`iam.database` in config). The Connect API and HTTP MCP share armature-iam / httpauthshim auth: browser cookie `wacky-tracky-sid`, or `Authorization: Bearer` API keys (`wt_` prefix). First empty IAM DB seeds `admin` / `admin`. Dev: `WACKYTRACKY_DEV_DISABLE_AUTH=true`. See [docs/modules/ROOT/pages/authentication.adoc](docs/modules/ROOT/pages/authentication.adoc).
 
 ## Connect RPC API
 
@@ -20,7 +20,7 @@ Every procedure is a POST with a JSON body to:
 
 `/api/wackytracky.clientapi.v1.WackyTrackyClientService/<MethodName>`
 
-Use the [OpenAPI spec](docs/source/api/openapi.yaml) (also at `GET /openapi` on a running server) for request/response schemas. For non-MCP integrations, prefer calling the Connect API directly or generating clients from OpenAPI.
+Use the [OpenAPI spec](docs/modules/ROOT/attachments/openapi.yaml) (also at `GET /openapi` on a running server) for request/response schemas. For non-MCP integrations, prefer calling the Connect API directly or generating clients from OpenAPI.
 
 ## MCP server
 
@@ -36,7 +36,7 @@ Use the [OpenAPI spec](docs/source/api/openapi.yaml) (also at `GET /openapi` on 
 }
 ```
 
-Add an `Authorization` header when HTTP authentication is enabled on your instance.
+Add `Authorization: Bearer <api-key>` for HTTP MCP when auth is enabled (cookie auth is not used on `/mcp`).
 
 **Stdio (local subprocess):**
 
@@ -93,7 +93,7 @@ Tools return JSON (camelCase fields) matching the Connect API responses.
 - Frontend code (js, vue, vite, etc.) should be in the frontend/ directory.
 - Integration tests should be in the integration-tests/ directory.
 - Protocol code should use connectrpc and buf, and should be in the protocol/ directory.
-- Documentation should be in the docs/ directory, and use mkdocs.
+- Documentation should be in the docs/ directory, and use Antora.
 
 # Specs (codebase-specific guidance)
 
@@ -116,7 +116,8 @@ Tools return JSON (camelCase fields) matching the Connect API responses.
 - Use Go modules for dependency management.
 - Use the standard library as much as possible.
 - Use the `logrus` library for logging.
-- Use the `koanf` library for configuration management.
+- Use the `koanf` library for configuration management (YAML `config.yaml`).
+- Listen address: honour `$PORT` when set (via `golure/pkg/listenaddr`), otherwise `listenAddress` from config (default `0.0.0.0:8080`). Vite’s `/api` proxy uses `$PORT` or `8080`.
 - Use the `jamesread/golure` library for utility functions.
 - Use the `jamesread/httpauthshim` library for HTTP authentication.
 - Use the `stretchr/testify` library for testing.

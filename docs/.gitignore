@@ -1,7 +1,2 @@
-# MkDocs build output
-site/
-
-# Temp / cache
-.cache/
-*.log
 node_modules
+site

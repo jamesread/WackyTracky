@@ -1,4 +1,4 @@
-OPENAPI_SRC := ../docs/source/api/openapi.yaml
+OPENAPI_SRC := ../docs/modules/ROOT/attachments/openapi.yaml
 OPENAPI_EMBED := internal/apidocs/openapi.yaml
 
 cicd: build

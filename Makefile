@@ -10,7 +10,8 @@ generate:
 	$(MAKE) -C protocol
 
 docs:
-	$(MAKE) -C docs
+	$(MAKE) -C docs ci
+	./docs/node_modules/.bin/antora antora-playbook.yml --to-dir build/site
 
 it: integration-tests
 
@@ -19,6 +20,12 @@ integration-tests:
 
 test: service
 	$(MAKE) -wC service test
+	$(MAKE) -wC frontend test
+
+lint: codestyle
+
+codestyle:
+	$(MAKE) -wC service codestyle
 
 go-tools:
 	go install "github.com/bufbuild/buf/cmd/buf"
@@ -33,4 +40,4 @@ certs:
 marketing-screenshots:
 	python3 var/marketing/scripts/take-marketing-screenshots.py
 
-.PHONY: default service frontend generate docs integration-tests test go-tools certs marketing-screenshots
+.PHONY: default service frontend generate docs integration-tests test lint codestyle go-tools certs marketing-screenshots

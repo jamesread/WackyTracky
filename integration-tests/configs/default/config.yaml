@@ -2,3 +2,8 @@
 database:
   driver: todotxt
   database: ./testdata/todotxt
+
+iam:
+  database: ./testdata/iam.sqlite
+
+auth: {}

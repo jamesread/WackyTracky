@@ -57,9 +57,14 @@ class WackyTrackyTestRunner {
     }
 
     console.log('      Starting WackyTracky server...')
+    // Integration tests exercise task UI without a login step; auth is disabled for the suite.
     this.serverProcess = spawn(binaryPath, [], {
       cwd: serviceDir,
-      env: { ...process.env }
+      env: {
+        ...process.env,
+        WACKYTRACKY_DEV_DISABLE_AUTH: 'true',
+        WACKYTRACKY_SECURE_COOKIES: 'false'
+      }
     })
 
     this.serverProcess.stdout?.on('data', (d) => process.env.CI === 'true' && process.stdout.write(d))

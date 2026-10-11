@@ -1,27 +1,30 @@
-name: Build Documentation
+name: Antora
 
 on:
   push:
-    branches:
-      - main
-      - master
+    branches: [main, master]
     paths:
       - 'docs/**'
+      - 'antora-playbook.yml'
       - 'var/marketing/screenshots/**'
       - '.github/workflows/docs.yml'
   pull_request:
-    branches:
-      - main
-      - master
+    branches: [main, master]
     paths:
       - 'docs/**'
+      - 'antora-playbook.yml'
       - 'var/marketing/screenshots/**'
       - '.github/workflows/docs.yml'
   workflow_dispatch:
 
+concurrency:
+  group: github-pages
+  cancel-in-progress: false
+
 permissions:
-  contents: write
+  contents: read
   pages: write
+  id-token: write
 
 jobs:
   build:
@@ -32,11 +35,36 @@ jobs:
 
       - name: Copy marketing screenshots into docs
         run: |
-          mkdir -p docs/source/assets/screenshots
-          cp -n var/marketing/screenshots/*.png docs/source/assets/screenshots/ 2>/dev/null || true
+          mkdir -p docs/modules/ROOT/images/screenshots
+          cp -n var/marketing/screenshots/*.png docs/modules/ROOT/images/screenshots/ 2>/dev/null || true
 
-      - name: Deploy docs
-        uses: mhausenblas/mkdocs-deploy-gh-pages@master
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          CONFIG_FILE: docs/mkdocs.yml
+      - name: Install Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+          cache-dependency-path: docs/package-lock.json
+
+      - name: Install docs dependencies
+        run: make -C docs ci
+
+      - name: Generate site
+        run: make docs
+
+      - name: Upload Artifacts
+        if: github.event_name != 'pull_request'
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: build/site
+
+  deploy:
+    if: github.event_name != 'pull_request' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master')
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

@@ -1,0 +1,705 @@
+= API reference
+
+Service: *WackyTrackyClientService* Package: `wackytracky.clientapi.v1`
+
+Base path for all procedures:
+
+....
+POST /api/wackytracky.clientapi.v1.WackyTrackyClientService/<MethodName>
+....
+
+Request and response bodies are JSON with the field names as in the
+tables below (camelCase in JSON: e.g. `parent++_++list++_++id` →
+`parentListId` for compatibility with Connect/Protobuf JSON mapping).
+
+'''''
+
+== RPCs
+
+=== Version
+
+Returns server version and build info.
+
+[cols=",",options="header",]
+|===
+|Procedure |`Version`
+|*Request* |`VersionRequest` (empty)
+|*Response* |`VersionResponse`
+|===
+
+*VersionResponse*
+
+[cols=",,",options="header",]
+|===
+|Field |Type |Description
+|version |string |Version string
+|commit |string |Git commit
+|date |string |Build date (ISO8601)
+|===
+
+'''''
+
+=== Init
+
+Returns app init data (e.g. wallpaper path).
+
+[cols=",",options="header",]
+|===
+|Procedure |`Init`
+|*Request* |`InitRequest` (empty)
+|*Response* |`InitResponse`
+|===
+
+*InitResponse*
+
+[cols=",,",options="header",]
+|===
+|Field |Type |Description
+|wallpaper |string |Wallpaper path or identifier
+|===
+
+'''''
+
+=== GetLists
+
+Returns all lists.
+
+[cols=",",options="header",]
+|===
+|Procedure |`GetLists`
+|*Request* |`GetListsRequest` (empty)
+|*Response* |`GetListsResponse`
+|===
+
+*GetListsResponse*
+
+[cols=",,",options="header",]
+|===
+|Field |Type |Description
+|lists |List++[]++ |All lists
+|===
+
+'''''
+
+=== ListTasks
+
+Returns tasks for a list or for a parent task (children). Used to load a
+list view or a subtree.
+
+[cols=",",options="header",]
+|===
+|Procedure |`ListTasks`
+|*Request* |`ListTasksRequest`
+|*Response* |`ListTasksResponse`
+|===
+
+*ListTasksRequest*
+
+[width="100%",cols="39%,23%,38%",options="header",]
+|===
+|Field |Type |Description
+|parent++_++id |string |List ID (for root tasks) or task ID (for
+subtasks)
+
+|parent++_++type |string |`"list"` or `"task"`
+|===
+
+*ListTasksResponse*
+
+[width="100%",cols="43%,34%,23%",options="header",]
+|===
+|Field |Type |Description
+|tasks |Task++[]++ |Tasks for the requested parent
+
+|tree |map++<++string, TaskIdList++>++ |Parent ID → ordered child task
+IDs (for hierarchy)
+
+|hidden++_++tag++_++names |string++[]++ |Tags currently hidden by
+hide-at-times rules
+
+|hidden++_++context++_++names |string++[]++ |Contexts currently hidden
+by hide-at-times rules
+|===
+
+*TaskIdList*
+
+[cols=",,",options="header",]
+|===
+|Field |Type |Description
+|ids |string++[]++ |Ordered task IDs
+|===
+
+'''''
+
+=== SearchTasks
+
+Searches tasks across lists. Query syntax is backend-dependent
+(todo.txt: plain terms, `#tag`, `@context`, `-term` to exclude).
+
+[cols=",",options="header",]
+|===
+|Procedure |`SearchTasks`
+|*Request* |`SearchTasksRequest`
+|*Response* |`SearchTasksResponse`
+|===
+
+*SearchTasksRequest*
+
+[width="100%",cols="26%,28%,46%",options="header",]
+|===
+|Field |Type |Description
+|query |string |Search query (freetext; backends may support structured
+syntax)
+|===
+
+*SearchTasksResponse*
+
+[cols=",,",options="header",]
+|===
+|Field |Type |Description
+|tasks |Task++[]++ |Matching tasks
+|===
+
+'''''
+
+=== CreateTask
+
+Creates a new task, optionally in a list or as a subtask.
+
+[cols=",",options="header",]
+|===
+|Procedure |`CreateTask`
+|*Request* |`CreateTaskRequest`
+|*Response* |`CreateTaskResponse`
+|===
+
+*CreateTaskRequest*
+
+[width="100%",cols="45%,21%,34%",options="header",]
+|===
+|Field |Type |Description
+|content |string |Task content (todo.txt line: text, {plus}projects,
+@contexts, #tags)
+
+|parent++_++list++_++id |string |Optional. List ID to add the task to
+
+|parent++_++task++_++id |string |Optional. Task ID to create this as a
+subtask of
+|===
+
+*CreateTaskResponse*
+
+[cols=",,",options="header",]
+|===
+|Field |Type |Description
+|task |Task |Created task
+|===
+
+'''''
+
+=== UpdateTask
+
+Updates a task’s content.
+
+[cols=",",options="header",]
+|===
+|Procedure |`UpdateTask`
+|*Request* |`UpdateTaskRequest`
+|*Response* |`UpdateTaskResponse`
+|===
+
+*UpdateTaskRequest*
+
+[cols=",,",options="header",]
+|===
+|Field |Type |Description
+|id |string |Task ID
+|content |string |New content (full todo.txt-style line)
+|===
+
+*UpdateTaskResponse*
+
+[cols=",,",options="header",]
+|===
+|Field |Type |Description
+|task |Task |Updated task
+|===
+
+'''''
+
+=== DoneTask
+
+Marks a task as done (moves to done.txt in todo.txt backend).
+
+[cols=",",options="header",]
+|===
+|Procedure |`DoneTask`
+|*Request* |`DoneTaskRequest`
+|*Response* |`DoneTaskResponse` (empty)
+|===
+
+*DoneTaskRequest*
+
+[cols=",,",options="header",]
+|===
+|Field |Type |Description
+|id |string |Task ID to mark done
+|===
+
+'''''
+
+=== MoveTask
+
+Moves a task to another list.
+
+[cols=",",options="header",]
+|===
+|Procedure |`MoveTask`
+|*Request* |`MoveTaskRequest`
+|*Response* |`MoveTaskResponse` (empty)
+|===
+
+*MoveTaskRequest*
+
+[cols=",,",options="header",]
+|===
+|Field |Type |Description
+|task++_++id |string |Task ID
+|target++_++list++_++id |string |Destination list ID
+|===
+
+'''''
+
+=== CreateList
+
+Creates a new list.
+
+[cols=",",options="header",]
+|===
+|Procedure |`CreateList`
+|*Request* |`CreateListRequest`
+|*Response* |`CreateListResponse` (empty)
+|===
+
+*CreateListRequest*
+
+[cols=",,",options="header",]
+|===
+|Field |Type |Description
+|title |string |List title
+|===
+
+'''''
+
+=== UpdateList
+
+Updates a list’s title.
+
+[cols=",",options="header",]
+|===
+|Procedure |`UpdateList`
+|*Request* |`UpdateListRequest`
+|*Response* |`UpdateListResponse` (empty)
+|===
+
+*UpdateListRequest*
+
+[cols=",,",options="header",]
+|===
+|Field |Type |Description
+|id |string |List ID
+|title |string |New title
+|===
+
+'''''
+
+=== DeleteList
+
+Deletes a list.
+
+[cols=",",options="header",]
+|===
+|Procedure |`DeleteList`
+|*Request* |`DeleteListRequest`
+|*Response* |`DeleteListResponse` (empty)
+|===
+
+*DeleteListRequest*
+
+[cols=",,",options="header",]
+|===
+|Field |Type |Description
+|id |string |List ID
+|===
+
+'''''
+
+=== GetTags
+
+Returns all tags (for UI/autocomplete). Behavior may vary by backend.
+
+[cols=",",options="header",]
+|===
+|Procedure |`GetTags`
+|*Request* |`GetTagsRequest` (empty)
+|*Response* |`GetTagsResponse`
+|===
+
+*GetTagsResponse*
+
+[cols=",,",options="header",]
+|===
+|Field |Type |Description
+|tags |Tag++[]++ |Tags
+|===
+
+*Tag*
+
+[cols=",,",options="header",]
+|===
+|Field |Type |Description
+|id |string |Tag ID
+|title |string |Tag label
+|===
+
+'''''
+
+=== RepoStatus
+
+Returns `git status` output for the todo.txt data directory (todo.txt
+backend). Useful for power users who version their data with Git.
+
+[cols=",",options="header",]
+|===
+|Procedure |`RepoStatus`
+|*Request* |`RepoStatusRequest` (empty)
+|*Response* |`RepoStatusResponse`
+|===
+
+*RepoStatusResponse*
+
+[width="100%",cols="31%,26%,43%",options="header",]
+|===
+|Field |Type |Description
+|output |string |Git status output, or error message if not a git repo /
+git unavailable
+|===
+
+'''''
+
+=== RepoSync
+
+Runs a conservative `git add`, `git commit`, and `git push` for the
+todo.txt data directory (todo.txt backend). The operation aborts without
+modifying the repository when merge conflicts, an in-progress
+merge/rebase/cherry-pick, detached HEAD, missing upstream, or being
+behind the remote is detected.
+
+[cols=",",options="header",]
+|===
+|Procedure |`RepoSync`
+|*Request* |`RepoSyncRequest`
+|*Response* |`RepoSyncResponse`
+|===
+
+*RepoSyncRequest*
+
+[width="100%",cols="41%,22%,37%",options="header",]
+|===
+|Field |Type |Description
+|server++_++name |string |Optional label included in the git commit
+message (`wt sync: ++<++server name++>++`)
+|===
+
+*RepoSyncResponse*
+
+[width="100%",cols="29%,31%,40%",options="header",]
+|===
+|Field |Type |Description
+|success |bool |Whether the sync completed successfully
+
+|message |string |Summary message or error reason
+
+|steps |string++[]++ |Completed steps (e.g. validated, staged,
+committed, pushed)
+|===
+
+'''''
+
+=== GetSavedSearches
+
+Returns the user’s saved searches (names and queries).
+
+[cols=",",options="header",]
+|===
+|Procedure |`GetSavedSearches`
+|*Request* |`GetSavedSearchesRequest` (empty)
+|*Response* |`GetSavedSearchesResponse`
+|===
+
+*GetSavedSearchesResponse*
+
+[cols=",,",options="header",]
+|===
+|Field |Type |Description
+|saved++_++searches |SavedSearch++[]++ |Saved searches
+|===
+
+*SavedSearch*
+
+[cols=",,",options="header",]
+|===
+|Field |Type |Description
+|id |string |Unique ID
+|name |string |Display name
+|query |string |Search query
+|===
+
+'''''
+
+=== SetSavedSearches
+
+Replaces the user’s saved searches. Persistence is backend-dependent
+(e.g. stored in browser and/or synced to server).
+
+[cols=",",options="header",]
+|===
+|Procedure |`SetSavedSearches`
+|*Request* |`SetSavedSearchesRequest`
+|*Response* |`SetSavedSearchesResponse` (empty)
+|===
+
+*SetSavedSearchesRequest*
+
+[width="100%",cols="36%,32%,32%",options="header",]
+|===
+|Field |Type |Description
+|saved++_++searches |SavedSearch++[]++ |Full list of saved searches to
+store
+|===
+
+'''''
+
+=== GetTaskMetadata
+
+Returns metadata fields for a task (e.g. notes, priority). Optional per
+backend.
+
+[cols=",",options="header",]
+|===
+|Procedure |`GetTaskMetadata`
+|*Request* |`GetTaskMetadataRequest`
+|*Response* |`GetTaskMetadataResponse`
+|===
+
+*GetTaskMetadataRequest*
+
+[cols=",,",options="header",]
+|===
+|Field |Type |Description
+|task++_++id |string |Task ID
+|===
+
+*GetTaskMetadataResponse*
+
+[width="100%",cols="22%,44%,34%",options="header",]
+|===
+|Field |Type |Description
+|fields |map++<++string, string++>++ |Field name → value (e.g. `notes`,
+`priority`, `wait`, `due`)
+|===
+
+'''''
+
+=== SetTaskMetadata
+
+Sets a single metadata field for a task (e.g. notes, priority, wait,
+due).
+
+[cols=",",options="header",]
+|===
+|Procedure |`SetTaskMetadata`
+|*Request* |`SetTaskMetadataRequest`
+|*Response* |`SetTaskMetadataResponse` (empty)
+|===
+
+*SetTaskMetadataRequest*
+
+[width="100%",cols="31%,26%,43%",options="header",]
+|===
+|Field |Type |Description
+|task++_++id |string |Task ID
+|field |string |Field name (e.g. `notes`, `priority`, `wait`, `due`)
+|value |string |Field value
+|===
+
+'''''
+
+=== GetTaskPropertyProperties
+
+Returns Task Property Properties (TPPs): per-tag and per-context
+settings (e.g. CSS, hide-at-times rules).
+
+[cols=",",options="header",]
+|===
+|Procedure |`GetTaskPropertyProperties`
+|*Request* |`GetTaskPropertyPropertiesRequest` (empty)
+|*Response* |`GetTaskPropertyPropertiesResponse`
+|===
+
+*GetTaskPropertyPropertiesResponse*
+
+[width="100%",cols="35%,44%,21%",options="header",]
+|===
+|Field |Type |Description
+|tag++_++properties |map++<++string, TaskPropertyProps++>++ |Tag name →
+props
+
+|context++_++properties |map++<++string, TaskPropertyProps++>++ |Context
+name → props
+|===
+
+*TaskPropertyProps*
+
+[width="100%",cols="22%,44%,34%",options="header",]
+|===
+|Field |Type |Description
+|props |map++<++string, string++>++ |Key → value. Supported keys: `css`,
+`hide-at-times` (expr expression)
+|===
+
+'''''
+
+=== SetTaskPropertyProperty
+
+Sets one TPP key for a tag or context (e.g. `css` or `hide-at-times`).
+
+[cols=",",options="header",]
+|===
+|Procedure |`SetTaskPropertyProperty`
+|*Request* |`SetTaskPropertyPropertyRequest`
+|*Response* |`SetTaskPropertyPropertyResponse` (empty)
+|===
+
+*SetTaskPropertyPropertyRequest*
+
+[cols=",,",options="header",]
+|===
+|Field |Type |Description
+|property++_++type |string |`"tag"` or `"context"`
+|property++_++name |string |Tag or context name
+|key |string |Prop key (e.g. `css`, `hide-at-times`)
+|value |string |Prop value
+|===
+
+'''''
+
+=== RuleStatus
+
+Returns current date/time components for building hide-at-times
+expressions (D = weekday short name, H = hour, M = minute).
+
+[cols=",",options="header",]
+|===
+|Procedure |`RuleStatus`
+|*Request* |`RuleStatusRequest` (empty)
+|*Response* |`RuleStatusResponse`
+|===
+
+*RuleStatusResponse*
+
+[cols=",,",options="header",]
+|===
+|Field |Type |Description
+|D |string |Short day: Mon, Tue, …, Sun
+|H |int32 |Hour 0–23
+|M |int32 |Minute 0–59
+|===
+
+'''''
+
+=== RuleTest
+
+Compiles and evaluates a hide-at-times expression. Use to validate or
+preview rules (e.g. “hide @work on weekends”).
+
+[cols=",",options="header",]
+|===
+|Procedure |`RuleTest`
+|*Request* |`RuleTestRequest`
+|*Response* |`RuleTestResponse`
+|===
+
+*RuleTestRequest*
+
+[cols=",,",options="header",]
+|===
+|Field |Type |Description
+|expression |string |Expr expression (can use D, H, M)
+|===
+
+*RuleTestResponse*
+
+[cols=",,",options="header",]
+|===
+|Field |Type |Description
+|compiles |bool |Whether the expression compiled
+|compile++_++error |string |Set when compiles is false
+|result |bool |Eval result when compiles is true
+|eval++_++error |string |Set when compile ok but eval failed
+|===
+
+'''''
+
+=== Tag
+
+Reserved RPC (Tag). Behavior is implementation-specific; may be used for
+tag-related actions.
+
+[cols=",",options="header",]
+|===
+|Procedure |`Tag`
+|*Request* |`TagRequest` (empty)
+|*Response* |`TagResponse` (empty)
+|===
+
+'''''
+
+== Shared message types
+
+=== List
+
+[cols=",,",options="header",]
+|===
+|Field |Type |Description
+|id |string |List ID
+|title |string |List title
+|count++_++items |int32 |Item count
+|===
+
+=== Task
+
+[width="100%",cols="43%,25%,32%",options="header",]
+|===
+|Field |Type |Description
+|id |string |Task ID
+
+|content |string |Full content (todo.txt-style line)
+
+|parent++_++id |string |Parent list or task ID
+
+|parent++_++type |string |`"list"` or `"task"`
+
+|count++_++subitems |int32 |Number of direct children
+
+|tags |string++[]++ |Parsed #tags
+
+|contexts |string++[]++ |Parsed @contexts
+
+|wait++_++until |string |Optional ISO date-time; task hidden until this
+time
+
+|priority |string |Optional single letter A–Z
+
+|due++_++date |string |Optional ISO date YYYY-MM-DD
+|===

@@ -1,4 +1,4 @@
-OPENAPI := ../docs/source/api/openapi.yaml
+OPENAPI := ../docs/modules/ROOT/attachments/openapi.yaml
 
 OPENAPI_EMBED := ../service/internal/apidocs/openapi.yaml
 

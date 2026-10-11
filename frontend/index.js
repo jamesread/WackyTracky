@@ -1,5 +1,5 @@
 import './buildid.js'
-import 'femtocrank/style.css';
+import 'picocrank/styles.css';
 import './style.css';
 
 import { purgeLegacyServiceWorkerCaches } from './js/modules/serviceWorkerMigration.js'

@@ -39,6 +39,96 @@ const (
 	// WackyTrackyClientServiceInitProcedure is the fully-qualified name of the
 	// WackyTrackyClientService's Init RPC.
 	WackyTrackyClientServiceInitProcedure = "/wackytracky.clientapi.v1.WackyTrackyClientService/Init"
+	// WackyTrackyClientServiceGetStatusProcedure is the fully-qualified name of the
+	// WackyTrackyClientService's GetStatus RPC.
+	WackyTrackyClientServiceGetStatusProcedure = "/wackytracky.clientapi.v1.WackyTrackyClientService/GetStatus"
+	// WackyTrackyClientServiceLoginWithUsernameAndPasswordProcedure is the fully-qualified name of the
+	// WackyTrackyClientService's LoginWithUsernameAndPassword RPC.
+	WackyTrackyClientServiceLoginWithUsernameAndPasswordProcedure = "/wackytracky.clientapi.v1.WackyTrackyClientService/LoginWithUsernameAndPassword"
+	// WackyTrackyClientServiceLogoutProcedure is the fully-qualified name of the
+	// WackyTrackyClientService's Logout RPC.
+	WackyTrackyClientServiceLogoutProcedure = "/wackytracky.clientapi.v1.WackyTrackyClientService/Logout"
+	// WackyTrackyClientServiceChangePasswordProcedure is the fully-qualified name of the
+	// WackyTrackyClientService's ChangePassword RPC.
+	WackyTrackyClientServiceChangePasswordProcedure = "/wackytracky.clientapi.v1.WackyTrackyClientService/ChangePassword"
+	// WackyTrackyClientServiceGetUsersProcedure is the fully-qualified name of the
+	// WackyTrackyClientService's GetUsers RPC.
+	WackyTrackyClientServiceGetUsersProcedure = "/wackytracky.clientapi.v1.WackyTrackyClientService/GetUsers"
+	// WackyTrackyClientServiceGetUserProcedure is the fully-qualified name of the
+	// WackyTrackyClientService's GetUser RPC.
+	WackyTrackyClientServiceGetUserProcedure = "/wackytracky.clientapi.v1.WackyTrackyClientService/GetUser"
+	// WackyTrackyClientServiceCreateUserProcedure is the fully-qualified name of the
+	// WackyTrackyClientService's CreateUser RPC.
+	WackyTrackyClientServiceCreateUserProcedure = "/wackytracky.clientapi.v1.WackyTrackyClientService/CreateUser"
+	// WackyTrackyClientServiceDeleteUserProcedure is the fully-qualified name of the
+	// WackyTrackyClientService's DeleteUser RPC.
+	WackyTrackyClientServiceDeleteUserProcedure = "/wackytracky.clientapi.v1.WackyTrackyClientService/DeleteUser"
+	// WackyTrackyClientServiceResetUserPasswordProcedure is the fully-qualified name of the
+	// WackyTrackyClientService's ResetUserPassword RPC.
+	WackyTrackyClientServiceResetUserPasswordProcedure = "/wackytracky.clientapi.v1.WackyTrackyClientService/ResetUserPassword"
+	// WackyTrackyClientServiceListRbacPermissionsProcedure is the fully-qualified name of the
+	// WackyTrackyClientService's ListRbacPermissions RPC.
+	WackyTrackyClientServiceListRbacPermissionsProcedure = "/wackytracky.clientapi.v1.WackyTrackyClientService/ListRbacPermissions"
+	// WackyTrackyClientServiceListRbacRolesProcedure is the fully-qualified name of the
+	// WackyTrackyClientService's ListRbacRoles RPC.
+	WackyTrackyClientServiceListRbacRolesProcedure = "/wackytracky.clientapi.v1.WackyTrackyClientService/ListRbacRoles"
+	// WackyTrackyClientServiceCreateRbacRoleProcedure is the fully-qualified name of the
+	// WackyTrackyClientService's CreateRbacRole RPC.
+	WackyTrackyClientServiceCreateRbacRoleProcedure = "/wackytracky.clientapi.v1.WackyTrackyClientService/CreateRbacRole"
+	// WackyTrackyClientServiceUpdateRbacRoleProcedure is the fully-qualified name of the
+	// WackyTrackyClientService's UpdateRbacRole RPC.
+	WackyTrackyClientServiceUpdateRbacRoleProcedure = "/wackytracky.clientapi.v1.WackyTrackyClientService/UpdateRbacRole"
+	// WackyTrackyClientServiceDeleteRbacRoleProcedure is the fully-qualified name of the
+	// WackyTrackyClientService's DeleteRbacRole RPC.
+	WackyTrackyClientServiceDeleteRbacRoleProcedure = "/wackytracky.clientapi.v1.WackyTrackyClientService/DeleteRbacRole"
+	// WackyTrackyClientServiceGetUserRbacRolesProcedure is the fully-qualified name of the
+	// WackyTrackyClientService's GetUserRbacRoles RPC.
+	WackyTrackyClientServiceGetUserRbacRolesProcedure = "/wackytracky.clientapi.v1.WackyTrackyClientService/GetUserRbacRoles"
+	// WackyTrackyClientServiceGetUserGroupRbacRolesProcedure is the fully-qualified name of the
+	// WackyTrackyClientService's GetUserGroupRbacRoles RPC.
+	WackyTrackyClientServiceGetUserGroupRbacRolesProcedure = "/wackytracky.clientapi.v1.WackyTrackyClientService/GetUserGroupRbacRoles"
+	// WackyTrackyClientServiceSetUserGroupRbacRolesProcedure is the fully-qualified name of the
+	// WackyTrackyClientService's SetUserGroupRbacRoles RPC.
+	WackyTrackyClientServiceSetUserGroupRbacRolesProcedure = "/wackytracky.clientapi.v1.WackyTrackyClientService/SetUserGroupRbacRoles"
+	// WackyTrackyClientServiceGetRbacRoleUsersProcedure is the fully-qualified name of the
+	// WackyTrackyClientService's GetRbacRoleUsers RPC.
+	WackyTrackyClientServiceGetRbacRoleUsersProcedure = "/wackytracky.clientapi.v1.WackyTrackyClientService/GetRbacRoleUsers"
+	// WackyTrackyClientServiceGetRbacRoleGroupsProcedure is the fully-qualified name of the
+	// WackyTrackyClientService's GetRbacRoleGroups RPC.
+	WackyTrackyClientServiceGetRbacRoleGroupsProcedure = "/wackytracky.clientapi.v1.WackyTrackyClientService/GetRbacRoleGroups"
+	// WackyTrackyClientServiceGetMyPermissionsAuditProcedure is the fully-qualified name of the
+	// WackyTrackyClientService's GetMyPermissionsAudit RPC.
+	WackyTrackyClientServiceGetMyPermissionsAuditProcedure = "/wackytracky.clientapi.v1.WackyTrackyClientService/GetMyPermissionsAudit"
+	// WackyTrackyClientServiceListUserGroupsProcedure is the fully-qualified name of the
+	// WackyTrackyClientService's ListUserGroups RPC.
+	WackyTrackyClientServiceListUserGroupsProcedure = "/wackytracky.clientapi.v1.WackyTrackyClientService/ListUserGroups"
+	// WackyTrackyClientServiceCreateUserGroupProcedure is the fully-qualified name of the
+	// WackyTrackyClientService's CreateUserGroup RPC.
+	WackyTrackyClientServiceCreateUserGroupProcedure = "/wackytracky.clientapi.v1.WackyTrackyClientService/CreateUserGroup"
+	// WackyTrackyClientServiceDeleteUserGroupProcedure is the fully-qualified name of the
+	// WackyTrackyClientService's DeleteUserGroup RPC.
+	WackyTrackyClientServiceDeleteUserGroupProcedure = "/wackytracky.clientapi.v1.WackyTrackyClientService/DeleteUserGroup"
+	// WackyTrackyClientServiceGetUserGroupMembersProcedure is the fully-qualified name of the
+	// WackyTrackyClientService's GetUserGroupMembers RPC.
+	WackyTrackyClientServiceGetUserGroupMembersProcedure = "/wackytracky.clientapi.v1.WackyTrackyClientService/GetUserGroupMembers"
+	// WackyTrackyClientServiceSetUserGroupMembersProcedure is the fully-qualified name of the
+	// WackyTrackyClientService's SetUserGroupMembers RPC.
+	WackyTrackyClientServiceSetUserGroupMembersProcedure = "/wackytracky.clientapi.v1.WackyTrackyClientService/SetUserGroupMembers"
+	// WackyTrackyClientServiceImpersonateUserProcedure is the fully-qualified name of the
+	// WackyTrackyClientService's ImpersonateUser RPC.
+	WackyTrackyClientServiceImpersonateUserProcedure = "/wackytracky.clientapi.v1.WackyTrackyClientService/ImpersonateUser"
+	// WackyTrackyClientServiceStopImpersonationProcedure is the fully-qualified name of the
+	// WackyTrackyClientService's StopImpersonation RPC.
+	WackyTrackyClientServiceStopImpersonationProcedure = "/wackytracky.clientapi.v1.WackyTrackyClientService/StopImpersonation"
+	// WackyTrackyClientServiceListApiKeysProcedure is the fully-qualified name of the
+	// WackyTrackyClientService's ListApiKeys RPC.
+	WackyTrackyClientServiceListApiKeysProcedure = "/wackytracky.clientapi.v1.WackyTrackyClientService/ListApiKeys"
+	// WackyTrackyClientServiceCreateApiKeyProcedure is the fully-qualified name of the
+	// WackyTrackyClientService's CreateApiKey RPC.
+	WackyTrackyClientServiceCreateApiKeyProcedure = "/wackytracky.clientapi.v1.WackyTrackyClientService/CreateApiKey"
+	// WackyTrackyClientServiceDeleteApiKeyProcedure is the fully-qualified name of the
+	// WackyTrackyClientService's DeleteApiKey RPC.
+	WackyTrackyClientServiceDeleteApiKeyProcedure = "/wackytracky.clientapi.v1.WackyTrackyClientService/DeleteApiKey"
 	// WackyTrackyClientServiceGetListsProcedure is the fully-qualified name of the
 	// WackyTrackyClientService's GetLists RPC.
 	WackyTrackyClientServiceGetListsProcedure = "/wackytracky.clientapi.v1.WackyTrackyClientService/GetLists"
@@ -112,6 +202,36 @@ const (
 type WackyTrackyClientServiceClient interface {
 	Version(context.Context, *connect.Request[v1.VersionRequest]) (*connect.Response[v1.VersionResponse], error)
 	Init(context.Context, *connect.Request[v1.InitRequest]) (*connect.Response[v1.InitResponse], error)
+	GetStatus(context.Context, *connect.Request[v1.GetStatusRequest]) (*connect.Response[v1.GetStatusResponse], error)
+	LoginWithUsernameAndPassword(context.Context, *connect.Request[v1.LoginWithUsernameAndPasswordRequest]) (*connect.Response[v1.LoginWithUsernameAndPasswordResponse], error)
+	Logout(context.Context, *connect.Request[v1.LogoutRequest]) (*connect.Response[v1.LogoutResponse], error)
+	ChangePassword(context.Context, *connect.Request[v1.ChangePasswordRequest]) (*connect.Response[v1.ChangePasswordResponse], error)
+	GetUsers(context.Context, *connect.Request[v1.GetUsersRequest]) (*connect.Response[v1.GetUsersResponse], error)
+	GetUser(context.Context, *connect.Request[v1.GetUserRequest]) (*connect.Response[v1.GetUserResponse], error)
+	CreateUser(context.Context, *connect.Request[v1.CreateUserRequest]) (*connect.Response[v1.CreateUserResponse], error)
+	DeleteUser(context.Context, *connect.Request[v1.DeleteUserRequest]) (*connect.Response[v1.DeleteUserResponse], error)
+	ResetUserPassword(context.Context, *connect.Request[v1.ResetUserPasswordRequest]) (*connect.Response[v1.ResetUserPasswordResponse], error)
+	ListRbacPermissions(context.Context, *connect.Request[v1.ListRbacPermissionsRequest]) (*connect.Response[v1.ListRbacPermissionsResponse], error)
+	ListRbacRoles(context.Context, *connect.Request[v1.ListRbacRolesRequest]) (*connect.Response[v1.ListRbacRolesResponse], error)
+	CreateRbacRole(context.Context, *connect.Request[v1.CreateRbacRoleRequest]) (*connect.Response[v1.CreateRbacRoleResponse], error)
+	UpdateRbacRole(context.Context, *connect.Request[v1.UpdateRbacRoleRequest]) (*connect.Response[v1.RbacRole], error)
+	DeleteRbacRole(context.Context, *connect.Request[v1.DeleteRbacRoleRequest]) (*connect.Response[v1.DeleteRbacRoleResponse], error)
+	GetUserRbacRoles(context.Context, *connect.Request[v1.GetUserRbacRolesRequest]) (*connect.Response[v1.GetUserRbacRolesResponse], error)
+	GetUserGroupRbacRoles(context.Context, *connect.Request[v1.GetUserGroupRbacRolesRequest]) (*connect.Response[v1.GetUserGroupRbacRolesResponse], error)
+	SetUserGroupRbacRoles(context.Context, *connect.Request[v1.SetUserGroupRbacRolesRequest]) (*connect.Response[v1.SetUserGroupRbacRolesResponse], error)
+	GetRbacRoleUsers(context.Context, *connect.Request[v1.GetRbacRoleUsersRequest]) (*connect.Response[v1.GetRbacRoleUsersResponse], error)
+	GetRbacRoleGroups(context.Context, *connect.Request[v1.GetRbacRoleGroupsRequest]) (*connect.Response[v1.GetRbacRoleGroupsResponse], error)
+	GetMyPermissionsAudit(context.Context, *connect.Request[v1.GetMyPermissionsAuditRequest]) (*connect.Response[v1.GetMyPermissionsAuditResponse], error)
+	ListUserGroups(context.Context, *connect.Request[v1.ListUserGroupsRequest]) (*connect.Response[v1.ListUserGroupsResponse], error)
+	CreateUserGroup(context.Context, *connect.Request[v1.CreateUserGroupRequest]) (*connect.Response[v1.CreateUserGroupResponse], error)
+	DeleteUserGroup(context.Context, *connect.Request[v1.DeleteUserGroupRequest]) (*connect.Response[v1.DeleteUserGroupResponse], error)
+	GetUserGroupMembers(context.Context, *connect.Request[v1.GetUserGroupMembersRequest]) (*connect.Response[v1.GetUserGroupMembersResponse], error)
+	SetUserGroupMembers(context.Context, *connect.Request[v1.SetUserGroupMembersRequest]) (*connect.Response[v1.SetUserGroupMembersResponse], error)
+	ImpersonateUser(context.Context, *connect.Request[v1.ImpersonateUserRequest]) (*connect.Response[v1.ImpersonateUserResponse], error)
+	StopImpersonation(context.Context, *connect.Request[v1.StopImpersonationRequest]) (*connect.Response[v1.StopImpersonationResponse], error)
+	ListApiKeys(context.Context, *connect.Request[v1.ListApiKeysRequest]) (*connect.Response[v1.ListApiKeysResponse], error)
+	CreateApiKey(context.Context, *connect.Request[v1.CreateApiKeyRequest]) (*connect.Response[v1.CreateApiKeyResponse], error)
+	DeleteApiKey(context.Context, *connect.Request[v1.DeleteApiKeyRequest]) (*connect.Response[v1.DeleteApiKeyResponse], error)
 	GetLists(context.Context, *connect.Request[v1.GetListsRequest]) (*connect.Response[v1.GetListsResponse], error)
 	ListTasks(context.Context, *connect.Request[v1.ListTasksRequest]) (*connect.Response[v1.ListTasksResponse], error)
 	SearchTasks(context.Context, *connect.Request[v1.SearchTasksRequest]) (*connect.Response[v1.SearchTasksResponse], error)
@@ -158,6 +278,186 @@ func NewWackyTrackyClientServiceClient(httpClient connect.HTTPClient, baseURL st
 			httpClient,
 			baseURL+WackyTrackyClientServiceInitProcedure,
 			connect.WithSchema(wackyTrackyClientServiceMethods.ByName("Init")),
+			connect.WithClientOptions(opts...),
+		),
+		getStatus: connect.NewClient[v1.GetStatusRequest, v1.GetStatusResponse](
+			httpClient,
+			baseURL+WackyTrackyClientServiceGetStatusProcedure,
+			connect.WithSchema(wackyTrackyClientServiceMethods.ByName("GetStatus")),
+			connect.WithClientOptions(opts...),
+		),
+		loginWithUsernameAndPassword: connect.NewClient[v1.LoginWithUsernameAndPasswordRequest, v1.LoginWithUsernameAndPasswordResponse](
+			httpClient,
+			baseURL+WackyTrackyClientServiceLoginWithUsernameAndPasswordProcedure,
+			connect.WithSchema(wackyTrackyClientServiceMethods.ByName("LoginWithUsernameAndPassword")),
+			connect.WithClientOptions(opts...),
+		),
+		logout: connect.NewClient[v1.LogoutRequest, v1.LogoutResponse](
+			httpClient,
+			baseURL+WackyTrackyClientServiceLogoutProcedure,
+			connect.WithSchema(wackyTrackyClientServiceMethods.ByName("Logout")),
+			connect.WithClientOptions(opts...),
+		),
+		changePassword: connect.NewClient[v1.ChangePasswordRequest, v1.ChangePasswordResponse](
+			httpClient,
+			baseURL+WackyTrackyClientServiceChangePasswordProcedure,
+			connect.WithSchema(wackyTrackyClientServiceMethods.ByName("ChangePassword")),
+			connect.WithClientOptions(opts...),
+		),
+		getUsers: connect.NewClient[v1.GetUsersRequest, v1.GetUsersResponse](
+			httpClient,
+			baseURL+WackyTrackyClientServiceGetUsersProcedure,
+			connect.WithSchema(wackyTrackyClientServiceMethods.ByName("GetUsers")),
+			connect.WithClientOptions(opts...),
+		),
+		getUser: connect.NewClient[v1.GetUserRequest, v1.GetUserResponse](
+			httpClient,
+			baseURL+WackyTrackyClientServiceGetUserProcedure,
+			connect.WithSchema(wackyTrackyClientServiceMethods.ByName("GetUser")),
+			connect.WithClientOptions(opts...),
+		),
+		createUser: connect.NewClient[v1.CreateUserRequest, v1.CreateUserResponse](
+			httpClient,
+			baseURL+WackyTrackyClientServiceCreateUserProcedure,
+			connect.WithSchema(wackyTrackyClientServiceMethods.ByName("CreateUser")),
+			connect.WithClientOptions(opts...),
+		),
+		deleteUser: connect.NewClient[v1.DeleteUserRequest, v1.DeleteUserResponse](
+			httpClient,
+			baseURL+WackyTrackyClientServiceDeleteUserProcedure,
+			connect.WithSchema(wackyTrackyClientServiceMethods.ByName("DeleteUser")),
+			connect.WithClientOptions(opts...),
+		),
+		resetUserPassword: connect.NewClient[v1.ResetUserPasswordRequest, v1.ResetUserPasswordResponse](
+			httpClient,
+			baseURL+WackyTrackyClientServiceResetUserPasswordProcedure,
+			connect.WithSchema(wackyTrackyClientServiceMethods.ByName("ResetUserPassword")),
+			connect.WithClientOptions(opts...),
+		),
+		listRbacPermissions: connect.NewClient[v1.ListRbacPermissionsRequest, v1.ListRbacPermissionsResponse](
+			httpClient,
+			baseURL+WackyTrackyClientServiceListRbacPermissionsProcedure,
+			connect.WithSchema(wackyTrackyClientServiceMethods.ByName("ListRbacPermissions")),
+			connect.WithClientOptions(opts...),
+		),
+		listRbacRoles: connect.NewClient[v1.ListRbacRolesRequest, v1.ListRbacRolesResponse](
+			httpClient,
+			baseURL+WackyTrackyClientServiceListRbacRolesProcedure,
+			connect.WithSchema(wackyTrackyClientServiceMethods.ByName("ListRbacRoles")),
+			connect.WithClientOptions(opts...),
+		),
+		createRbacRole: connect.NewClient[v1.CreateRbacRoleRequest, v1.CreateRbacRoleResponse](
+			httpClient,
+			baseURL+WackyTrackyClientServiceCreateRbacRoleProcedure,
+			connect.WithSchema(wackyTrackyClientServiceMethods.ByName("CreateRbacRole")),
+			connect.WithClientOptions(opts...),
+		),
+		updateRbacRole: connect.NewClient[v1.UpdateRbacRoleRequest, v1.RbacRole](
+			httpClient,
+			baseURL+WackyTrackyClientServiceUpdateRbacRoleProcedure,
+			connect.WithSchema(wackyTrackyClientServiceMethods.ByName("UpdateRbacRole")),
+			connect.WithClientOptions(opts...),
+		),
+		deleteRbacRole: connect.NewClient[v1.DeleteRbacRoleRequest, v1.DeleteRbacRoleResponse](
+			httpClient,
+			baseURL+WackyTrackyClientServiceDeleteRbacRoleProcedure,
+			connect.WithSchema(wackyTrackyClientServiceMethods.ByName("DeleteRbacRole")),
+			connect.WithClientOptions(opts...),
+		),
+		getUserRbacRoles: connect.NewClient[v1.GetUserRbacRolesRequest, v1.GetUserRbacRolesResponse](
+			httpClient,
+			baseURL+WackyTrackyClientServiceGetUserRbacRolesProcedure,
+			connect.WithSchema(wackyTrackyClientServiceMethods.ByName("GetUserRbacRoles")),
+			connect.WithClientOptions(opts...),
+		),
+		getUserGroupRbacRoles: connect.NewClient[v1.GetUserGroupRbacRolesRequest, v1.GetUserGroupRbacRolesResponse](
+			httpClient,
+			baseURL+WackyTrackyClientServiceGetUserGroupRbacRolesProcedure,
+			connect.WithSchema(wackyTrackyClientServiceMethods.ByName("GetUserGroupRbacRoles")),
+			connect.WithClientOptions(opts...),
+		),
+		setUserGroupRbacRoles: connect.NewClient[v1.SetUserGroupRbacRolesRequest, v1.SetUserGroupRbacRolesResponse](
+			httpClient,
+			baseURL+WackyTrackyClientServiceSetUserGroupRbacRolesProcedure,
+			connect.WithSchema(wackyTrackyClientServiceMethods.ByName("SetUserGroupRbacRoles")),
+			connect.WithClientOptions(opts...),
+		),
+		getRbacRoleUsers: connect.NewClient[v1.GetRbacRoleUsersRequest, v1.GetRbacRoleUsersResponse](
+			httpClient,
+			baseURL+WackyTrackyClientServiceGetRbacRoleUsersProcedure,
+			connect.WithSchema(wackyTrackyClientServiceMethods.ByName("GetRbacRoleUsers")),
+			connect.WithClientOptions(opts...),
+		),
+		getRbacRoleGroups: connect.NewClient[v1.GetRbacRoleGroupsRequest, v1.GetRbacRoleGroupsResponse](
+			httpClient,
+			baseURL+WackyTrackyClientServiceGetRbacRoleGroupsProcedure,
+			connect.WithSchema(wackyTrackyClientServiceMethods.ByName("GetRbacRoleGroups")),
+			connect.WithClientOptions(opts...),
+		),
+		getMyPermissionsAudit: connect.NewClient[v1.GetMyPermissionsAuditRequest, v1.GetMyPermissionsAuditResponse](
+			httpClient,
+			baseURL+WackyTrackyClientServiceGetMyPermissionsAuditProcedure,
+			connect.WithSchema(wackyTrackyClientServiceMethods.ByName("GetMyPermissionsAudit")),
+			connect.WithClientOptions(opts...),
+		),
+		listUserGroups: connect.NewClient[v1.ListUserGroupsRequest, v1.ListUserGroupsResponse](
+			httpClient,
+			baseURL+WackyTrackyClientServiceListUserGroupsProcedure,
+			connect.WithSchema(wackyTrackyClientServiceMethods.ByName("ListUserGroups")),
+			connect.WithClientOptions(opts...),
+		),
+		createUserGroup: connect.NewClient[v1.CreateUserGroupRequest, v1.CreateUserGroupResponse](
+			httpClient,
+			baseURL+WackyTrackyClientServiceCreateUserGroupProcedure,
+			connect.WithSchema(wackyTrackyClientServiceMethods.ByName("CreateUserGroup")),
+			connect.WithClientOptions(opts...),
+		),
+		deleteUserGroup: connect.NewClient[v1.DeleteUserGroupRequest, v1.DeleteUserGroupResponse](
+			httpClient,
+			baseURL+WackyTrackyClientServiceDeleteUserGroupProcedure,
+			connect.WithSchema(wackyTrackyClientServiceMethods.ByName("DeleteUserGroup")),
+			connect.WithClientOptions(opts...),
+		),
+		getUserGroupMembers: connect.NewClient[v1.GetUserGroupMembersRequest, v1.GetUserGroupMembersResponse](
+			httpClient,
+			baseURL+WackyTrackyClientServiceGetUserGroupMembersProcedure,
+			connect.WithSchema(wackyTrackyClientServiceMethods.ByName("GetUserGroupMembers")),
+			connect.WithClientOptions(opts...),
+		),
+		setUserGroupMembers: connect.NewClient[v1.SetUserGroupMembersRequest, v1.SetUserGroupMembersResponse](
+			httpClient,
+			baseURL+WackyTrackyClientServiceSetUserGroupMembersProcedure,
+			connect.WithSchema(wackyTrackyClientServiceMethods.ByName("SetUserGroupMembers")),
+			connect.WithClientOptions(opts...),
+		),
+		impersonateUser: connect.NewClient[v1.ImpersonateUserRequest, v1.ImpersonateUserResponse](
+			httpClient,
+			baseURL+WackyTrackyClientServiceImpersonateUserProcedure,
+			connect.WithSchema(wackyTrackyClientServiceMethods.ByName("ImpersonateUser")),
+			connect.WithClientOptions(opts...),
+		),
+		stopImpersonation: connect.NewClient[v1.StopImpersonationRequest, v1.StopImpersonationResponse](
+			httpClient,
+			baseURL+WackyTrackyClientServiceStopImpersonationProcedure,
+			connect.WithSchema(wackyTrackyClientServiceMethods.ByName("StopImpersonation")),
+			connect.WithClientOptions(opts...),
+		),
+		listApiKeys: connect.NewClient[v1.ListApiKeysRequest, v1.ListApiKeysResponse](
+			httpClient,
+			baseURL+WackyTrackyClientServiceListApiKeysProcedure,
+			connect.WithSchema(wackyTrackyClientServiceMethods.ByName("ListApiKeys")),
+			connect.WithClientOptions(opts...),
+		),
+		createApiKey: connect.NewClient[v1.CreateApiKeyRequest, v1.CreateApiKeyResponse](
+			httpClient,
+			baseURL+WackyTrackyClientServiceCreateApiKeyProcedure,
+			connect.WithSchema(wackyTrackyClientServiceMethods.ByName("CreateApiKey")),
+			connect.WithClientOptions(opts...),
+		),
+		deleteApiKey: connect.NewClient[v1.DeleteApiKeyRequest, v1.DeleteApiKeyResponse](
+			httpClient,
+			baseURL+WackyTrackyClientServiceDeleteApiKeyProcedure,
+			connect.WithSchema(wackyTrackyClientServiceMethods.ByName("DeleteApiKey")),
 			connect.WithClientOptions(opts...),
 		),
 		getLists: connect.NewClient[v1.GetListsRequest, v1.GetListsResponse](
@@ -297,30 +597,60 @@ func NewWackyTrackyClientServiceClient(httpClient connect.HTTPClient, baseURL st
 
 // wackyTrackyClientServiceClient implements WackyTrackyClientServiceClient.
 type wackyTrackyClientServiceClient struct {
-	version                   *connect.Client[v1.VersionRequest, v1.VersionResponse]
-	init                      *connect.Client[v1.InitRequest, v1.InitResponse]
-	getLists                  *connect.Client[v1.GetListsRequest, v1.GetListsResponse]
-	listTasks                 *connect.Client[v1.ListTasksRequest, v1.ListTasksResponse]
-	searchTasks               *connect.Client[v1.SearchTasksRequest, v1.SearchTasksResponse]
-	createTask                *connect.Client[v1.CreateTaskRequest, v1.CreateTaskResponse]
-	updateTask                *connect.Client[v1.UpdateTaskRequest, v1.UpdateTaskResponse]
-	doneTask                  *connect.Client[v1.DoneTaskRequest, v1.DoneTaskResponse]
-	moveTask                  *connect.Client[v1.MoveTaskRequest, v1.MoveTaskResponse]
-	createList                *connect.Client[v1.CreateListRequest, v1.CreateListResponse]
-	tag                       *connect.Client[v1.TagRequest, v1.TagResponse]
-	updateList                *connect.Client[v1.UpdateListRequest, v1.UpdateListResponse]
-	deleteList                *connect.Client[v1.DeleteListRequest, v1.DeleteListResponse]
-	getTags                   *connect.Client[v1.GetTagsRequest, v1.GetTagsResponse]
-	repoStatus                *connect.Client[v1.RepoStatusRequest, v1.RepoStatusResponse]
-	repoSync                  *connect.Client[v1.RepoSyncRequest, v1.RepoSyncResponse]
-	getSavedSearches          *connect.Client[v1.GetSavedSearchesRequest, v1.GetSavedSearchesResponse]
-	setSavedSearches          *connect.Client[v1.SetSavedSearchesRequest, v1.SetSavedSearchesResponse]
-	getTaskMetadata           *connect.Client[v1.GetTaskMetadataRequest, v1.GetTaskMetadataResponse]
-	setTaskMetadata           *connect.Client[v1.SetTaskMetadataRequest, v1.SetTaskMetadataResponse]
-	getTaskPropertyProperties *connect.Client[v1.GetTaskPropertyPropertiesRequest, v1.GetTaskPropertyPropertiesResponse]
-	setTaskPropertyProperty   *connect.Client[v1.SetTaskPropertyPropertyRequest, v1.SetTaskPropertyPropertyResponse]
-	ruleStatus                *connect.Client[v1.RuleStatusRequest, v1.RuleStatusResponse]
-	ruleTest                  *connect.Client[v1.RuleTestRequest, v1.RuleTestResponse]
+	version                      *connect.Client[v1.VersionRequest, v1.VersionResponse]
+	init                         *connect.Client[v1.InitRequest, v1.InitResponse]
+	getStatus                    *connect.Client[v1.GetStatusRequest, v1.GetStatusResponse]
+	loginWithUsernameAndPassword *connect.Client[v1.LoginWithUsernameAndPasswordRequest, v1.LoginWithUsernameAndPasswordResponse]
+	logout                       *connect.Client[v1.LogoutRequest, v1.LogoutResponse]
+	changePassword               *connect.Client[v1.ChangePasswordRequest, v1.ChangePasswordResponse]
+	getUsers                     *connect.Client[v1.GetUsersRequest, v1.GetUsersResponse]
+	getUser                      *connect.Client[v1.GetUserRequest, v1.GetUserResponse]
+	createUser                   *connect.Client[v1.CreateUserRequest, v1.CreateUserResponse]
+	deleteUser                   *connect.Client[v1.DeleteUserRequest, v1.DeleteUserResponse]
+	resetUserPassword            *connect.Client[v1.ResetUserPasswordRequest, v1.ResetUserPasswordResponse]
+	listRbacPermissions          *connect.Client[v1.ListRbacPermissionsRequest, v1.ListRbacPermissionsResponse]
+	listRbacRoles                *connect.Client[v1.ListRbacRolesRequest, v1.ListRbacRolesResponse]
+	createRbacRole               *connect.Client[v1.CreateRbacRoleRequest, v1.CreateRbacRoleResponse]
+	updateRbacRole               *connect.Client[v1.UpdateRbacRoleRequest, v1.RbacRole]
+	deleteRbacRole               *connect.Client[v1.DeleteRbacRoleRequest, v1.DeleteRbacRoleResponse]
+	getUserRbacRoles             *connect.Client[v1.GetUserRbacRolesRequest, v1.GetUserRbacRolesResponse]
+	getUserGroupRbacRoles        *connect.Client[v1.GetUserGroupRbacRolesRequest, v1.GetUserGroupRbacRolesResponse]
+	setUserGroupRbacRoles        *connect.Client[v1.SetUserGroupRbacRolesRequest, v1.SetUserGroupRbacRolesResponse]
+	getRbacRoleUsers             *connect.Client[v1.GetRbacRoleUsersRequest, v1.GetRbacRoleUsersResponse]
+	getRbacRoleGroups            *connect.Client[v1.GetRbacRoleGroupsRequest, v1.GetRbacRoleGroupsResponse]
+	getMyPermissionsAudit        *connect.Client[v1.GetMyPermissionsAuditRequest, v1.GetMyPermissionsAuditResponse]
+	listUserGroups               *connect.Client[v1.ListUserGroupsRequest, v1.ListUserGroupsResponse]
+	createUserGroup              *connect.Client[v1.CreateUserGroupRequest, v1.CreateUserGroupResponse]
+	deleteUserGroup              *connect.Client[v1.DeleteUserGroupRequest, v1.DeleteUserGroupResponse]
+	getUserGroupMembers          *connect.Client[v1.GetUserGroupMembersRequest, v1.GetUserGroupMembersResponse]
+	setUserGroupMembers          *connect.Client[v1.SetUserGroupMembersRequest, v1.SetUserGroupMembersResponse]
+	impersonateUser              *connect.Client[v1.ImpersonateUserRequest, v1.ImpersonateUserResponse]
+	stopImpersonation            *connect.Client[v1.StopImpersonationRequest, v1.StopImpersonationResponse]
+	listApiKeys                  *connect.Client[v1.ListApiKeysRequest, v1.ListApiKeysResponse]
+	createApiKey                 *connect.Client[v1.CreateApiKeyRequest, v1.CreateApiKeyResponse]
+	deleteApiKey                 *connect.Client[v1.DeleteApiKeyRequest, v1.DeleteApiKeyResponse]
+	getLists                     *connect.Client[v1.GetListsRequest, v1.GetListsResponse]
+	listTasks                    *connect.Client[v1.ListTasksRequest, v1.ListTasksResponse]
+	searchTasks                  *connect.Client[v1.SearchTasksRequest, v1.SearchTasksResponse]
+	createTask                   *connect.Client[v1.CreateTaskRequest, v1.CreateTaskResponse]
+	updateTask                   *connect.Client[v1.UpdateTaskRequest, v1.UpdateTaskResponse]
+	doneTask                     *connect.Client[v1.DoneTaskRequest, v1.DoneTaskResponse]
+	moveTask                     *connect.Client[v1.MoveTaskRequest, v1.MoveTaskResponse]
+	createList                   *connect.Client[v1.CreateListRequest, v1.CreateListResponse]
+	tag                          *connect.Client[v1.TagRequest, v1.TagResponse]
+	updateList                   *connect.Client[v1.UpdateListRequest, v1.UpdateListResponse]
+	deleteList                   *connect.Client[v1.DeleteListRequest, v1.DeleteListResponse]
+	getTags                      *connect.Client[v1.GetTagsRequest, v1.GetTagsResponse]
+	repoStatus                   *connect.Client[v1.RepoStatusRequest, v1.RepoStatusResponse]
+	repoSync                     *connect.Client[v1.RepoSyncRequest, v1.RepoSyncResponse]
+	getSavedSearches             *connect.Client[v1.GetSavedSearchesRequest, v1.GetSavedSearchesResponse]
+	setSavedSearches             *connect.Client[v1.SetSavedSearchesRequest, v1.SetSavedSearchesResponse]
+	getTaskMetadata              *connect.Client[v1.GetTaskMetadataRequest, v1.GetTaskMetadataResponse]
+	setTaskMetadata              *connect.Client[v1.SetTaskMetadataRequest, v1.SetTaskMetadataResponse]
+	getTaskPropertyProperties    *connect.Client[v1.GetTaskPropertyPropertiesRequest, v1.GetTaskPropertyPropertiesResponse]
+	setTaskPropertyProperty      *connect.Client[v1.SetTaskPropertyPropertyRequest, v1.SetTaskPropertyPropertyResponse]
+	ruleStatus                   *connect.Client[v1.RuleStatusRequest, v1.RuleStatusResponse]
+	ruleTest                     *connect.Client[v1.RuleTestRequest, v1.RuleTestResponse]
 }
 
 // Version calls wackytracky.clientapi.v1.WackyTrackyClientService.Version.
@@ -331,6 +661,160 @@ func (c *wackyTrackyClientServiceClient) Version(ctx context.Context, req *conne
 // Init calls wackytracky.clientapi.v1.WackyTrackyClientService.Init.
 func (c *wackyTrackyClientServiceClient) Init(ctx context.Context, req *connect.Request[v1.InitRequest]) (*connect.Response[v1.InitResponse], error) {
 	return c.init.CallUnary(ctx, req)
+}
+
+// GetStatus calls wackytracky.clientapi.v1.WackyTrackyClientService.GetStatus.
+func (c *wackyTrackyClientServiceClient) GetStatus(ctx context.Context, req *connect.Request[v1.GetStatusRequest]) (*connect.Response[v1.GetStatusResponse], error) {
+	return c.getStatus.CallUnary(ctx, req)
+}
+
+// LoginWithUsernameAndPassword calls
+// wackytracky.clientapi.v1.WackyTrackyClientService.LoginWithUsernameAndPassword.
+func (c *wackyTrackyClientServiceClient) LoginWithUsernameAndPassword(ctx context.Context, req *connect.Request[v1.LoginWithUsernameAndPasswordRequest]) (*connect.Response[v1.LoginWithUsernameAndPasswordResponse], error) {
+	return c.loginWithUsernameAndPassword.CallUnary(ctx, req)
+}
+
+// Logout calls wackytracky.clientapi.v1.WackyTrackyClientService.Logout.
+func (c *wackyTrackyClientServiceClient) Logout(ctx context.Context, req *connect.Request[v1.LogoutRequest]) (*connect.Response[v1.LogoutResponse], error) {
+	return c.logout.CallUnary(ctx, req)
+}
+
+// ChangePassword calls wackytracky.clientapi.v1.WackyTrackyClientService.ChangePassword.
+func (c *wackyTrackyClientServiceClient) ChangePassword(ctx context.Context, req *connect.Request[v1.ChangePasswordRequest]) (*connect.Response[v1.ChangePasswordResponse], error) {
+	return c.changePassword.CallUnary(ctx, req)
+}
+
+// GetUsers calls wackytracky.clientapi.v1.WackyTrackyClientService.GetUsers.
+func (c *wackyTrackyClientServiceClient) GetUsers(ctx context.Context, req *connect.Request[v1.GetUsersRequest]) (*connect.Response[v1.GetUsersResponse], error) {
+	return c.getUsers.CallUnary(ctx, req)
+}
+
+// GetUser calls wackytracky.clientapi.v1.WackyTrackyClientService.GetUser.
+func (c *wackyTrackyClientServiceClient) GetUser(ctx context.Context, req *connect.Request[v1.GetUserRequest]) (*connect.Response[v1.GetUserResponse], error) {
+	return c.getUser.CallUnary(ctx, req)
+}
+
+// CreateUser calls wackytracky.clientapi.v1.WackyTrackyClientService.CreateUser.
+func (c *wackyTrackyClientServiceClient) CreateUser(ctx context.Context, req *connect.Request[v1.CreateUserRequest]) (*connect.Response[v1.CreateUserResponse], error) {
+	return c.createUser.CallUnary(ctx, req)
+}
+
+// DeleteUser calls wackytracky.clientapi.v1.WackyTrackyClientService.DeleteUser.
+func (c *wackyTrackyClientServiceClient) DeleteUser(ctx context.Context, req *connect.Request[v1.DeleteUserRequest]) (*connect.Response[v1.DeleteUserResponse], error) {
+	return c.deleteUser.CallUnary(ctx, req)
+}
+
+// ResetUserPassword calls wackytracky.clientapi.v1.WackyTrackyClientService.ResetUserPassword.
+func (c *wackyTrackyClientServiceClient) ResetUserPassword(ctx context.Context, req *connect.Request[v1.ResetUserPasswordRequest]) (*connect.Response[v1.ResetUserPasswordResponse], error) {
+	return c.resetUserPassword.CallUnary(ctx, req)
+}
+
+// ListRbacPermissions calls wackytracky.clientapi.v1.WackyTrackyClientService.ListRbacPermissions.
+func (c *wackyTrackyClientServiceClient) ListRbacPermissions(ctx context.Context, req *connect.Request[v1.ListRbacPermissionsRequest]) (*connect.Response[v1.ListRbacPermissionsResponse], error) {
+	return c.listRbacPermissions.CallUnary(ctx, req)
+}
+
+// ListRbacRoles calls wackytracky.clientapi.v1.WackyTrackyClientService.ListRbacRoles.
+func (c *wackyTrackyClientServiceClient) ListRbacRoles(ctx context.Context, req *connect.Request[v1.ListRbacRolesRequest]) (*connect.Response[v1.ListRbacRolesResponse], error) {
+	return c.listRbacRoles.CallUnary(ctx, req)
+}
+
+// CreateRbacRole calls wackytracky.clientapi.v1.WackyTrackyClientService.CreateRbacRole.
+func (c *wackyTrackyClientServiceClient) CreateRbacRole(ctx context.Context, req *connect.Request[v1.CreateRbacRoleRequest]) (*connect.Response[v1.CreateRbacRoleResponse], error) {
+	return c.createRbacRole.CallUnary(ctx, req)
+}
+
+// UpdateRbacRole calls wackytracky.clientapi.v1.WackyTrackyClientService.UpdateRbacRole.
+func (c *wackyTrackyClientServiceClient) UpdateRbacRole(ctx context.Context, req *connect.Request[v1.UpdateRbacRoleRequest]) (*connect.Response[v1.RbacRole], error) {
+	return c.updateRbacRole.CallUnary(ctx, req)
+}
+
+// DeleteRbacRole calls wackytracky.clientapi.v1.WackyTrackyClientService.DeleteRbacRole.
+func (c *wackyTrackyClientServiceClient) DeleteRbacRole(ctx context.Context, req *connect.Request[v1.DeleteRbacRoleRequest]) (*connect.Response[v1.DeleteRbacRoleResponse], error) {
+	return c.deleteRbacRole.CallUnary(ctx, req)
+}
+
+// GetUserRbacRoles calls wackytracky.clientapi.v1.WackyTrackyClientService.GetUserRbacRoles.
+func (c *wackyTrackyClientServiceClient) GetUserRbacRoles(ctx context.Context, req *connect.Request[v1.GetUserRbacRolesRequest]) (*connect.Response[v1.GetUserRbacRolesResponse], error) {
+	return c.getUserRbacRoles.CallUnary(ctx, req)
+}
+
+// GetUserGroupRbacRoles calls
+// wackytracky.clientapi.v1.WackyTrackyClientService.GetUserGroupRbacRoles.
+func (c *wackyTrackyClientServiceClient) GetUserGroupRbacRoles(ctx context.Context, req *connect.Request[v1.GetUserGroupRbacRolesRequest]) (*connect.Response[v1.GetUserGroupRbacRolesResponse], error) {
+	return c.getUserGroupRbacRoles.CallUnary(ctx, req)
+}
+
+// SetUserGroupRbacRoles calls
+// wackytracky.clientapi.v1.WackyTrackyClientService.SetUserGroupRbacRoles.
+func (c *wackyTrackyClientServiceClient) SetUserGroupRbacRoles(ctx context.Context, req *connect.Request[v1.SetUserGroupRbacRolesRequest]) (*connect.Response[v1.SetUserGroupRbacRolesResponse], error) {
+	return c.setUserGroupRbacRoles.CallUnary(ctx, req)
+}
+
+// GetRbacRoleUsers calls wackytracky.clientapi.v1.WackyTrackyClientService.GetRbacRoleUsers.
+func (c *wackyTrackyClientServiceClient) GetRbacRoleUsers(ctx context.Context, req *connect.Request[v1.GetRbacRoleUsersRequest]) (*connect.Response[v1.GetRbacRoleUsersResponse], error) {
+	return c.getRbacRoleUsers.CallUnary(ctx, req)
+}
+
+// GetRbacRoleGroups calls wackytracky.clientapi.v1.WackyTrackyClientService.GetRbacRoleGroups.
+func (c *wackyTrackyClientServiceClient) GetRbacRoleGroups(ctx context.Context, req *connect.Request[v1.GetRbacRoleGroupsRequest]) (*connect.Response[v1.GetRbacRoleGroupsResponse], error) {
+	return c.getRbacRoleGroups.CallUnary(ctx, req)
+}
+
+// GetMyPermissionsAudit calls
+// wackytracky.clientapi.v1.WackyTrackyClientService.GetMyPermissionsAudit.
+func (c *wackyTrackyClientServiceClient) GetMyPermissionsAudit(ctx context.Context, req *connect.Request[v1.GetMyPermissionsAuditRequest]) (*connect.Response[v1.GetMyPermissionsAuditResponse], error) {
+	return c.getMyPermissionsAudit.CallUnary(ctx, req)
+}
+
+// ListUserGroups calls wackytracky.clientapi.v1.WackyTrackyClientService.ListUserGroups.
+func (c *wackyTrackyClientServiceClient) ListUserGroups(ctx context.Context, req *connect.Request[v1.ListUserGroupsRequest]) (*connect.Response[v1.ListUserGroupsResponse], error) {
+	return c.listUserGroups.CallUnary(ctx, req)
+}
+
+// CreateUserGroup calls wackytracky.clientapi.v1.WackyTrackyClientService.CreateUserGroup.
+func (c *wackyTrackyClientServiceClient) CreateUserGroup(ctx context.Context, req *connect.Request[v1.CreateUserGroupRequest]) (*connect.Response[v1.CreateUserGroupResponse], error) {
+	return c.createUserGroup.CallUnary(ctx, req)
+}
+
+// DeleteUserGroup calls wackytracky.clientapi.v1.WackyTrackyClientService.DeleteUserGroup.
+func (c *wackyTrackyClientServiceClient) DeleteUserGroup(ctx context.Context, req *connect.Request[v1.DeleteUserGroupRequest]) (*connect.Response[v1.DeleteUserGroupResponse], error) {
+	return c.deleteUserGroup.CallUnary(ctx, req)
+}
+
+// GetUserGroupMembers calls wackytracky.clientapi.v1.WackyTrackyClientService.GetUserGroupMembers.
+func (c *wackyTrackyClientServiceClient) GetUserGroupMembers(ctx context.Context, req *connect.Request[v1.GetUserGroupMembersRequest]) (*connect.Response[v1.GetUserGroupMembersResponse], error) {
+	return c.getUserGroupMembers.CallUnary(ctx, req)
+}
+
+// SetUserGroupMembers calls wackytracky.clientapi.v1.WackyTrackyClientService.SetUserGroupMembers.
+func (c *wackyTrackyClientServiceClient) SetUserGroupMembers(ctx context.Context, req *connect.Request[v1.SetUserGroupMembersRequest]) (*connect.Response[v1.SetUserGroupMembersResponse], error) {
+	return c.setUserGroupMembers.CallUnary(ctx, req)
+}
+
+// ImpersonateUser calls wackytracky.clientapi.v1.WackyTrackyClientService.ImpersonateUser.
+func (c *wackyTrackyClientServiceClient) ImpersonateUser(ctx context.Context, req *connect.Request[v1.ImpersonateUserRequest]) (*connect.Response[v1.ImpersonateUserResponse], error) {
+	return c.impersonateUser.CallUnary(ctx, req)
+}
+
+// StopImpersonation calls wackytracky.clientapi.v1.WackyTrackyClientService.StopImpersonation.
+func (c *wackyTrackyClientServiceClient) StopImpersonation(ctx context.Context, req *connect.Request[v1.StopImpersonationRequest]) (*connect.Response[v1.StopImpersonationResponse], error) {
+	return c.stopImpersonation.CallUnary(ctx, req)
+}
+
+// ListApiKeys calls wackytracky.clientapi.v1.WackyTrackyClientService.ListApiKeys.
+func (c *wackyTrackyClientServiceClient) ListApiKeys(ctx context.Context, req *connect.Request[v1.ListApiKeysRequest]) (*connect.Response[v1.ListApiKeysResponse], error) {
+	return c.listApiKeys.CallUnary(ctx, req)
+}
+
+// CreateApiKey calls wackytracky.clientapi.v1.WackyTrackyClientService.CreateApiKey.
+func (c *wackyTrackyClientServiceClient) CreateApiKey(ctx context.Context, req *connect.Request[v1.CreateApiKeyRequest]) (*connect.Response[v1.CreateApiKeyResponse], error) {
+	return c.createApiKey.CallUnary(ctx, req)
+}
+
+// DeleteApiKey calls wackytracky.clientapi.v1.WackyTrackyClientService.DeleteApiKey.
+func (c *wackyTrackyClientServiceClient) DeleteApiKey(ctx context.Context, req *connect.Request[v1.DeleteApiKeyRequest]) (*connect.Response[v1.DeleteApiKeyResponse], error) {
+	return c.deleteApiKey.CallUnary(ctx, req)
 }
 
 // GetLists calls wackytracky.clientapi.v1.WackyTrackyClientService.GetLists.
@@ -450,6 +934,36 @@ func (c *wackyTrackyClientServiceClient) RuleTest(ctx context.Context, req *conn
 type WackyTrackyClientServiceHandler interface {
 	Version(context.Context, *connect.Request[v1.VersionRequest]) (*connect.Response[v1.VersionResponse], error)
 	Init(context.Context, *connect.Request[v1.InitRequest]) (*connect.Response[v1.InitResponse], error)
+	GetStatus(context.Context, *connect.Request[v1.GetStatusRequest]) (*connect.Response[v1.GetStatusResponse], error)
+	LoginWithUsernameAndPassword(context.Context, *connect.Request[v1.LoginWithUsernameAndPasswordRequest]) (*connect.Response[v1.LoginWithUsernameAndPasswordResponse], error)
+	Logout(context.Context, *connect.Request[v1.LogoutRequest]) (*connect.Response[v1.LogoutResponse], error)
+	ChangePassword(context.Context, *connect.Request[v1.ChangePasswordRequest]) (*connect.Response[v1.ChangePasswordResponse], error)
+	GetUsers(context.Context, *connect.Request[v1.GetUsersRequest]) (*connect.Response[v1.GetUsersResponse], error)
+	GetUser(context.Context, *connect.Request[v1.GetUserRequest]) (*connect.Response[v1.GetUserResponse], error)
+	CreateUser(context.Context, *connect.Request[v1.CreateUserRequest]) (*connect.Response[v1.CreateUserResponse], error)
+	DeleteUser(context.Context, *connect.Request[v1.DeleteUserRequest]) (*connect.Response[v1.DeleteUserResponse], error)
+	ResetUserPassword(context.Context, *connect.Request[v1.ResetUserPasswordRequest]) (*connect.Response[v1.ResetUserPasswordResponse], error)
+	ListRbacPermissions(context.Context, *connect.Request[v1.ListRbacPermissionsRequest]) (*connect.Response[v1.ListRbacPermissionsResponse], error)
+	ListRbacRoles(context.Context, *connect.Request[v1.ListRbacRolesRequest]) (*connect.Response[v1.ListRbacRolesResponse], error)
+	CreateRbacRole(context.Context, *connect.Request[v1.CreateRbacRoleRequest]) (*connect.Response[v1.CreateRbacRoleResponse], error)
+	UpdateRbacRole(context.Context, *connect.Request[v1.UpdateRbacRoleRequest]) (*connect.Response[v1.RbacRole], error)
+	DeleteRbacRole(context.Context, *connect.Request[v1.DeleteRbacRoleRequest]) (*connect.Response[v1.DeleteRbacRoleResponse], error)
+	GetUserRbacRoles(context.Context, *connect.Request[v1.GetUserRbacRolesRequest]) (*connect.Response[v1.GetUserRbacRolesResponse], error)
+	GetUserGroupRbacRoles(context.Context, *connect.Request[v1.GetUserGroupRbacRolesRequest]) (*connect.Response[v1.GetUserGroupRbacRolesResponse], error)
+	SetUserGroupRbacRoles(context.Context, *connect.Request[v1.SetUserGroupRbacRolesRequest]) (*connect.Response[v1.SetUserGroupRbacRolesResponse], error)
+	GetRbacRoleUsers(context.Context, *connect.Request[v1.GetRbacRoleUsersRequest]) (*connect.Response[v1.GetRbacRoleUsersResponse], error)
+	GetRbacRoleGroups(context.Context, *connect.Request[v1.GetRbacRoleGroupsRequest]) (*connect.Response[v1.GetRbacRoleGroupsResponse], error)
+	GetMyPermissionsAudit(context.Context, *connect.Request[v1.GetMyPermissionsAuditRequest]) (*connect.Response[v1.GetMyPermissionsAuditResponse], error)
+	ListUserGroups(context.Context, *connect.Request[v1.ListUserGroupsRequest]) (*connect.Response[v1.ListUserGroupsResponse], error)
+	CreateUserGroup(context.Context, *connect.Request[v1.CreateUserGroupRequest]) (*connect.Response[v1.CreateUserGroupResponse], error)
+	DeleteUserGroup(context.Context, *connect.Request[v1.DeleteUserGroupRequest]) (*connect.Response[v1.DeleteUserGroupResponse], error)
+	GetUserGroupMembers(context.Context, *connect.Request[v1.GetUserGroupMembersRequest]) (*connect.Response[v1.GetUserGroupMembersResponse], error)
+	SetUserGroupMembers(context.Context, *connect.Request[v1.SetUserGroupMembersRequest]) (*connect.Response[v1.SetUserGroupMembersResponse], error)
+	ImpersonateUser(context.Context, *connect.Request[v1.ImpersonateUserRequest]) (*connect.Response[v1.ImpersonateUserResponse], error)
+	StopImpersonation(context.Context, *connect.Request[v1.StopImpersonationRequest]) (*connect.Response[v1.StopImpersonationResponse], error)
+	ListApiKeys(context.Context, *connect.Request[v1.ListApiKeysRequest]) (*connect.Response[v1.ListApiKeysResponse], error)
+	CreateApiKey(context.Context, *connect.Request[v1.CreateApiKeyRequest]) (*connect.Response[v1.CreateApiKeyResponse], error)
+	DeleteApiKey(context.Context, *connect.Request[v1.DeleteApiKeyRequest]) (*connect.Response[v1.DeleteApiKeyResponse], error)
 	GetLists(context.Context, *connect.Request[v1.GetListsRequest]) (*connect.Response[v1.GetListsResponse], error)
 	ListTasks(context.Context, *connect.Request[v1.ListTasksRequest]) (*connect.Response[v1.ListTasksResponse], error)
 	SearchTasks(context.Context, *connect.Request[v1.SearchTasksRequest]) (*connect.Response[v1.SearchTasksResponse], error)
@@ -491,6 +1005,186 @@ func NewWackyTrackyClientServiceHandler(svc WackyTrackyClientServiceHandler, opt
 		WackyTrackyClientServiceInitProcedure,
 		svc.Init,
 		connect.WithSchema(wackyTrackyClientServiceMethods.ByName("Init")),
+		connect.WithHandlerOptions(opts...),
+	)
+	wackyTrackyClientServiceGetStatusHandler := connect.NewUnaryHandler(
+		WackyTrackyClientServiceGetStatusProcedure,
+		svc.GetStatus,
+		connect.WithSchema(wackyTrackyClientServiceMethods.ByName("GetStatus")),
+		connect.WithHandlerOptions(opts...),
+	)
+	wackyTrackyClientServiceLoginWithUsernameAndPasswordHandler := connect.NewUnaryHandler(
+		WackyTrackyClientServiceLoginWithUsernameAndPasswordProcedure,
+		svc.LoginWithUsernameAndPassword,
+		connect.WithSchema(wackyTrackyClientServiceMethods.ByName("LoginWithUsernameAndPassword")),
+		connect.WithHandlerOptions(opts...),
+	)
+	wackyTrackyClientServiceLogoutHandler := connect.NewUnaryHandler(
+		WackyTrackyClientServiceLogoutProcedure,
+		svc.Logout,
+		connect.WithSchema(wackyTrackyClientServiceMethods.ByName("Logout")),
+		connect.WithHandlerOptions(opts...),
+	)
+	wackyTrackyClientServiceChangePasswordHandler := connect.NewUnaryHandler(
+		WackyTrackyClientServiceChangePasswordProcedure,
+		svc.ChangePassword,
+		connect.WithSchema(wackyTrackyClientServiceMethods.ByName("ChangePassword")),
+		connect.WithHandlerOptions(opts...),
+	)
+	wackyTrackyClientServiceGetUsersHandler := connect.NewUnaryHandler(
+		WackyTrackyClientServiceGetUsersProcedure,
+		svc.GetUsers,
+		connect.WithSchema(wackyTrackyClientServiceMethods.ByName("GetUsers")),
+		connect.WithHandlerOptions(opts...),
+	)
+	wackyTrackyClientServiceGetUserHandler := connect.NewUnaryHandler(
+		WackyTrackyClientServiceGetUserProcedure,
+		svc.GetUser,
+		connect.WithSchema(wackyTrackyClientServiceMethods.ByName("GetUser")),
+		connect.WithHandlerOptions(opts...),
+	)
+	wackyTrackyClientServiceCreateUserHandler := connect.NewUnaryHandler(
+		WackyTrackyClientServiceCreateUserProcedure,
+		svc.CreateUser,
+		connect.WithSchema(wackyTrackyClientServiceMethods.ByName("CreateUser")),
+		connect.WithHandlerOptions(opts...),
+	)
+	wackyTrackyClientServiceDeleteUserHandler := connect.NewUnaryHandler(
+		WackyTrackyClientServiceDeleteUserProcedure,
+		svc.DeleteUser,
+		connect.WithSchema(wackyTrackyClientServiceMethods.ByName("DeleteUser")),
+		connect.WithHandlerOptions(opts...),
+	)
+	wackyTrackyClientServiceResetUserPasswordHandler := connect.NewUnaryHandler(
+		WackyTrackyClientServiceResetUserPasswordProcedure,
+		svc.ResetUserPassword,
+		connect.WithSchema(wackyTrackyClientServiceMethods.ByName("ResetUserPassword")),
+		connect.WithHandlerOptions(opts...),
+	)
+	wackyTrackyClientServiceListRbacPermissionsHandler := connect.NewUnaryHandler(
+		WackyTrackyClientServiceListRbacPermissionsProcedure,
+		svc.ListRbacPermissions,
+		connect.WithSchema(wackyTrackyClientServiceMethods.ByName("ListRbacPermissions")),
+		connect.WithHandlerOptions(opts...),
+	)
+	wackyTrackyClientServiceListRbacRolesHandler := connect.NewUnaryHandler(
+		WackyTrackyClientServiceListRbacRolesProcedure,
+		svc.ListRbacRoles,
+		connect.WithSchema(wackyTrackyClientServiceMethods.ByName("ListRbacRoles")),
+		connect.WithHandlerOptions(opts...),
+	)
+	wackyTrackyClientServiceCreateRbacRoleHandler := connect.NewUnaryHandler(
+		WackyTrackyClientServiceCreateRbacRoleProcedure,
+		svc.CreateRbacRole,
+		connect.WithSchema(wackyTrackyClientServiceMethods.ByName("CreateRbacRole")),
+		connect.WithHandlerOptions(opts...),
+	)
+	wackyTrackyClientServiceUpdateRbacRoleHandler := connect.NewUnaryHandler(
+		WackyTrackyClientServiceUpdateRbacRoleProcedure,
+		svc.UpdateRbacRole,
+		connect.WithSchema(wackyTrackyClientServiceMethods.ByName("UpdateRbacRole")),
+		connect.WithHandlerOptions(opts...),
+	)
+	wackyTrackyClientServiceDeleteRbacRoleHandler := connect.NewUnaryHandler(
+		WackyTrackyClientServiceDeleteRbacRoleProcedure,
+		svc.DeleteRbacRole,
+		connect.WithSchema(wackyTrackyClientServiceMethods.ByName("DeleteRbacRole")),
+		connect.WithHandlerOptions(opts...),
+	)
+	wackyTrackyClientServiceGetUserRbacRolesHandler := connect.NewUnaryHandler(
+		WackyTrackyClientServiceGetUserRbacRolesProcedure,
+		svc.GetUserRbacRoles,
+		connect.WithSchema(wackyTrackyClientServiceMethods.ByName("GetUserRbacRoles")),
+		connect.WithHandlerOptions(opts...),
+	)
+	wackyTrackyClientServiceGetUserGroupRbacRolesHandler := connect.NewUnaryHandler(
+		WackyTrackyClientServiceGetUserGroupRbacRolesProcedure,
+		svc.GetUserGroupRbacRoles,
+		connect.WithSchema(wackyTrackyClientServiceMethods.ByName("GetUserGroupRbacRoles")),
+		connect.WithHandlerOptions(opts...),
+	)
+	wackyTrackyClientServiceSetUserGroupRbacRolesHandler := connect.NewUnaryHandler(
+		WackyTrackyClientServiceSetUserGroupRbacRolesProcedure,
+		svc.SetUserGroupRbacRoles,
+		connect.WithSchema(wackyTrackyClientServiceMethods.ByName("SetUserGroupRbacRoles")),
+		connect.WithHandlerOptions(opts...),
+	)
+	wackyTrackyClientServiceGetRbacRoleUsersHandler := connect.NewUnaryHandler(
+		WackyTrackyClientServiceGetRbacRoleUsersProcedure,
+		svc.GetRbacRoleUsers,
+		connect.WithSchema(wackyTrackyClientServiceMethods.ByName("GetRbacRoleUsers")),
+		connect.WithHandlerOptions(opts...),
+	)
+	wackyTrackyClientServiceGetRbacRoleGroupsHandler := connect.NewUnaryHandler(
+		WackyTrackyClientServiceGetRbacRoleGroupsProcedure,
+		svc.GetRbacRoleGroups,
+		connect.WithSchema(wackyTrackyClientServiceMethods.ByName("GetRbacRoleGroups")),
+		connect.WithHandlerOptions(opts...),
+	)
+	wackyTrackyClientServiceGetMyPermissionsAuditHandler := connect.NewUnaryHandler(
+		WackyTrackyClientServiceGetMyPermissionsAuditProcedure,
+		svc.GetMyPermissionsAudit,
+		connect.WithSchema(wackyTrackyClientServiceMethods.ByName("GetMyPermissionsAudit")),
+		connect.WithHandlerOptions(opts...),
+	)
+	wackyTrackyClientServiceListUserGroupsHandler := connect.NewUnaryHandler(
+		WackyTrackyClientServiceListUserGroupsProcedure,
+		svc.ListUserGroups,
+		connect.WithSchema(wackyTrackyClientServiceMethods.ByName("ListUserGroups")),
+		connect.WithHandlerOptions(opts...),
+	)
+	wackyTrackyClientServiceCreateUserGroupHandler := connect.NewUnaryHandler(
+		WackyTrackyClientServiceCreateUserGroupProcedure,
+		svc.CreateUserGroup,
+		connect.WithSchema(wackyTrackyClientServiceMethods.ByName("CreateUserGroup")),
+		connect.WithHandlerOptions(opts...),
+	)
+	wackyTrackyClientServiceDeleteUserGroupHandler := connect.NewUnaryHandler(
+		WackyTrackyClientServiceDeleteUserGroupProcedure,
+		svc.DeleteUserGroup,
+		connect.WithSchema(wackyTrackyClientServiceMethods.ByName("DeleteUserGroup")),
+		connect.WithHandlerOptions(opts...),
+	)
+	wackyTrackyClientServiceGetUserGroupMembersHandler := connect.NewUnaryHandler(
+		WackyTrackyClientServiceGetUserGroupMembersProcedure,
+		svc.GetUserGroupMembers,
+		connect.WithSchema(wackyTrackyClientServiceMethods.ByName("GetUserGroupMembers")),
+		connect.WithHandlerOptions(opts...),
+	)
+	wackyTrackyClientServiceSetUserGroupMembersHandler := connect.NewUnaryHandler(
+		WackyTrackyClientServiceSetUserGroupMembersProcedure,
+		svc.SetUserGroupMembers,
+		connect.WithSchema(wackyTrackyClientServiceMethods.ByName("SetUserGroupMembers")),
+		connect.WithHandlerOptions(opts...),
+	)
+	wackyTrackyClientServiceImpersonateUserHandler := connect.NewUnaryHandler(
+		WackyTrackyClientServiceImpersonateUserProcedure,
+		svc.ImpersonateUser,
+		connect.WithSchema(wackyTrackyClientServiceMethods.ByName("ImpersonateUser")),
+		connect.WithHandlerOptions(opts...),
+	)
+	wackyTrackyClientServiceStopImpersonationHandler := connect.NewUnaryHandler(
+		WackyTrackyClientServiceStopImpersonationProcedure,
+		svc.StopImpersonation,
+		connect.WithSchema(wackyTrackyClientServiceMethods.ByName("StopImpersonation")),
+		connect.WithHandlerOptions(opts...),
+	)
+	wackyTrackyClientServiceListApiKeysHandler := connect.NewUnaryHandler(
+		WackyTrackyClientServiceListApiKeysProcedure,
+		svc.ListApiKeys,
+		connect.WithSchema(wackyTrackyClientServiceMethods.ByName("ListApiKeys")),
+		connect.WithHandlerOptions(opts...),
+	)
+	wackyTrackyClientServiceCreateApiKeyHandler := connect.NewUnaryHandler(
+		WackyTrackyClientServiceCreateApiKeyProcedure,
+		svc.CreateApiKey,
+		connect.WithSchema(wackyTrackyClientServiceMethods.ByName("CreateApiKey")),
+		connect.WithHandlerOptions(opts...),
+	)
+	wackyTrackyClientServiceDeleteApiKeyHandler := connect.NewUnaryHandler(
+		WackyTrackyClientServiceDeleteApiKeyProcedure,
+		svc.DeleteApiKey,
+		connect.WithSchema(wackyTrackyClientServiceMethods.ByName("DeleteApiKey")),
 		connect.WithHandlerOptions(opts...),
 	)
 	wackyTrackyClientServiceGetListsHandler := connect.NewUnaryHandler(
@@ -631,6 +1325,66 @@ func NewWackyTrackyClientServiceHandler(svc WackyTrackyClientServiceHandler, opt
 			wackyTrackyClientServiceVersionHandler.ServeHTTP(w, r)
 		case WackyTrackyClientServiceInitProcedure:
 			wackyTrackyClientServiceInitHandler.ServeHTTP(w, r)
+		case WackyTrackyClientServiceGetStatusProcedure:
+			wackyTrackyClientServiceGetStatusHandler.ServeHTTP(w, r)
+		case WackyTrackyClientServiceLoginWithUsernameAndPasswordProcedure:
+			wackyTrackyClientServiceLoginWithUsernameAndPasswordHandler.ServeHTTP(w, r)
+		case WackyTrackyClientServiceLogoutProcedure:
+			wackyTrackyClientServiceLogoutHandler.ServeHTTP(w, r)
+		case WackyTrackyClientServiceChangePasswordProcedure:
+			wackyTrackyClientServiceChangePasswordHandler.ServeHTTP(w, r)
+		case WackyTrackyClientServiceGetUsersProcedure:
+			wackyTrackyClientServiceGetUsersHandler.ServeHTTP(w, r)
+		case WackyTrackyClientServiceGetUserProcedure:
+			wackyTrackyClientServiceGetUserHandler.ServeHTTP(w, r)
+		case WackyTrackyClientServiceCreateUserProcedure:
+			wackyTrackyClientServiceCreateUserHandler.ServeHTTP(w, r)
+		case WackyTrackyClientServiceDeleteUserProcedure:
+			wackyTrackyClientServiceDeleteUserHandler.ServeHTTP(w, r)
+		case WackyTrackyClientServiceResetUserPasswordProcedure:
+			wackyTrackyClientServiceResetUserPasswordHandler.ServeHTTP(w, r)
+		case WackyTrackyClientServiceListRbacPermissionsProcedure:
+			wackyTrackyClientServiceListRbacPermissionsHandler.ServeHTTP(w, r)
+		case WackyTrackyClientServiceListRbacRolesProcedure:
+			wackyTrackyClientServiceListRbacRolesHandler.ServeHTTP(w, r)
+		case WackyTrackyClientServiceCreateRbacRoleProcedure:
+			wackyTrackyClientServiceCreateRbacRoleHandler.ServeHTTP(w, r)
+		case WackyTrackyClientServiceUpdateRbacRoleProcedure:
+			wackyTrackyClientServiceUpdateRbacRoleHandler.ServeHTTP(w, r)
+		case WackyTrackyClientServiceDeleteRbacRoleProcedure:
+			wackyTrackyClientServiceDeleteRbacRoleHandler.ServeHTTP(w, r)
+		case WackyTrackyClientServiceGetUserRbacRolesProcedure:
+			wackyTrackyClientServiceGetUserRbacRolesHandler.ServeHTTP(w, r)
+		case WackyTrackyClientServiceGetUserGroupRbacRolesProcedure:
+			wackyTrackyClientServiceGetUserGroupRbacRolesHandler.ServeHTTP(w, r)
+		case WackyTrackyClientServiceSetUserGroupRbacRolesProcedure:
+			wackyTrackyClientServiceSetUserGroupRbacRolesHandler.ServeHTTP(w, r)
+		case WackyTrackyClientServiceGetRbacRoleUsersProcedure:
+			wackyTrackyClientServiceGetRbacRoleUsersHandler.ServeHTTP(w, r)
+		case WackyTrackyClientServiceGetRbacRoleGroupsProcedure:
+			wackyTrackyClientServiceGetRbacRoleGroupsHandler.ServeHTTP(w, r)
+		case WackyTrackyClientServiceGetMyPermissionsAuditProcedure:
+			wackyTrackyClientServiceGetMyPermissionsAuditHandler.ServeHTTP(w, r)
+		case WackyTrackyClientServiceListUserGroupsProcedure:
+			wackyTrackyClientServiceListUserGroupsHandler.ServeHTTP(w, r)
+		case WackyTrackyClientServiceCreateUserGroupProcedure:
+			wackyTrackyClientServiceCreateUserGroupHandler.ServeHTTP(w, r)
+		case WackyTrackyClientServiceDeleteUserGroupProcedure:
+			wackyTrackyClientServiceDeleteUserGroupHandler.ServeHTTP(w, r)
+		case WackyTrackyClientServiceGetUserGroupMembersProcedure:
+			wackyTrackyClientServiceGetUserGroupMembersHandler.ServeHTTP(w, r)
+		case WackyTrackyClientServiceSetUserGroupMembersProcedure:
+			wackyTrackyClientServiceSetUserGroupMembersHandler.ServeHTTP(w, r)
+		case WackyTrackyClientServiceImpersonateUserProcedure:
+			wackyTrackyClientServiceImpersonateUserHandler.ServeHTTP(w, r)
+		case WackyTrackyClientServiceStopImpersonationProcedure:
+			wackyTrackyClientServiceStopImpersonationHandler.ServeHTTP(w, r)
+		case WackyTrackyClientServiceListApiKeysProcedure:
+			wackyTrackyClientServiceListApiKeysHandler.ServeHTTP(w, r)
+		case WackyTrackyClientServiceCreateApiKeyProcedure:
+			wackyTrackyClientServiceCreateApiKeyHandler.ServeHTTP(w, r)
+		case WackyTrackyClientServiceDeleteApiKeyProcedure:
+			wackyTrackyClientServiceDeleteApiKeyHandler.ServeHTTP(w, r)
 		case WackyTrackyClientServiceGetListsProcedure:
 			wackyTrackyClientServiceGetListsHandler.ServeHTTP(w, r)
 		case WackyTrackyClientServiceListTasksProcedure:
@@ -690,6 +1444,126 @@ func (UnimplementedWackyTrackyClientServiceHandler) Version(context.Context, *co
 
 func (UnimplementedWackyTrackyClientServiceHandler) Init(context.Context, *connect.Request[v1.InitRequest]) (*connect.Response[v1.InitResponse], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("wackytracky.clientapi.v1.WackyTrackyClientService.Init is not implemented"))
+}
+
+func (UnimplementedWackyTrackyClientServiceHandler) GetStatus(context.Context, *connect.Request[v1.GetStatusRequest]) (*connect.Response[v1.GetStatusResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("wackytracky.clientapi.v1.WackyTrackyClientService.GetStatus is not implemented"))
+}
+
+func (UnimplementedWackyTrackyClientServiceHandler) LoginWithUsernameAndPassword(context.Context, *connect.Request[v1.LoginWithUsernameAndPasswordRequest]) (*connect.Response[v1.LoginWithUsernameAndPasswordResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("wackytracky.clientapi.v1.WackyTrackyClientService.LoginWithUsernameAndPassword is not implemented"))
+}
+
+func (UnimplementedWackyTrackyClientServiceHandler) Logout(context.Context, *connect.Request[v1.LogoutRequest]) (*connect.Response[v1.LogoutResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("wackytracky.clientapi.v1.WackyTrackyClientService.Logout is not implemented"))
+}
+
+func (UnimplementedWackyTrackyClientServiceHandler) ChangePassword(context.Context, *connect.Request[v1.ChangePasswordRequest]) (*connect.Response[v1.ChangePasswordResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("wackytracky.clientapi.v1.WackyTrackyClientService.ChangePassword is not implemented"))
+}
+
+func (UnimplementedWackyTrackyClientServiceHandler) GetUsers(context.Context, *connect.Request[v1.GetUsersRequest]) (*connect.Response[v1.GetUsersResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("wackytracky.clientapi.v1.WackyTrackyClientService.GetUsers is not implemented"))
+}
+
+func (UnimplementedWackyTrackyClientServiceHandler) GetUser(context.Context, *connect.Request[v1.GetUserRequest]) (*connect.Response[v1.GetUserResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("wackytracky.clientapi.v1.WackyTrackyClientService.GetUser is not implemented"))
+}
+
+func (UnimplementedWackyTrackyClientServiceHandler) CreateUser(context.Context, *connect.Request[v1.CreateUserRequest]) (*connect.Response[v1.CreateUserResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("wackytracky.clientapi.v1.WackyTrackyClientService.CreateUser is not implemented"))
+}
+
+func (UnimplementedWackyTrackyClientServiceHandler) DeleteUser(context.Context, *connect.Request[v1.DeleteUserRequest]) (*connect.Response[v1.DeleteUserResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("wackytracky.clientapi.v1.WackyTrackyClientService.DeleteUser is not implemented"))
+}
+
+func (UnimplementedWackyTrackyClientServiceHandler) ResetUserPassword(context.Context, *connect.Request[v1.ResetUserPasswordRequest]) (*connect.Response[v1.ResetUserPasswordResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("wackytracky.clientapi.v1.WackyTrackyClientService.ResetUserPassword is not implemented"))
+}
+
+func (UnimplementedWackyTrackyClientServiceHandler) ListRbacPermissions(context.Context, *connect.Request[v1.ListRbacPermissionsRequest]) (*connect.Response[v1.ListRbacPermissionsResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("wackytracky.clientapi.v1.WackyTrackyClientService.ListRbacPermissions is not implemented"))
+}
+
+func (UnimplementedWackyTrackyClientServiceHandler) ListRbacRoles(context.Context, *connect.Request[v1.ListRbacRolesRequest]) (*connect.Response[v1.ListRbacRolesResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("wackytracky.clientapi.v1.WackyTrackyClientService.ListRbacRoles is not implemented"))
+}
+
+func (UnimplementedWackyTrackyClientServiceHandler) CreateRbacRole(context.Context, *connect.Request[v1.CreateRbacRoleRequest]) (*connect.Response[v1.CreateRbacRoleResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("wackytracky.clientapi.v1.WackyTrackyClientService.CreateRbacRole is not implemented"))
+}
+
+func (UnimplementedWackyTrackyClientServiceHandler) UpdateRbacRole(context.Context, *connect.Request[v1.UpdateRbacRoleRequest]) (*connect.Response[v1.RbacRole], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("wackytracky.clientapi.v1.WackyTrackyClientService.UpdateRbacRole is not implemented"))
+}
+
+func (UnimplementedWackyTrackyClientServiceHandler) DeleteRbacRole(context.Context, *connect.Request[v1.DeleteRbacRoleRequest]) (*connect.Response[v1.DeleteRbacRoleResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("wackytracky.clientapi.v1.WackyTrackyClientService.DeleteRbacRole is not implemented"))
+}
+
+func (UnimplementedWackyTrackyClientServiceHandler) GetUserRbacRoles(context.Context, *connect.Request[v1.GetUserRbacRolesRequest]) (*connect.Response[v1.GetUserRbacRolesResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("wackytracky.clientapi.v1.WackyTrackyClientService.GetUserRbacRoles is not implemented"))
+}
+
+func (UnimplementedWackyTrackyClientServiceHandler) GetUserGroupRbacRoles(context.Context, *connect.Request[v1.GetUserGroupRbacRolesRequest]) (*connect.Response[v1.GetUserGroupRbacRolesResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("wackytracky.clientapi.v1.WackyTrackyClientService.GetUserGroupRbacRoles is not implemented"))
+}
+
+func (UnimplementedWackyTrackyClientServiceHandler) SetUserGroupRbacRoles(context.Context, *connect.Request[v1.SetUserGroupRbacRolesRequest]) (*connect.Response[v1.SetUserGroupRbacRolesResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("wackytracky.clientapi.v1.WackyTrackyClientService.SetUserGroupRbacRoles is not implemented"))
+}
+
+func (UnimplementedWackyTrackyClientServiceHandler) GetRbacRoleUsers(context.Context, *connect.Request[v1.GetRbacRoleUsersRequest]) (*connect.Response[v1.GetRbacRoleUsersResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("wackytracky.clientapi.v1.WackyTrackyClientService.GetRbacRoleUsers is not implemented"))
+}
+
+func (UnimplementedWackyTrackyClientServiceHandler) GetRbacRoleGroups(context.Context, *connect.Request[v1.GetRbacRoleGroupsRequest]) (*connect.Response[v1.GetRbacRoleGroupsResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("wackytracky.clientapi.v1.WackyTrackyClientService.GetRbacRoleGroups is not implemented"))
+}
+
+func (UnimplementedWackyTrackyClientServiceHandler) GetMyPermissionsAudit(context.Context, *connect.Request[v1.GetMyPermissionsAuditRequest]) (*connect.Response[v1.GetMyPermissionsAuditResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("wackytracky.clientapi.v1.WackyTrackyClientService.GetMyPermissionsAudit is not implemented"))
+}
+
+func (UnimplementedWackyTrackyClientServiceHandler) ListUserGroups(context.Context, *connect.Request[v1.ListUserGroupsRequest]) (*connect.Response[v1.ListUserGroupsResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("wackytracky.clientapi.v1.WackyTrackyClientService.ListUserGroups is not implemented"))
+}
+
+func (UnimplementedWackyTrackyClientServiceHandler) CreateUserGroup(context.Context, *connect.Request[v1.CreateUserGroupRequest]) (*connect.Response[v1.CreateUserGroupResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("wackytracky.clientapi.v1.WackyTrackyClientService.CreateUserGroup is not implemented"))
+}
+
+func (UnimplementedWackyTrackyClientServiceHandler) DeleteUserGroup(context.Context, *connect.Request[v1.DeleteUserGroupRequest]) (*connect.Response[v1.DeleteUserGroupResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("wackytracky.clientapi.v1.WackyTrackyClientService.DeleteUserGroup is not implemented"))
+}
+
+func (UnimplementedWackyTrackyClientServiceHandler) GetUserGroupMembers(context.Context, *connect.Request[v1.GetUserGroupMembersRequest]) (*connect.Response[v1.GetUserGroupMembersResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("wackytracky.clientapi.v1.WackyTrackyClientService.GetUserGroupMembers is not implemented"))
+}
+
+func (UnimplementedWackyTrackyClientServiceHandler) SetUserGroupMembers(context.Context, *connect.Request[v1.SetUserGroupMembersRequest]) (*connect.Response[v1.SetUserGroupMembersResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("wackytracky.clientapi.v1.WackyTrackyClientService.SetUserGroupMembers is not implemented"))
+}
+
+func (UnimplementedWackyTrackyClientServiceHandler) ImpersonateUser(context.Context, *connect.Request[v1.ImpersonateUserRequest]) (*connect.Response[v1.ImpersonateUserResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("wackytracky.clientapi.v1.WackyTrackyClientService.ImpersonateUser is not implemented"))
+}
+
+func (UnimplementedWackyTrackyClientServiceHandler) StopImpersonation(context.Context, *connect.Request[v1.StopImpersonationRequest]) (*connect.Response[v1.StopImpersonationResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("wackytracky.clientapi.v1.WackyTrackyClientService.StopImpersonation is not implemented"))
+}
+
+func (UnimplementedWackyTrackyClientServiceHandler) ListApiKeys(context.Context, *connect.Request[v1.ListApiKeysRequest]) (*connect.Response[v1.ListApiKeysResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("wackytracky.clientapi.v1.WackyTrackyClientService.ListApiKeys is not implemented"))
+}
+
+func (UnimplementedWackyTrackyClientServiceHandler) CreateApiKey(context.Context, *connect.Request[v1.CreateApiKeyRequest]) (*connect.Response[v1.CreateApiKeyResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("wackytracky.clientapi.v1.WackyTrackyClientService.CreateApiKey is not implemented"))
+}
+
+func (UnimplementedWackyTrackyClientServiceHandler) DeleteApiKey(context.Context, *connect.Request[v1.DeleteApiKeyRequest]) (*connect.Response[v1.DeleteApiKeyResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("wackytracky.clientapi.v1.WackyTrackyClientService.DeleteApiKey is not implemented"))
 }
 
 func (UnimplementedWackyTrackyClientServiceHandler) GetLists(context.Context, *connect.Request[v1.GetListsRequest]) (*connect.Response[v1.GetListsResponse], error) {

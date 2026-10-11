@@ -1,111 +1,218 @@
 <template>
-	<section class="tpp-view">
-		<h2 id="tpp-title" class="tpp-title">Tag & context properties</h2>
-		<p class="tpp-intro">Set properties per tag (#name) or context (@name). Supported: <strong>css</strong> (arbitrary CSS for the chip style attribute), <strong>hide-at-times</strong>.</p>
+	<Section
+		title="TPPs"
+		:icon="Settings01Icon"
+		subtitle="Set properties per tag (#name) or context (@name)."
+		:padding="true"
+	>
+		<template #toolbar>
+			<button
+				type="button"
+				class="inline-icon neutral"
+				aria-label="Refresh"
+				title="Refresh"
+				@click="fetchAll"
+			>
+				<HugeiconsIcon
+					:icon="Refresh01Icon"
+					width="1em"
+					height="1em"
+					:strokeWidth="iconStrokeWidth"
+					aria-hidden="true"
+				/>
+			</button>
+		</template>
 
-		<div class="tpp-section tpp-rule-builder">
-			<h3 class="tpp-subheading">Hide-at-times rule builder</h3>
-			<p class="tpp-rule-hint">Tasks with a tag or context that has a hide-at-times rule are hidden from the list when the rule evaluates to true. Use <strong>D</strong> (day: Mon–Sun), <strong>H</strong> (hour 0–23), <strong>M</strong> (minute 0–59). Example: <code>D == "Sat" || D == "Sun"</code></p>
-			<p class="tpp-rule-status" aria-live="polite">Current: D = {{ ruleStatus.D }}, H = {{ ruleStatus.H }}, M = {{ ruleStatus.M }}</p>
-			<div class="tpp-rule-test">
-				<input v-model="ruleTestExpression" type="text" class="tpp-rule-expr-input" placeholder='e.g. D == "Sat" || D == "Sun"' @keydown.enter.prevent="testRule" />
-				<button type="button" class="tpp-add-btn" @click="testRule">Test</button>
-			</div>
-			<div v-if="ruleTestResult !== null" class="tpp-rule-result" :class="{ 'tpp-rule-result-ok': ruleTestResult?.compiles && ruleTestResult?.evalError === undefined, 'tpp-rule-result-err': ruleTestResult?.compileError || ruleTestResult?.evalError }">
-				<template v-if="!ruleTestResult.compiles">
-					<span class="tpp-rule-result-label">Compiles:</span> No. {{ ruleTestResult.compileError }}
+		<p class="tpp-intro">
+			Supported: <strong>css</strong> (arbitrary CSS for the chip style attribute),
+			<strong>hide-at-times</strong>.
+		</p>
+		<p v-if="tppError" class="inline-notification error">{{ tppError }}</p>
+	</Section>
+
+	<Section
+		title="Hide-at-times rule builder"
+		subtitle="Tasks with a matching tag or context are hidden when the rule evaluates to true."
+		:padding="true"
+	>
+		<p class="tpp-rule-hint">
+			Use <strong>D</strong> (day: Mon–Sun), <strong>H</strong> (hour 0–23),
+			<strong>M</strong> (minute 0–59). Example:
+			<code>D == "Sat" || D == "Sun"</code>
+		</p>
+		<p class="tpp-rule-status" aria-live="polite">
+			Current: D = {{ ruleStatus.D }}, H = {{ ruleStatus.H }}, M = {{ ruleStatus.M }}
+		</p>
+
+		<FormLayout @submit.prevent="testRule">
+			<FormField
+				label="Expression"
+				for="tpp-rule-expr"
+				description='Example: D == "Sat" || D == "Sun"'
+			>
+				<input
+					id="tpp-rule-expr"
+					v-model="ruleTestExpression"
+					type="text"
+					placeholder='e.g. D == "Sat" || D == "Sun"'
+				/>
+			</FormField>
+			<template #actions>
+				<button type="submit" class="neutral">Test</button>
+			</template>
+		</FormLayout>
+
+		<div
+			v-if="ruleTestResult !== null"
+			class="tpp-rule-result"
+			:class="{
+				'tpp-rule-result-ok': ruleTestResult?.compiles && ruleTestResult?.evalError === undefined,
+				'tpp-rule-result-err': ruleTestResult?.compileError || ruleTestResult?.evalError,
+			}"
+		>
+			<template v-if="!ruleTestResult.compiles">
+				<span class="tpp-rule-result-label">Compiles:</span> No. {{ ruleTestResult.compileError }}
+			</template>
+			<template v-else>
+				<span class="tpp-rule-result-label">Compiles:</span> Yes.
+				<template v-if="ruleTestResult.evalError">
+					<span class="tpp-rule-result-label">Eval error:</span> {{ ruleTestResult.evalError }}
 				</template>
 				<template v-else>
-					<span class="tpp-rule-result-label">Compiles:</span> Yes.
-					<template v-if="ruleTestResult.evalError">
-						<span class="tpp-rule-result-label">Eval error:</span> {{ ruleTestResult.evalError }}
-					</template>
-					<template v-else>
-						<span class="tpp-rule-result-label">Result:</span> {{ ruleTestResult.result ? 'true' : 'false' }}
-					</template>
+					<span class="tpp-rule-result-label">Result:</span>
+					{{ ruleTestResult.result ? 'true' : 'false' }}
 				</template>
+			</template>
+		</div>
+	</Section>
+
+	<Section
+		title="Tags"
+		subtitle="Per-tag properties: css (chip inline style), hide-at-times (expression)."
+		:padding="true"
+	>
+		<div class="tpp-table-wrap">
+			<div class="tpp-table-header">
+				<span class="tpp-col-name">Tag</span>
+				<span class="tpp-col-css">css</span>
+				<span class="tpp-col-hide">hide-at-times</span>
+				<span class="tpp-col-action"></span>
+			</div>
+			<div v-for="(props, name) in tagEntries" :key="'tag-' + name" class="tpp-table-row">
+				<span class="tpp-col-name">#{{ name }}</span>
+				<input
+					type="text"
+					v-model="tagCss[name]"
+					class="tpp-col-css"
+					placeholder="e.g. background: #f0f0f0; color: #333"
+					@change="saveTagProp(name, 'css', tagCss[name] || '')"
+				/>
+				<input
+					type="text"
+					v-model="tagHideAtTimes[name]"
+					class="tpp-col-hide"
+					placeholder='e.g. D == "Sat"'
+					@change="saveTagProp(name, 'hide-at-times', tagHideAtTimes[name] || '')"
+				/>
+				<button type="button" class="bad small" title="Remove" @click="clearTagProp(name)">
+					Remove
+				</button>
 			</div>
 		</div>
 
-		<div class="tpp-section">
-			<h3 class="tpp-subheading">Tags</h3>
-			<p class="tpp-prop-hint">Per-tag properties: <strong>css</strong> (chip inline style), <strong>hide-at-times</strong> (expression to hide tasks with this tag).</p>
-			<div class="tpp-table-wrap">
-				<div class="tpp-table-header">
-					<span class="tpp-col-name">Tag</span>
-					<span class="tpp-col-css">css</span>
-					<span class="tpp-col-hide">hide-at-times</span>
-					<span class="tpp-col-action"></span>
-				</div>
-				<div v-for="(props, name) in tagEntries" :key="'tag-' + name" class="tpp-table-row">
-					<span class="tpp-col-name">#{{ name }}</span>
-					<input
-						type="text"
-						v-model="tagCss[name]"
-						class="tpp-col-css"
-						placeholder="e.g. background: #f0f0f0; color: #333"
-						@change="saveTagProp(name, 'css', tagCss[name] || '')"
-					/>
-					<input
-						type="text"
-						v-model="tagHideAtTimes[name]"
-						class="tpp-col-hide"
-						placeholder='e.g. D == "Sat"'
-						@change="saveTagProp(name, 'hide-at-times', tagHideAtTimes[name] || '')"
-					/>
-					<button type="button" class="tpp-remove-btn" title="Remove" @click="clearTagProp(name)">Remove</button>
-				</div>
+		<FormLayout @submit.prevent="addTag">
+			<FormField label="Tag name" for="tpp-new-tag-name">
+				<input id="tpp-new-tag-name" v-model="newTagName" type="text" placeholder="Tag name" />
+			</FormField>
+			<FormField label="css" for="tpp-new-tag-css">
+				<input
+					id="tpp-new-tag-css"
+					v-model="newTagCss"
+					type="text"
+					placeholder="e.g. background: #f0f0f0; color: #333"
+				/>
+			</FormField>
+			<template #actions>
+				<button type="submit" class="good" :disabled="!newTagName.trim() || !newTagCss.trim()">
+					Add tag
+				</button>
+			</template>
+		</FormLayout>
+	</Section>
+
+	<Section
+		title="Contexts"
+		subtitle="Per-context properties: css (chip inline style), hide-at-times (expression)."
+		:padding="true"
+	>
+		<div class="tpp-table-wrap">
+			<div class="tpp-table-header">
+				<span class="tpp-col-name">Context</span>
+				<span class="tpp-col-css">css</span>
+				<span class="tpp-col-hide">hide-at-times</span>
+				<span class="tpp-col-action"></span>
 			</div>
-			<div class="tpp-add-row">
-				<input v-model="newTagName" type="text" class="tpp-name-input" placeholder="Tag name" />
-				<input v-model="newTagCss" type="text" class="tpp-col-css tpp-add-input" placeholder="css" />
-				<button type="button" class="tpp-add-btn" @click="addTag">Add tag</button>
+			<div v-for="(props, name) in contextEntries" :key="'ctx-' + name" class="tpp-table-row">
+				<span class="tpp-col-name">@{{ name }}</span>
+				<input
+					type="text"
+					v-model="contextCss[name]"
+					class="tpp-col-css"
+					placeholder="e.g. background: #f0f0f0; color: #333"
+					@change="saveContextProp(name, 'css', contextCss[name] || '')"
+				/>
+				<input
+					type="text"
+					v-model="contextHideAtTimes[name]"
+					class="tpp-col-hide"
+					placeholder='e.g. D == "Sat"'
+					@change="saveContextProp(name, 'hide-at-times', contextHideAtTimes[name] || '')"
+				/>
+				<button type="button" class="bad small" title="Remove" @click="clearContextProp(name)">
+					Remove
+				</button>
 			</div>
 		</div>
 
-		<div class="tpp-section">
-			<h3 class="tpp-subheading">Contexts</h3>
-			<p class="tpp-prop-hint">Per-context properties: <strong>css</strong> (chip inline style), <strong>hide-at-times</strong> (expression to hide tasks with this context).</p>
-			<div class="tpp-table-wrap">
-				<div class="tpp-table-header">
-					<span class="tpp-col-name">Context</span>
-					<span class="tpp-col-css">css</span>
-					<span class="tpp-col-hide">hide-at-times</span>
-					<span class="tpp-col-action"></span>
-				</div>
-				<div v-for="(props, name) in contextEntries" :key="'ctx-' + name" class="tpp-table-row">
-					<span class="tpp-col-name">@{{ name }}</span>
-					<input
-						type="text"
-						v-model="contextCss[name]"
-						class="tpp-col-css"
-						placeholder="e.g. background: #f0f0f0; color: #333"
-						@change="saveContextProp(name, 'css', contextCss[name] || '')"
-					/>
-					<input
-						type="text"
-						v-model="contextHideAtTimes[name]"
-						class="tpp-col-hide"
-						placeholder='e.g. D == "Sat"'
-						@change="saveContextProp(name, 'hide-at-times', contextHideAtTimes[name] || '')"
-					/>
-					<button type="button" class="tpp-remove-btn" title="Remove" @click="clearContextProp(name)">Remove</button>
-				</div>
-			</div>
-			<div class="tpp-add-row">
-				<input v-model="newContextName" type="text" class="tpp-name-input" placeholder="Context name" />
-				<input v-model="newContextCss" type="text" class="tpp-col-css tpp-add-input" placeholder="css" />
-				<button type="button" class="tpp-add-btn" @click="addContext">Add context</button>
-			</div>
-		</div>
-
-		<p v-if="tppError" class="tpp-error">{{ tppError }}</p>
-	</section>
+		<FormLayout @submit.prevent="addContext">
+			<FormField label="Context name" for="tpp-new-context-name">
+				<input
+					id="tpp-new-context-name"
+					v-model="newContextName"
+					type="text"
+					placeholder="Context name"
+				/>
+			</FormField>
+			<FormField label="css" for="tpp-new-context-css">
+				<input
+					id="tpp-new-context-css"
+					v-model="newContextCss"
+					type="text"
+					placeholder="e.g. background: #f0f0f0; color: #333"
+				/>
+			</FormField>
+			<template #actions>
+				<button
+					type="submit"
+					class="good"
+					:disabled="!newContextName.trim() || !newContextCss.trim()"
+				>
+					Add context
+				</button>
+			</template>
+		</FormLayout>
+	</Section>
 </template>
 
 <script setup>
 import { ref, computed, onMounted, inject } from 'vue';
+import Section from 'picocrank/vue/components/Section.vue';
+import FormField from 'picocrank/vue/components/FormField.vue';
+import FormLayout from 'picocrank/vue/components/FormLayout.vue';
+import { HugeiconsIcon } from '@hugeicons/vue';
+import { Refresh01Icon, Settings01Icon } from '@hugeicons/core-free-icons';
 
+const iconStrokeWidth = 2.5;
 const refreshTaskPropertyProperties = inject('refreshTaskPropertyProperties', () => Promise.resolve());
 const tagProperties = ref({});
 const contextProperties = ref({});
@@ -233,42 +340,41 @@ async function addContext() {
 	newContextCss.value = '';
 }
 
-onMounted(() => {
-	fetchTpp();
-	fetchRuleStatus();
-});
+async function fetchAll() {
+	await fetchTpp();
+	await fetchRuleStatus();
+}
+
+onMounted(fetchAll);
 </script>
 
 <style scoped>
-.tpp-view {
-	padding: 1.5rem;
-}
-.tpp-title {
-	margin: 0 0 0.5rem 0;
-	font-size: 1.25rem;
-}
-.tpp-intro {
-	margin: 0 0 1.25rem 0;
-	color: var(--femtocrank-text-muted, #666);
+.tpp-intro,
+.tpp-rule-hint {
+	margin: 0 0 1rem;
+	color: var(--muted-text-color, #666);
 	font-size: 0.9rem;
 }
-.tpp-section {
-	margin-bottom: 1.5rem;
+
+.tpp-rule-hint code {
+	font-size: 0.85em;
+	background: var(--standout-bg-color, #f5f5f5);
+	padding: 0.1rem 0.3rem;
+	border-radius: 0.2rem;
 }
-.tpp-subheading {
-	margin: 0 0 0.5rem 0;
-	font-size: 1rem;
+
+.tpp-rule-status {
+	margin: 0 0 1rem;
+	font-size: 0.9rem;
 }
-.tpp-prop-hint {
-	margin: 0 0 0.5rem 0;
-	font-size: 0.875rem;
-	color: var(--femtocrank-text-muted, #666);
-}
+
 .tpp-table-wrap {
 	display: flex;
 	flex-direction: column;
 	gap: 0.25rem;
+	margin-bottom: 1.25rem;
 }
+
 .tpp-table-header,
 .tpp-table-row {
 	display: grid;
@@ -276,110 +382,40 @@ onMounted(() => {
 	gap: 0.5rem;
 	align-items: center;
 }
+
 .tpp-table-header {
 	font-size: 0.875rem;
 	font-weight: 500;
-	color: var(--femtocrank-text-muted, #666);
+	color: var(--muted-text-color, #666);
 	padding-bottom: 0.25rem;
-	border-bottom: 1px solid var(--femtocrank-border, #ccc);
+	border-bottom: 1px solid var(--border-color, #ccc);
 }
-.tpp-table-row {
-	min-height: 2rem;
-}
+
 .tpp-col-name {
 	font-weight: 500;
 }
-.tpp-col-css {
-	width: 100%;
-	min-width: 0;
-	padding: 0.25rem 0.5rem;
-	border: 1px solid var(--femtocrank-border, #ccc);
-	border-radius: 0.25rem;
-	font-size: 0.875rem;
-}
+
+.tpp-col-css,
 .tpp-col-hide {
 	width: 100%;
 	min-width: 0;
-	padding: 0.25rem 0.5rem;
-	border: 1px solid var(--femtocrank-border, #ccc);
-	border-radius: 0.25rem;
-	font-size: 0.875rem;
-}
-.tpp-name-input {
-	width: 8rem;
-	padding: 0.25rem 0.5rem;
-	border: 1px solid var(--femtocrank-border, #ccc);
-	border-radius: 0.25rem;
-}
-.tpp-add-input {
-	width: 10rem;
-}
-.tpp-remove-btn,
-.tpp-add-btn {
-	padding: 0.25rem 0.5rem;
-	font-size: 0.875rem;
-	border: 1px solid var(--femtocrank-border, #ccc);
-	border-radius: 0.25rem;
-	background: var(--femtocrank-bg, #fff);
-	cursor: pointer;
-}
-.tpp-add-row {
-	display: flex;
-	align-items: center;
-	gap: 0.5rem;
-	margin-top: 0.75rem;
-}
-.tpp-error {
-	color: var(--femtocrank-error, #c00);
-	margin: 1rem 0 0 0;
 }
 
-.tpp-rule-builder {
-	background: var(--femtocrank-bg-muted, #f5f5f5);
-	border-radius: 0.5rem;
-	padding: 1rem;
-}
-.tpp-rule-hint {
-	margin: 0 0 0.5rem 0;
-	font-size: 0.875rem;
-	color: var(--femtocrank-text-muted, #666);
-}
-.tpp-rule-hint code {
-	font-size: 0.85em;
-	background: var(--femtocrank-bg, #fff);
-	padding: 0.1rem 0.3rem;
-	border-radius: 0.2rem;
-}
-.tpp-rule-status {
-	margin: 0 0 0.5rem 0;
-	font-size: 0.9rem;
-}
-.tpp-rule-test {
-	display: flex;
-	align-items: center;
-	gap: 0.5rem;
-	margin-bottom: 0.5rem;
-}
-.tpp-rule-expr-input {
-	flex: 1;
-	max-width: 24rem;
-	padding: 0.25rem 0.5rem;
-	border: 1px solid var(--femtocrank-border, #ccc);
-	border-radius: 0.25rem;
-}
 .tpp-rule-result {
-	margin-top: 0.5rem;
+	margin-top: 1rem;
 	font-size: 0.875rem;
 }
+
 .tpp-rule-result-ok {
-	color: var(--femtocrank-text-muted, #666);
+	color: var(--muted-text-color, #666);
 }
+
 .tpp-rule-result-err {
-	color: var(--femtocrank-error, #c00);
+	color: var(--karma-bad, #c00);
 }
+
 .tpp-rule-result-label {
 	font-weight: 500;
 	margin-right: 0.25rem;
 }
-
 </style>

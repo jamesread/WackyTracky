@@ -1,0 +1,24 @@
+= Backends
+
+WackyTracky can store tasks and lists in different backends. You choose
+one when configuring the app.
+
+== Recommended: todo.txt
+
+*xref:backends/todotxt.adoc[todo.txt]* is the *default* backend. It is
+*recommended* for most users and is the one that receives *most
+development and testing*. Your data lives as plain text files in the
+http://todotxt.org[todo.txt] format, so you can edit, sync, or back up
+your tasks with standard tools.
+
+Use todo.txt unless you have a specific reason to use another backend.
+
+== Other backends
+
+* *xref:backends/neo4j.adoc[Neo4j]* — Store tasks in a Neo4j graph database. For
+users who already run Neo4j or want a graph-based store.
+* *xref:backends/yamlfiles.adoc[YAML files]* — Store tasks in YAML files on disk. A
+simple file-based option that does not use the todo.txt format.
+
+Each backend has its own configuration options; see the linked pages for
+details.

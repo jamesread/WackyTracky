@@ -134,40 +134,42 @@
 			<div class="task-details-dialog wait-dialog" role="dialog" aria-labelledby="wait-dialog-title" aria-modal="true" @click.stop>
 				<h2 id="wait-dialog-title" class="task-details-title">Wait until</h2>
 				<p class="task-details-content">{{ taskForWait.content }}</p>
-				<div class="wait-dialog-field">
-					<label for="wait-datetime-input">Date and time</label>
-					<input id="wait-datetime-input" v-model="waitDateTimeDraft" type="datetime-local" class="wait-datetime-input" />
-				</div>
 				<div class="wait-dialog-shortcuts">
-					<button type="button" class="wait-shortcut-btn" @click="setWaitRelativeDays(1)">+1 day</button>
-					<button type="button" class="wait-shortcut-btn" @click="setWaitRelativeDays(2)">+2 days</button>
-					<button type="button" class="wait-shortcut-btn" @click="setWaitRelativeDays(3)">+3 days</button>
+					<button type="button" class="neutral small" @click="setWaitRelativeDays(1)">+1 day</button>
+					<button type="button" class="neutral small" @click="setWaitRelativeDays(2)">+2 days</button>
+					<button type="button" class="neutral small" @click="setWaitRelativeDays(3)">+3 days</button>
 				</div>
-				<div class="task-details-actions wait-dialog-actions">
-					<button type="button" class="task-details-close-btn" @click="closeWaitDialog">Cancel</button>
-					<button type="button" class="task-details-close-btn" @click="clearWaitAndClose">Clear wait</button>
-					<button type="button" class="task-details-close-btn good" @click="saveWaitAndClose">Save</button>
-				</div>
+				<FormLayout @submit.prevent="saveWaitAndClose">
+					<FormField label="Date and time" for="wait-datetime-input">
+						<input id="wait-datetime-input" v-model="waitDateTimeDraft" type="datetime-local" />
+					</FormField>
+					<template #actions>
+						<button type="button" class="neutral" @click="closeWaitDialog">Cancel</button>
+						<button type="button" class="neutral" @click="clearWaitAndClose">Clear wait</button>
+						<button type="submit" class="good">Save</button>
+					</template>
+				</FormLayout>
 			</div>
 		</div>
 		<div v-if="taskForDue" class="confirm-overlay task-details-overlay" @click.self="closeDueDialog">
 			<div class="task-details-dialog wait-dialog" role="dialog" aria-labelledby="due-dialog-title" aria-modal="true" @click.stop>
 				<h2 id="due-dialog-title" class="task-details-title">Due date</h2>
 				<p class="task-details-content">{{ taskForDue.content }}</p>
-				<div class="wait-dialog-field">
-					<label for="due-date-input">Date</label>
-					<input id="due-date-input" v-model="dueDateDraft" type="date" class="wait-datetime-input" />
-				</div>
 				<div class="wait-dialog-shortcuts">
-					<button type="button" class="wait-shortcut-btn" @click="setDueRelativeDays(1)">+1 day</button>
-					<button type="button" class="wait-shortcut-btn" @click="setDueRelativeDays(2)">+2 days</button>
-					<button type="button" class="wait-shortcut-btn" @click="setDueRelativeDays(7)">+7 days</button>
+					<button type="button" class="neutral small" @click="setDueRelativeDays(1)">+1 day</button>
+					<button type="button" class="neutral small" @click="setDueRelativeDays(2)">+2 days</button>
+					<button type="button" class="neutral small" @click="setDueRelativeDays(7)">+7 days</button>
 				</div>
-				<div class="task-details-actions wait-dialog-actions">
-					<button type="button" class="task-details-close-btn" @click="closeDueDialog">Cancel</button>
-					<button type="button" class="task-details-close-btn" @click="clearDueAndClose">Clear due</button>
-					<button type="button" class="task-details-close-btn good" @click="saveDueAndClose">Save</button>
-				</div>
+				<FormLayout @submit.prevent="saveDueAndClose">
+					<FormField label="Date" for="due-date-input">
+						<input id="due-date-input" v-model="dueDateDraft" type="date" />
+					</FormField>
+					<template #actions>
+						<button type="button" class="neutral" @click="closeDueDialog">Cancel</button>
+						<button type="button" class="neutral" @click="clearDueAndClose">Clear due</button>
+						<button type="submit" class="good">Save</button>
+					</template>
+				</FormLayout>
 			</div>
 		</div>
 		<div v-if="pendingDoneTask" class="confirm-overlay" @click.self="pendingDoneTask = null">
@@ -186,17 +188,24 @@
 		<div v-if="listOptionsOpen" class="list-options-overlay" @click.self="listOptionsOpen = false">
 			<div class="list-options-dialog" role="dialog" aria-labelledby="list-options-title" aria-modal="true">
 				<h2 id="list-options-title" class="list-options-title">List options</h2>
-				<div class="list-options-rename">
-					<label for="list-rename-input">Rename list</label>
-					<input id="list-rename-input" v-model="listRenameTitle" type="text" class="list-rename-input" />
-					<button type="button" class="list-options-action-btn" @click="renameList">Rename</button>
-				</div>
+				<FormLayout @submit.prevent="renameList">
+					<FormField label="Rename list" for="list-rename-input">
+						<input id="list-rename-input" v-model="listRenameTitle" type="text" />
+					</FormField>
+					<template #actions>
+						<button type="submit" class="neutral">Rename</button>
+					</template>
+				</FormLayout>
 				<div class="list-options-delete">
-					<button type="button" class="list-options-delete-btn" @click="confirmDeleteList">Delete list</button>
-					<p v-if="deleteListConfirm" class="list-options-delete-confirm">Tasks will be moved to Inbox. <button type="button" class="confirm-delete-list-btn" @click="deleteList">Confirm delete</button> <button type="button" class="cancel-delete-list-btn" @click="deleteListConfirm = false">Cancel</button></p>
+					<button type="button" class="bad" @click="confirmDeleteList">Delete list</button>
+					<p v-if="deleteListConfirm" class="list-options-delete-confirm">
+						Tasks will be moved to Inbox.
+						<button type="button" class="bad small" @click="deleteList">Confirm delete</button>
+						<button type="button" class="neutral small" @click="deleteListConfirm = false">Cancel</button>
+					</p>
 				</div>
 				<div class="list-options-dialog-actions">
-					<button type="button" class="list-options-close" @click="closeListOptions">Close</button>
+					<button type="button" class="neutral" @click="closeListOptions">Close</button>
 				</div>
 			</div>
 		</div>
@@ -210,6 +219,8 @@
 	import { HugeiconsIcon } from '@hugeicons/vue';
 	import { Folder01Icon, FolderOpenIcon, CheckmarkBadge01Icon, PlayIcon, ClockIcon, Calendar03Icon, MoreVerticalIcon } from '@hugeicons/core-free-icons';
 	import Section from 'picocrank/vue/components/Section.vue';
+	import FormField from 'picocrank/vue/components/FormField.vue';
+	import FormLayout from 'picocrank/vue/components/FormLayout.vue';
 	import { useSettings } from '../composables/useSettings.js';
 	import { getCachedList, getOfflineTasks, getOfflineEdits, INBOX_LIST_ID } from '../../../js/modules/offlineStorage.js';
 	import { describeApiError } from '../../../js/modules/apiError.js';

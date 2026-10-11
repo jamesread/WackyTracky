@@ -1,6 +1,5 @@
----
 site:
-  title: Wacky Tracky docs
+  title: WackyTracky docs
   start_page: ROOT::index.adoc
   robots: allow
 content:
@@ -21,4 +20,4 @@ asciidoc:
     kroki-default-format: png
   extensions:
     - '@asciidoctor/tabs'
-    - 'asciidoctor-kroki'
+    - asciidoctor-kroki

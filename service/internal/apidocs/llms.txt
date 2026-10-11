@@ -4,7 +4,7 @@
 
 WackyTracky exposes machine-readable integration endpoints on the same base URL as the web application.
 
-When HTTP authentication is enabled on a deployment, include credentials on API and MCP requests (for example `Authorization: Basic ...`). The MCP server and Connect API share the same authentication.
+Authentication: browser cookie `wacky-tracky-sid`, or `Authorization: Bearer <api-key>` (keys use prefix `wt_`). HTTP MCP requires a Bearer API key. First empty IAM database seeds admin/admin.
 
 ## API
 
@@ -37,4 +37,4 @@ For local stdio clients (Claude Desktop, Cursor with a subprocess), run `wt mcp`
 - [GitHub repository](https://github.com/wacky-tracky/WackyTracky): Source code, issues, and releases
 - [README](https://github.com/wacky-tracky/WackyTracky#readme): Project overview and setup
 - [AGENTS.md](https://github.com/wacky-tracky/WackyTracky/blob/main/AGENTS.md): AI agent integration guide and MCP tool reference
-- [API docs](https://github.com/wacky-tracky/WackyTracky/tree/main/docs/source/api): Human-readable API reference and deployment guides
+- [API docs](https://github.com/wacky-tracky/WackyTracky/tree/main/docs/modules/ROOT/pages/api): Human-readable API reference and deployment guides

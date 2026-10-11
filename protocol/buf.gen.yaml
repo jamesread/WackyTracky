@@ -4,7 +4,8 @@ plugins:
     out: ../service/gen/
     opt: paths=source_relative
 
-  - remote: buf.build/connectrpc/go
+  # Pin to connect-go v1.x (emits connectrpc.com/connect, not connect/v2).
+  - remote: buf.build/connectrpc/go:v1.18.1
     out: ../service/gen/
     opt: paths=source_relative
 
@@ -15,7 +16,7 @@ plugins:
   # OpenAPI spec for the Connect JSON/HTTP API, published with the docs so
   # humans and LLMs can discover endpoints and message shapes.
   - remote: buf.build/community/sudorandom-connect-openapi
-    out: ../docs/source/api
+    out: ../docs/modules/ROOT/attachments
     opt:
       - format=yaml
       - path=openapi.yaml

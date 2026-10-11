@@ -1,0 +1,92 @@
+= Authentication
+
+WackyTracky uses a separate SQLite database for accounts, sessions, API
+keys, and roles. Task data stays in your chosen task backend (todo.txt,
+Neo4j, or YAML files).
+
+== First administrator
+
+On first start with an empty IAM database, the service creates:
+
+[cols=",",options="header",]
+|===
+|Username |Password
+|`admin` |`admin`
+|===
+
+Change this password before exposing the instance. The first account is
+placed in the *Administrators* group (full access).
+
+== Config
+
+In `config.yaml`:
+
+[source,yaml]
+----
+iam:
+  database: ./data/iam.sqlite   # SQLite file for users/sessions/RBAC
+
+auth: {}                        # optional httpauthshim settings (JWT, trusted headers, mTLS)
+----
+
+* *`iam.database`* — Path to the IAM SQLite file. Created automatically
+if missing.
+* *`auth`* — Optional
+https://github.com/jamesread/httpauthshim[httpauthshim] configuration
+for JWT, reverse-proxy headers, or mTLS. Empty `++{++}` is valid
+(username/password only).
+
+Persist the IAM database (and your task data) across container restarts
+with volumes.
+
+== Browser sessions vs API keys
+
+[width="100%",cols="62%,38%",options="header",]
+|===
+|Method |How
+|Web UI |Login sets an HttpOnly cookie named `wacky-tracky-sid`
+
+|Scripts / MCP (HTTP) |Create an API key in the UI, send
+`Authorization: Bearer ++<++key++>++` (keys use the `wt++_++` prefix)
+|===
+
+Read-only API keys cannot change data. Cookie auth is not used on
+`/mcp`; use a Bearer API key there.
+
+== How access works
+
+Permissions come from *groups and roles*, not from ticking boxes on a
+single user:
+
+[arabic]
+. A *role* lists permissions (for example `app.access` or `users.view`).
+. A *group* is given one or more roles.
+. Users belong to groups and inherit the union of those roles.
+
+Built-in seeds include the *Everyone* group (member access) and
+*Administrators* (superuser). Do not leave the system with zero
+administrators.
+
+== Development: disable auth
+
+For local development only:
+
+[source,bash]
+----
+export WACKYTRACKY_DEV_DISABLE_AUTH=true
+----
+
+Requests run as an anonymous superuser. Never enable this in production.
+
+To allow non-HTTPS cookies in local HTTP:
+
+[source,bash]
+----
+export WACKYTRACKY_SECURE_COOKIES=false
+----
+
+== Optional single sign-on
+
+Extend `auth:` for JWT, trusted headers, or mTLS via httpauthshim. Strip
+inbound identity headers at your reverse proxy unless you trust the
+source. Most self-hosted setups only need username and password.

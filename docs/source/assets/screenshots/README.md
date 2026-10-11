@@ -1,1 +1,0 @@
-Screenshots used in the docs and README. Copy `list-work.png`, `task-options.png`, and `tpp.png` from `var/marketing/screenshots/` after running `make marketing-screenshots` from the repo root, then commit them so the MkDocs and GitHub Pages build include the images.

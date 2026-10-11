@@ -1,43 +1,106 @@
 <!DOCTYPE html>
-<html lang = "en">
+<html lang="en">
 
 <head>
 	<title>WackyTracky</title>
 
-	<meta name = "viewport" content = "width=device-width, initial-scale=1.0">
-	<meta name = "theme-color" content = "#444444">
-	<meta name = "description" content = "Task and list tracking." />
-	<meta name = "mobile-web-app-capable" content = "yes" />
-	<meta name = "apple-mobile-web-app-capable" content = "yes" />
-	<meta name = "apple-mobile-web-app-status-bar-style" content = "default" />
-	<meta name = "apple-mobile-web-app-title" content = "WackyTracky" />
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta name="theme-color" content="#444444">
+	<meta name="description" content="Task and list tracking." />
+	<meta name="mobile-web-app-capable" content="yes" />
+	<meta name="apple-mobile-web-app-capable" content="yes" />
+	<meta name="apple-mobile-web-app-status-bar-style" content="default" />
+	<meta name="apple-mobile-web-app-title" content="WackyTracky" />
 
-	<link rel="manifest" href = "/wt.webmanifest" />
-	<link rel="canonical" href = "https://web.wacky-tracky.com" />
-	<link rel="shortcut icon" href = "resources/images/logos/wacky-tracky.png" type = "image/png" />
-	<link rel="apple-touch-icon" href = "resources/images/logos/wacky-tracky.png" />
+	<link rel="manifest" href="/wt.webmanifest" />
+	<link rel="canonical" href="https://web.wacky-tracky.com" />
+	<link rel="shortcut icon" href="resources/images/logos/wacky-tracky.png" type="image/png" />
+	<link rel="apple-touch-icon" href="resources/images/logos/wacky-tracky.png" />
 	<style>
+		:root {
+			--boot-bg: #dee3e7;
+			--boot-card: #fff;
+			--boot-ink: #222;
+			--boot-muted: #5d5d5d;
+			--boot-accent: #2dae82;
+			--boot-shadow: 0 0 6px 5px #aaa;
+		}
+
+		html, body {
+			margin: 0;
+			min-height: 100%;
+			background: var(--boot-bg);
+			color: var(--boot-ink);
+			font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+		}
+
 		#initMessages {
 			display: flex;
 			align-items: center;
 			justify-content: center;
-			min-height: 50vh;
-			text-align: center;
-			padding: 1rem;
+			min-height: 100vh;
+			padding: 1.5rem;
 			box-sizing: border-box;
 		}
+
 		#initMessages .boot-message-card {
-			background-color: white;
-			padding: 1.25rem 1.5rem;
-			border-radius: 0.5rem;
-			box-shadow: 0 0 0.5em #9a9a9a;
-			font-weight: bold;
-			max-width: 20rem;
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+			gap: 0.85rem;
+			width: min(100%, 20rem);
+			padding: 2rem 1.75rem;
+			background: var(--boot-card);
+			border-radius: 0.8em;
+			box-shadow: var(--boot-shadow);
+			text-align: center;
 		}
-		#initMessages .boot-message-card p {
+
+		#initMessages .boot-logo {
+			width: 3.5rem;
+			height: 3.5rem;
+			object-fit: contain;
+		}
+
+		#initMessages .boot-brand {
+			margin: 0;
+			font-size: 1.35rem;
+			font-weight: 600;
+			letter-spacing: -0.02em;
+			line-height: 1.2;
+		}
+
+		#initMessages .boot-status {
 			margin: 0;
 			font-size: 0.95rem;
-			color: #333;
+			font-weight: 400;
+			color: var(--boot-muted);
+			line-height: 1.4;
+		}
+
+		#initMessages .boot-spinner {
+			width: 1.35rem;
+			height: 1.35rem;
+			border: 2.5px solid color-mix(in srgb, var(--boot-accent) 25%, transparent);
+			border-top-color: var(--boot-accent);
+			border-radius: 50%;
+			animation: boot-spin 0.7s linear infinite;
+		}
+
+		#initMessages noscript {
+			display: block;
+			max-width: 20rem;
+			padding: 1.25rem 1.5rem;
+			background: var(--boot-card);
+			border-radius: 0.8em;
+			box-shadow: var(--boot-shadow);
+			font-weight: 600;
+			text-align: center;
+		}
+
+		@keyframes boot-spin {
+			to { transform: rotate(360deg); }
 		}
 	</style>
 </head>
@@ -45,10 +108,19 @@
 <body>
 	<div id="slot-app"></div>
 
-	<div id="initMessages" class="init-messages">
-		<noscript>Javascript is needed.</noscript>
+	<div id="initMessages" class="init-messages" role="status" aria-live="polite">
+		<noscript>JavaScript is required to run WackyTracky.</noscript>
 		<div id="bootMessage" class="boot-message-card">
-			<p>Waiting for scripts to initialize...</p>
+			<img
+				class="boot-logo"
+				src="resources/images/logos/wacky-tracky.png"
+				alt=""
+				width="56"
+				height="56"
+			/>
+			<p class="boot-brand">WackyTracky</p>
+			<p class="boot-status">Waiting for scripts to initialize…</p>
+			<div class="boot-spinner" aria-hidden="true"></div>
 		</div>
 	</div>
 

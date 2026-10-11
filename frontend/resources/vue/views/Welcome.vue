@@ -1,49 +1,98 @@
 <template>
-	<section class="welcome">
-		<h2>Welcome</h2>
-		<p class="welcome-intro">Choose a list to view or add tasks.</p>
-		<div v-if="lists.length" class="list-nav">
-			<router-link
-				v-for="list in lists"
-				:key="list.id"
-				:to="'/lists/' + list.id"
-				class="list-nav-btn"
+	<Section
+		title="Welcome"
+		:icon="HomeIcon"
+		subtitle="Choose a list to view or add tasks."
+		:padding="true"
+	>
+		<template #toolbar>
+			<button
+				type="button"
+				class="inline-icon neutral"
+				aria-label="Refresh"
+				title="Refresh"
+				:disabled="loading"
+				@click="loadLists"
 			>
-				{{ list.title }}
-				<span v-if="list.countItems != null" class="list-count">{{ list.countItems }}</span>
-			</router-link>
-		</div>
-		<p v-else-if="loadError" class="welcome-error" role="alert">
-			{{ loadError }}
-			<button type="button" class="welcome-retry-btn" @click="loadLists">Try again</button>
-		</p>
-		<p v-else-if="!loading" class="welcome-empty">No lists yet.</p>
-		<p v-else class="welcome-loading">Loading…</p>
-		<div class="welcome-actions">
-			<button type="button" class="new-list-btn" :disabled="!isOnline" @click="showCreateDialog = true">
-				New list
+				<HugeiconsIcon
+					:icon="Refresh01Icon"
+					width="1em"
+					height="1em"
+					:strokeWidth="iconStrokeWidth"
+					aria-hidden="true"
+				/>
 			</button>
-		</div>
+			<button
+				type="button"
+				class="inline-icon good"
+				aria-label="New list"
+				title="New list"
+				:disabled="!isOnline"
+				@click="showCreateDialog = true"
+			>
+				<HugeiconsIcon
+					:icon="PlusSignIcon"
+					width="1em"
+					height="1em"
+					:strokeWidth="iconStrokeWidth"
+					aria-hidden="true"
+				/>
+			</button>
+		</template>
+
+		<p v-if="loadError" class="inline-notification error" role="alert">
+			{{ loadError }}
+			<button type="button" class="neutral small" @click="loadLists">Try again</button>
+		</p>
+		<p v-else-if="loading && !lists.length" class="muted">Loading…</p>
+		<p v-else-if="!loading && !lists.length" class="inline-notification note">No lists yet.</p>
+		<Navigation v-else ref="navRef">
+			<NavigationGrid />
+		</Navigation>
+
 		<CreateListDialog
 			v-model="showCreateDialog"
 			@created="onListCreated"
 		/>
-	</section>
+	</Section>
 </template>
 
 <script setup>
-	import { ref, onMounted, watch, inject } from 'vue';
+	import { ref, onMounted, watch, inject, nextTick } from 'vue';
+	import { useRouter } from 'vue-router';
+	import Section from 'picocrank/vue/components/Section.vue';
+	import Navigation from 'picocrank/vue/components/Navigation.vue';
+	import NavigationGrid from 'picocrank/vue/components/NavigationGrid.vue';
+	import { HugeiconsIcon } from '@hugeicons/vue';
+	import { HomeIcon, Folder01Icon, PlusSignIcon, Refresh01Icon } from '@hugeicons/core-free-icons';
 	import CreateListDialog from '../components/CreateListDialog.vue';
 	import { getCachedInbox, INBOX_LIST_ID } from '../../../js/modules/offlineStorage.js';
 	import { describeApiError } from '../../../js/modules/apiError.js';
 
+	const iconStrokeWidth = 2.5;
+	const router = useRouter();
 	const lists = ref([]);
 	const loading = ref(true);
 	const loadError = ref(null);
 	const showCreateDialog = ref(false);
+	const navRef = ref(null);
 	const refreshTrigger = inject('refreshTrigger', null);
 	const showToast = inject('showToast', () => {});
 	const isOnline = inject('isOnline', ref(true));
+
+	async function syncNavGrid() {
+		await nextTick();
+		const nav = navRef.value;
+		if (!nav) return;
+		nav.clearNavigationLinks();
+		for (const list of lists.value) {
+			nav.addCallback(list.title, () => router.push('/lists/' + list.id), {
+				icon: Folder01Icon,
+				name: 'list-' + list.id,
+				count: list.countItems,
+			});
+		}
+	}
 
 	async function loadLists() {
 		loading.value = true;
@@ -55,6 +104,7 @@
 				? [{ id: cached.listId, title: cached.listTitle, countItems: cached.tasks?.length ?? null }]
 				: [{ id: INBOX_LIST_ID, title: 'Inbox', countItems: null }];
 			loading.value = false;
+			await syncNavGrid();
 			return;
 		}
 		if (!window.client) {
@@ -70,6 +120,7 @@
 			showToast(message, 'error');
 		} finally {
 			loading.value = false;
+			await syncNavGrid();
 		}
 	}
 
@@ -79,69 +130,6 @@
 	}
 
 	watch(isOnline, loadLists);
+	watch(lists, () => { syncNavGrid(); });
 	onMounted(loadLists);
 </script>
-
-<style scoped>
-	.welcome {
-		padding: 1.5rem;
-	}
-	.welcome h2 {
-		margin: 0 0 0.5rem 0;
-		font-size: 1.5rem;
-	}
-	.welcome-intro {
-		margin: 0 0 1.25rem 0;
-		color: #555;
-	}
-	.list-nav {
-		display: flex;
-		flex-wrap: wrap;
-		gap: 0.75rem;
-	}
-	.list-nav-btn {
-		display: inline-flex;
-		align-items: center;
-		gap: 0.5rem;
-		padding: 0.6rem 1rem;
-		border-radius: 0.5rem;
-		background: var(--femtocrank-bg, #fff);
-		border: 1px solid var(--femtocrank-border, #ccc);
-		color: inherit;
-		text-decoration: none;
-		font-size: 1rem;
-		transition: background 0.15s;
-	}
-	.list-nav-btn:hover {
-		background: var(--femtocrank-hover, #f0f0f0);
-	}
-	.list-count {
-		font-size: 0.85em;
-		color: #666;
-	}
-	.welcome-empty,
-	.welcome-loading {
-		margin: 0;
-		color: #666;
-	}
-	.welcome-error {
-		margin: 0;
-		color: #c00;
-		font-size: 0.95rem;
-	}
-	.welcome-retry-btn {
-		margin-left: 0.5rem;
-		padding: 0.35rem 0.6rem;
-		border: 1px solid #ccc;
-		border-radius: 0.35rem;
-		background: #fff;
-		font-size: 0.9rem;
-		cursor: pointer;
-	}
-	.welcome-retry-btn:hover {
-		background: #f5f5f5;
-	}
-	.welcome-actions {
-		margin-top: 1.5rem;
-	}
-</style>

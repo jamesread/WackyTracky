@@ -25,6 +25,7 @@ wt.key
 **/*.dll
 dist/
 **/dist/
+/build/
 
 # Go
 **/*.test
@@ -47,6 +48,7 @@ integration-tests/screenshots/
 integration-tests/node_modules/
 integration-tests/testdata/
 service/testdata/
+service/data/
 
 # Draft / working files (optional: remove if you want to track these)
 AGENTS-baseline.md

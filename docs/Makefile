@@ -1,11 +1,9 @@
-site:
-	rm -rf site
-	mkdocs build
-
-devenv:
-	pip install mkdocs-material
+default: ci
 
 ci:
 	npm ci
 
-.PHONY: site
+site:
+	./node_modules/.bin/antora ../antora-playbook.yml --to-dir ../build/site
+
+.PHONY: default ci site

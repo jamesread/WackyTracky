@@ -174,6 +174,12 @@ message DeleteListResponse {}
 message InitRequest {}
 message InitResponse {
 	string wallpaper = 1;
+	bool show_footer = 2;
+	bool show_new_versions = 3;
+	string available_version = 4;
+	string current_version = 5;
+	string page_title = 6;
+	bool show_version_number = 7;
 }
 
 message VersionRequest {}
@@ -213,10 +219,334 @@ message SetSavedSearchesRequest {
 }
 message SetSavedSearchesResponse {}
 
+// --- IAM / authentication ---
+
+message StandardResponse {
+	bool success = 1;
+	string message = 2;
+}
+
+message GetStatusRequest {}
+
+message GetStatusResponse {
+	string username = 1;
+	bool is_logged_in = 2;
+	repeated string rbac_permissions = 3;
+	bool rbac_is_superuser = 4;
+	bool is_impersonating = 5;
+	string impersonator_username = 6;
+	bool uses_secure_cookies = 7;
+	string account_created_at = 8;
+}
+
+message LoginWithUsernameAndPasswordRequest {
+	string username = 1;
+	string password = 2;
+}
+
+message LoginWithUsernameAndPasswordResponse {
+	StandardResponse standard_response = 1;
+	string username = 2;
+}
+
+message LogoutRequest {}
+
+message LogoutResponse {
+	StandardResponse standard_response = 1;
+}
+
+message ChangePasswordRequest {
+	string current_password = 1;
+	string new_password = 2;
+}
+
+message ChangePasswordResponse {
+	StandardResponse standard_response = 1;
+}
+
+message UserAccount {
+	int32 id = 1;
+	string username = 2;
+	string created_at = 3;
+	string created_by = 4;
+	repeated UserGroup user_groups = 5;
+}
+
+message GetUsersRequest {}
+
+message GetUsersResponse {
+	repeated UserAccount users = 1;
+}
+
+message GetUserRequest {
+	int32 user_id = 1;
+}
+
+message GetUserResponse {
+	UserAccount user = 1;
+	repeated UserGroup user_groups = 2;
+}
+
+message CreateUserRequest {
+	string username = 1;
+	string password = 2;
+}
+
+message CreateUserResponse {
+	StandardResponse standard_response = 1;
+	UserAccount user = 2;
+}
+
+message DeleteUserRequest {
+	int32 user_id = 1;
+}
+
+message DeleteUserResponse {
+	StandardResponse standard_response = 1;
+}
+
+message ResetUserPasswordRequest {
+	int32 user_id = 1;
+	string new_password = 2;
+}
+
+message ResetUserPasswordResponse {
+	StandardResponse standard_response = 1;
+}
+
+message RbacPermission {
+	int32 id = 1;
+	string name = 2;
+	string description = 3;
+}
+
+message RbacRole {
+	int32 id = 1;
+	string name = 2;
+	string description = 3;
+	repeated int32 permission_ids = 4;
+	int32 group_count = 5;
+	int32 user_count = 6;
+}
+
+message ListRbacPermissionsRequest {}
+
+message ListRbacPermissionsResponse {
+	repeated RbacPermission permissions = 1;
+}
+
+message ListRbacRolesRequest {}
+
+message ListRbacRolesResponse {
+	repeated RbacRole roles = 1;
+}
+
+message CreateRbacRoleRequest {
+	string name = 1;
+	string description = 2;
+	repeated int32 permission_ids = 3;
+}
+
+message CreateRbacRoleResponse {
+	RbacRole role = 1;
+}
+
+message UpdateRbacRoleRequest {
+	int32 id = 1;
+	string name = 2;
+	string description = 3;
+	repeated int32 permission_ids = 4;
+}
+
+message DeleteRbacRoleRequest {
+	int32 id = 1;
+}
+
+message DeleteRbacRoleResponse {}
+
+message GetUserRbacRolesRequest {
+	int32 user_id = 1;
+}
+
+message GetUserRbacRolesResponse {
+	repeated RbacRole roles = 1;
+}
+
+message GetUserGroupRbacRolesRequest {
+	int32 group_id = 1;
+}
+
+message GetUserGroupRbacRolesResponse {
+	repeated int32 role_ids = 1;
+}
+
+message SetUserGroupRbacRolesRequest {
+	int32 group_id = 1;
+	repeated int32 role_ids = 2;
+}
+
+message SetUserGroupRbacRolesResponse {
+	StandardResponse standard_response = 1;
+}
+
+message GetRbacRoleUsersRequest {
+	int32 role_id = 1;
+}
+
+message GetRbacRoleUsersResponse {
+	repeated string usernames = 1;
+}
+
+message GetRbacRoleGroupsRequest {
+	int32 role_id = 1;
+}
+
+message GetRbacRoleGroupsResponse {
+	repeated string group_names = 1;
+}
+
+message MyPermissionAuditRow {
+	string permission = 1;
+	bool granted = 2;
+	repeated string granting_groups = 3;
+}
+
+message GetMyPermissionsAuditRequest {}
+
+message GetMyPermissionsAuditResponse {
+	repeated string group_names = 1;
+	repeated string role_names = 2;
+	bool is_superuser = 3;
+	repeated MyPermissionAuditRow permissions = 4;
+}
+
+message UserGroup {
+	int32 id = 1;
+	string name = 2;
+	int32 member_count = 3;
+}
+
+message ListUserGroupsRequest {}
+
+message ListUserGroupsResponse {
+	repeated UserGroup groups = 1;
+}
+
+message CreateUserGroupRequest {
+	string name = 1;
+}
+
+message CreateUserGroupResponse {
+	UserGroup group = 1;
+}
+
+message DeleteUserGroupRequest {
+	int32 group_id = 1;
+}
+
+message DeleteUserGroupResponse {}
+
+message GetUserGroupMembersRequest {
+	int32 group_id = 1;
+}
+
+message GetUserGroupMembersResponse {
+	repeated UserAccount members = 1;
+}
+
+message SetUserGroupMembersRequest {
+	int32 group_id = 1;
+	repeated int32 user_ids = 2;
+}
+
+message SetUserGroupMembersResponse {
+	StandardResponse standard_response = 1;
+}
+
+message ImpersonateUserRequest {
+	int32 user_id = 1;
+}
+
+message ImpersonateUserResponse {
+	StandardResponse standard_response = 1;
+}
+
+message StopImpersonationRequest {}
+
+message StopImpersonationResponse {
+	StandardResponse standard_response = 1;
+}
+
+message ApiKey {
+	int32 id = 1;
+	string name = 2;
+	string created_at = 3;
+	string last_used_at = 4;
+	bool read_only = 5;
+}
+
+message ListApiKeysRequest {}
+
+message ListApiKeysResponse {
+	repeated ApiKey keys = 1;
+}
+
+message CreateApiKeyRequest {
+	string name = 1;
+	bool read_only = 2;
+}
+
+message CreateApiKeyResponse {
+	ApiKey key = 1;
+	string secret = 2;
+}
+
+message DeleteApiKeyRequest {
+	int32 id = 1;
+}
+
+message DeleteApiKeyResponse {}
+
 service WackyTrackyClientService {
 	rpc Version(VersionRequest) returns (VersionResponse) {}
 
 	rpc Init(InitRequest) returns (InitResponse) {}
+
+	rpc GetStatus(GetStatusRequest) returns (GetStatusResponse) {}
+	rpc LoginWithUsernameAndPassword(LoginWithUsernameAndPasswordRequest) returns (LoginWithUsernameAndPasswordResponse) {}
+	rpc Logout(LogoutRequest) returns (LogoutResponse) {}
+	rpc ChangePassword(ChangePasswordRequest) returns (ChangePasswordResponse) {}
+
+	rpc GetUsers(GetUsersRequest) returns (GetUsersResponse) {}
+	rpc GetUser(GetUserRequest) returns (GetUserResponse) {}
+	rpc CreateUser(CreateUserRequest) returns (CreateUserResponse) {}
+	rpc DeleteUser(DeleteUserRequest) returns (DeleteUserResponse) {}
+	rpc ResetUserPassword(ResetUserPasswordRequest) returns (ResetUserPasswordResponse) {}
+
+	rpc ListRbacPermissions(ListRbacPermissionsRequest) returns (ListRbacPermissionsResponse) {}
+	rpc ListRbacRoles(ListRbacRolesRequest) returns (ListRbacRolesResponse) {}
+	rpc CreateRbacRole(CreateRbacRoleRequest) returns (CreateRbacRoleResponse) {}
+	rpc UpdateRbacRole(UpdateRbacRoleRequest) returns (RbacRole) {}
+	rpc DeleteRbacRole(DeleteRbacRoleRequest) returns (DeleteRbacRoleResponse) {}
+	rpc GetUserRbacRoles(GetUserRbacRolesRequest) returns (GetUserRbacRolesResponse) {}
+	rpc GetUserGroupRbacRoles(GetUserGroupRbacRolesRequest) returns (GetUserGroupRbacRolesResponse) {}
+	rpc SetUserGroupRbacRoles(SetUserGroupRbacRolesRequest) returns (SetUserGroupRbacRolesResponse) {}
+	rpc GetRbacRoleUsers(GetRbacRoleUsersRequest) returns (GetRbacRoleUsersResponse) {}
+	rpc GetRbacRoleGroups(GetRbacRoleGroupsRequest) returns (GetRbacRoleGroupsResponse) {}
+	rpc GetMyPermissionsAudit(GetMyPermissionsAuditRequest) returns (GetMyPermissionsAuditResponse) {}
+
+	rpc ListUserGroups(ListUserGroupsRequest) returns (ListUserGroupsResponse) {}
+	rpc CreateUserGroup(CreateUserGroupRequest) returns (CreateUserGroupResponse) {}
+	rpc DeleteUserGroup(DeleteUserGroupRequest) returns (DeleteUserGroupResponse) {}
+	rpc GetUserGroupMembers(GetUserGroupMembersRequest) returns (GetUserGroupMembersResponse) {}
+	rpc SetUserGroupMembers(SetUserGroupMembersRequest) returns (SetUserGroupMembersResponse) {}
+
+	rpc ImpersonateUser(ImpersonateUserRequest) returns (ImpersonateUserResponse) {}
+	rpc StopImpersonation(StopImpersonationRequest) returns (StopImpersonationResponse) {}
+
+	rpc ListApiKeys(ListApiKeysRequest) returns (ListApiKeysResponse) {}
+	rpc CreateApiKey(CreateApiKeyRequest) returns (CreateApiKeyResponse) {}
+	rpc DeleteApiKey(DeleteApiKeyRequest) returns (DeleteApiKeyResponse) {}
 
 	rpc GetLists(GetListsRequest) returns (GetListsResponse) {}
 

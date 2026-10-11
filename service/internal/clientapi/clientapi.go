@@ -12,11 +12,14 @@ import (
 	log "github.com/sirupsen/logrus"
 	pb "github.com/wacky-tracky/wacky-tracky-server/gen/wacky-tracky/clientapi/v1"
 	clientv1 "github.com/wacky-tracky/wacky-tracky-server/gen/wacky-tracky/clientapi/v1/clientv1connect"
+	"github.com/wacky-tracky/wacky-tracky-server/internal/auth"
 	"github.com/wacky-tracky/wacky-tracky-server/internal/buildinfo"
 	dbmdl "github.com/wacky-tracky/wacky-tracky-server/internal/db/model"
 	"github.com/wacky-tracky/wacky-tracky-server/internal/db/todotxt"
 	"github.com/wacky-tracky/wacky-tracky-server/internal/gitsync"
+	"github.com/wacky-tracky/wacky-tracky-server/internal/iamstore"
 	"github.com/wacky-tracky/wacky-tracky-server/internal/ruleeval"
+	"github.com/wacky-tracky/wacky-tracky-server/internal/runtimeconfig"
 )
 
 var metricListTasksCount = promauto.NewCounter(prometheus.CounterOpts{
@@ -25,12 +28,18 @@ var metricListTasksCount = promauto.NewCounter(prometheus.CounterOpts{
 })
 
 type wackyTrackyClientService struct {
-	dbconn dbmdl.DB
+	dbconn   dbmdl.DB
+	iamStore iamstore.Store
+	log      *log.Logger
 }
 
-func GetNewClientAPI(newdb dbmdl.DB) *wackyTrackyClientService {
+func GetNewClientAPI(newdb dbmdl.DB, iamStore iamstore.Store) *wackyTrackyClientService {
 	api := newServer()
 	api.dbconn = newdb
+	api.iamStore = iamStore
+	if api.log == nil {
+		api.log = log.StandardLogger()
+	}
 	if err := api.dbconn.Connect(); err != nil {
 		log.Warnf("DB connect: %v", err)
 	}
@@ -39,9 +48,11 @@ func GetNewClientAPI(newdb dbmdl.DB) *wackyTrackyClientService {
 	return api
 }
 
-func (api *wackyTrackyClientService) GetNewHandler() (string, http.Handler) {
+func (api *wackyTrackyClientService) GetNewHandler(authLayer *auth.Layer) (string, http.Handler) {
 	path, handler := clientv1.NewWackyTrackyClientServiceHandler(api)
-
+	if authLayer != nil {
+		handler = authLayer.WrapHandler(handler)
+	}
 	return path, handler
 }
 
@@ -537,14 +548,30 @@ func (api *wackyTrackyClientService) RuleTest(ctx context.Context, req *connect.
 }
 
 func (api *wackyTrackyClientService) Init(ctx context.Context, req *connect.Request[pb.InitRequest]) (*connect.Response[pb.InitResponse], error) {
-	res := &pb.InitResponse{
-		Wallpaper: "wallpaper.jpg",
+	cfg := runtimeconfig.RuntimeConfig
+	showVersion := cfg.ShowVersionNumber
+	currentVersion := ""
+	availableVersion := ""
+	showNew := false
+	if showVersion {
+		currentVersion = buildinfo.Version
+		showNew = cfg.ShowNewVersions
+		// No update-check yet; leave available_version empty until one exists.
 	}
-
+	res := &pb.InitResponse{
+		Wallpaper:         "wallpaper.jpg",
+		ShowFooter:        cfg.ShowFooter,
+		ShowNewVersions:   showVersion && showNew,
+		AvailableVersion:  availableVersion,
+		CurrentVersion:    currentVersion,
+		PageTitle:         "WackyTracky",
+		ShowVersionNumber: showVersion,
+	}
 	return connect.NewResponse(res), nil
 }
 
 func newServer() *wackyTrackyClientService {
-	server := wackyTrackyClientService{}
-	return &server
+	return &wackyTrackyClientService{
+		log: log.StandardLogger(),
+	}
 }

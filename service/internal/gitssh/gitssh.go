@@ -8,7 +8,7 @@ import (
 	"strings"
 
 	log "github.com/sirupsen/logrus"
-	"github.com/spf13/viper"
+	"github.com/wacky-tracky/wacky-tracky-server/internal/runtimeconfig"
 )
 
 const (
@@ -27,7 +27,7 @@ type SetupResult struct {
 }
 
 func ResolveConfigDir() string {
-	if f := viper.ConfigFileUsed(); f != "" {
+	if f := runtimeconfig.ConfigFileUsed(); f != "" {
 		return filepath.Dir(f)
 	}
 	if info, err := os.Stat("/config"); err == nil && info.IsDir() {

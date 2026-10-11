@@ -1,0 +1,3403 @@
+openapi: 3.1.0
+info:
+  title: API
+  description: API documentation for API
+  version: 1.0.0
+paths:
+  /api/wackytracky.clientapi.v1.WackyTrackyClientService/ChangePassword:
+    post:
+      tags:
+        - wackytracky.clientapi.v1.WackyTrackyClientService
+      summary: ChangePassword
+      operationId: wackytracky.clientapi.v1.WackyTrackyClientService.ChangePassword
+      parameters:
+        - name: Connect-Protocol-Version
+          in: header
+          description: Define the version of the Connect protocol
+          schema:
+            $ref: '#/components/schemas/connect-protocol-version'
+          example: 1
+        - name: Connect-Timeout-Ms
+          in: header
+          description: Define the timeout, in ms
+          schema:
+            $ref: '#/components/schemas/connect-timeout-header'
+          example: 1000
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/wackytracky.clientapi.v1.ChangePasswordRequest'
+        required: true
+      responses:
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/connect.error'
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/wackytracky.clientapi.v1.ChangePasswordResponse'
+  /api/wackytracky.clientapi.v1.WackyTrackyClientService/CreateApiKey:
+    post:
+      tags:
+        - wackytracky.clientapi.v1.WackyTrackyClientService
+      summary: CreateApiKey
+      operationId: wackytracky.clientapi.v1.WackyTrackyClientService.CreateApiKey
+      parameters:
+        - name: Connect-Protocol-Version
+          in: header
+          description: Define the version of the Connect protocol
+          schema:
+            $ref: '#/components/schemas/connect-protocol-version'
+          example: 1
+        - name: Connect-Timeout-Ms
+          in: header
+          description: Define the timeout, in ms
+          schema:
+            $ref: '#/components/schemas/connect-timeout-header'
+          example: 1000
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/wackytracky.clientapi.v1.CreateApiKeyRequest'
+        required: true
+      responses:
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/connect.error'
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/wackytracky.clientapi.v1.CreateApiKeyResponse'
+  /api/wackytracky.clientapi.v1.WackyTrackyClientService/CreateList:
+    post:
+      tags:
+        - wackytracky.clientapi.v1.WackyTrackyClientService
+      summary: CreateList
+      operationId: wackytracky.clientapi.v1.WackyTrackyClientService.CreateList
+      parameters:
+        - name: Connect-Protocol-Version
+          in: header
+          description: Define the version of the Connect protocol
+          schema:
+            $ref: '#/components/schemas/connect-protocol-version'
+          example: 1
+        - name: Connect-Timeout-Ms
+          in: header
+          description: Define the timeout, in ms
+          schema:
+            $ref: '#/components/schemas/connect-timeout-header'
+          example: 1000
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/wackytracky.clientapi.v1.CreateListRequest'
+        required: true
+      responses:
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/connect.error'
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/wackytracky.clientapi.v1.CreateListResponse'
+  /api/wackytracky.clientapi.v1.WackyTrackyClientService/CreateRbacRole:
+    post:
+      tags:
+        - wackytracky.clientapi.v1.WackyTrackyClientService
+      summary: CreateRbacRole
+      operationId: wackytracky.clientapi.v1.WackyTrackyClientService.CreateRbacRole
+      parameters:
+        - name: Connect-Protocol-Version
+          in: header
+          description: Define the version of the Connect protocol
+          schema:
+            $ref: '#/components/schemas/connect-protocol-version'
+          example: 1
+        - name: Connect-Timeout-Ms
+          in: header
+          description: Define the timeout, in ms
+          schema:
+            $ref: '#/components/schemas/connect-timeout-header'
+          example: 1000
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/wackytracky.clientapi.v1.CreateRbacRoleRequest'
+        required: true
+      responses:
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/connect.error'
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/wackytracky.clientapi.v1.CreateRbacRoleResponse'
+  /api/wackytracky.clientapi.v1.WackyTrackyClientService/CreateTask:
+    post:
+      tags:
+        - wackytracky.clientapi.v1.WackyTrackyClientService
+      summary: CreateTask
+      operationId: wackytracky.clientapi.v1.WackyTrackyClientService.CreateTask
+      parameters:
+        - name: Connect-Protocol-Version
+          in: header
+          description: Define the version of the Connect protocol
+          schema:
+            $ref: '#/components/schemas/connect-protocol-version'
+          example: 1
+        - name: Connect-Timeout-Ms
+          in: header
+          description: Define the timeout, in ms
+          schema:
+            $ref: '#/components/schemas/connect-timeout-header'
+          example: 1000
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/wackytracky.clientapi.v1.CreateTaskRequest'
+        required: true
+      responses:
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/connect.error'
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/wackytracky.clientapi.v1.CreateTaskResponse'
+  /api/wackytracky.clientapi.v1.WackyTrackyClientService/CreateUser:
+    post:
+      tags:
+        - wackytracky.clientapi.v1.WackyTrackyClientService
+      summary: CreateUser
+      operationId: wackytracky.clientapi.v1.WackyTrackyClientService.CreateUser
+      parameters:
+        - name: Connect-Protocol-Version
+          in: header
+          description: Define the version of the Connect protocol
+          schema:
+            $ref: '#/components/schemas/connect-protocol-version'
+          example: 1
+        - name: Connect-Timeout-Ms
+          in: header
+          description: Define the timeout, in ms
+          schema:
+            $ref: '#/components/schemas/connect-timeout-header'
+          example: 1000
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/wackytracky.clientapi.v1.CreateUserRequest'
+        required: true
+      responses:
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/connect.error'
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/wackytracky.clientapi.v1.CreateUserResponse'
+  /api/wackytracky.clientapi.v1.WackyTrackyClientService/CreateUserGroup:
+    post:
+      tags:
+        - wackytracky.clientapi.v1.WackyTrackyClientService
+      summary: CreateUserGroup
+      operationId: wackytracky.clientapi.v1.WackyTrackyClientService.CreateUserGroup
+      parameters:
+        - name: Connect-Protocol-Version
+          in: header
+          description: Define the version of the Connect protocol
+          schema:
+            $ref: '#/components/schemas/connect-protocol-version'
+          example: 1
+        - name: Connect-Timeout-Ms
+          in: header
+          description: Define the timeout, in ms
+          schema:
+            $ref: '#/components/schemas/connect-timeout-header'
+          example: 1000
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/wackytracky.clientapi.v1.CreateUserGroupRequest'
+        required: true
+      responses:
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/connect.error'
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/wackytracky.clientapi.v1.CreateUserGroupResponse'
+  /api/wackytracky.clientapi.v1.WackyTrackyClientService/DeleteApiKey:
+    post:
+      tags:
+        - wackytracky.clientapi.v1.WackyTrackyClientService
+      summary: DeleteApiKey
+      operationId: wackytracky.clientapi.v1.WackyTrackyClientService.DeleteApiKey
+      parameters:
+        - name: Connect-Protocol-Version
+          in: header
+          description: Define the version of the Connect protocol
+          schema:
+            $ref: '#/components/schemas/connect-protocol-version'
+          example: 1
+        - name: Connect-Timeout-Ms
+          in: header
+          description: Define the timeout, in ms
+          schema:
+            $ref: '#/components/schemas/connect-timeout-header'
+          example: 1000
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/wackytracky.clientapi.v1.DeleteApiKeyRequest'
+        required: true
+      responses:
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/connect.error'
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/wackytracky.clientapi.v1.DeleteApiKeyResponse'
+  /api/wackytracky.clientapi.v1.WackyTrackyClientService/DeleteList:
+    post:
+      tags:
+        - wackytracky.clientapi.v1.WackyTrackyClientService
+      summary: DeleteList
+      operationId: wackytracky.clientapi.v1.WackyTrackyClientService.DeleteList
+      parameters:
+        - name: Connect-Protocol-Version
+          in: header
+          description: Define the version of the Connect protocol
+          schema:
+            $ref: '#/components/schemas/connect-protocol-version'
+          example: 1
+        - name: Connect-Timeout-Ms
+          in: header
+          description: Define the timeout, in ms
+          schema:
+            $ref: '#/components/schemas/connect-timeout-header'
+          example: 1000
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/wackytracky.clientapi.v1.DeleteListRequest'
+        required: true
+      responses:
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/connect.error'
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/wackytracky.clientapi.v1.DeleteListResponse'
+  /api/wackytracky.clientapi.v1.WackyTrackyClientService/DeleteRbacRole:
+    post:
+      tags:
+        - wackytracky.clientapi.v1.WackyTrackyClientService
+      summary: DeleteRbacRole
+      operationId: wackytracky.clientapi.v1.WackyTrackyClientService.DeleteRbacRole
+      parameters:
+        - name: Connect-Protocol-Version
+          in: header
+          description: Define the version of the Connect protocol
+          schema:
+            $ref: '#/components/schemas/connect-protocol-version'
+          example: 1
+        - name: Connect-Timeout-Ms
+          in: header
+          description: Define the timeout, in ms
+          schema:
+            $ref: '#/components/schemas/connect-timeout-header'
+          example: 1000
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/wackytracky.clientapi.v1.DeleteRbacRoleRequest'
+        required: true
+      responses:
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/connect.error'
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/wackytracky.clientapi.v1.DeleteRbacRoleResponse'
+  /api/wackytracky.clientapi.v1.WackyTrackyClientService/DeleteUser:
+    post:
+      tags:
+        - wackytracky.clientapi.v1.WackyTrackyClientService
+      summary: DeleteUser
+      operationId: wackytracky.clientapi.v1.WackyTrackyClientService.DeleteUser
+      parameters:
+        - name: Connect-Protocol-Version
+          in: header
+          description: Define the version of the Connect protocol
+          schema:
+            $ref: '#/components/schemas/connect-protocol-version'
+          example: 1
+        - name: Connect-Timeout-Ms
+          in: header
+          description: Define the timeout, in ms
+          schema:
+            $ref: '#/components/schemas/connect-timeout-header'
+          example: 1000
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/wackytracky.clientapi.v1.DeleteUserRequest'
+        required: true
+      responses:
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/connect.error'
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/wackytracky.clientapi.v1.DeleteUserResponse'
+  /api/wackytracky.clientapi.v1.WackyTrackyClientService/DeleteUserGroup:
+    post:
+      tags:
+        - wackytracky.clientapi.v1.WackyTrackyClientService
+      summary: DeleteUserGroup
+      operationId: wackytracky.clientapi.v1.WackyTrackyClientService.DeleteUserGroup
+      parameters:
+        - name: Connect-Protocol-Version
+          in: header
+          description: Define the version of the Connect protocol
+          schema:
+            $ref: '#/components/schemas/connect-protocol-version'
+          example: 1
+        - name: Connect-Timeout-Ms
+          in: header
+          description: Define the timeout, in ms
+          schema:
+            $ref: '#/components/schemas/connect-timeout-header'
+          example: 1000
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/wackytracky.clientapi.v1.DeleteUserGroupRequest'
+        required: true
+      responses:
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/connect.error'
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/wackytracky.clientapi.v1.DeleteUserGroupResponse'
+  /api/wackytracky.clientapi.v1.WackyTrackyClientService/DoneTask:
+    post:
+      tags:
+        - wackytracky.clientapi.v1.WackyTrackyClientService
+      summary: DoneTask
+      operationId: wackytracky.clientapi.v1.WackyTrackyClientService.DoneTask
+      parameters:
+        - name: Connect-Protocol-Version
+          in: header
+          description: Define the version of the Connect protocol
+          schema:
+            $ref: '#/components/schemas/connect-protocol-version'
+          example: 1
+        - name: Connect-Timeout-Ms
+          in: header
+          description: Define the timeout, in ms
+          schema:
+            $ref: '#/components/schemas/connect-timeout-header'
+          example: 1000
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/wackytracky.clientapi.v1.DoneTaskRequest'
+        required: true
+      responses:
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/connect.error'
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/wackytracky.clientapi.v1.DoneTaskResponse'
+  /api/wackytracky.clientapi.v1.WackyTrackyClientService/GetLists:
+    post:
+      tags:
+        - wackytracky.clientapi.v1.WackyTrackyClientService
+      summary: GetLists
+      operationId: wackytracky.clientapi.v1.WackyTrackyClientService.GetLists
+      parameters:
+        - name: Connect-Protocol-Version
+          in: header
+          description: Define the version of the Connect protocol
+          schema:
+            $ref: '#/components/schemas/connect-protocol-version'
+          example: 1
+        - name: Connect-Timeout-Ms
+          in: header
+          description: Define the timeout, in ms
+          schema:
+            $ref: '#/components/schemas/connect-timeout-header'
+          example: 1000
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/wackytracky.clientapi.v1.GetListsRequest'
+        required: true
+      responses:
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/connect.error'
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/wackytracky.clientapi.v1.GetListsResponse'
+  /api/wackytracky.clientapi.v1.WackyTrackyClientService/GetMyPermissionsAudit:
+    post:
+      tags:
+        - wackytracky.clientapi.v1.WackyTrackyClientService
+      summary: GetMyPermissionsAudit
+      operationId: wackytracky.clientapi.v1.WackyTrackyClientService.GetMyPermissionsAudit
+      parameters:
+        - name: Connect-Protocol-Version
+          in: header
+          description: Define the version of the Connect protocol
+          schema:
+            $ref: '#/components/schemas/connect-protocol-version'
+          example: 1
+        - name: Connect-Timeout-Ms
+          in: header
+          description: Define the timeout, in ms
+          schema:
+            $ref: '#/components/schemas/connect-timeout-header'
+          example: 1000
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/wackytracky.clientapi.v1.GetMyPermissionsAuditRequest'
+        required: true
+      responses:
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/connect.error'
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/wackytracky.clientapi.v1.GetMyPermissionsAuditResponse'
+  /api/wackytracky.clientapi.v1.WackyTrackyClientService/GetRbacRoleGroups:
+    post:
+      tags:
+        - wackytracky.clientapi.v1.WackyTrackyClientService
+      summary: GetRbacRoleGroups
+      operationId: wackytracky.clientapi.v1.WackyTrackyClientService.GetRbacRoleGroups
+      parameters:
+        - name: Connect-Protocol-Version
+          in: header
+          description: Define the version of the Connect protocol
+          schema:
+            $ref: '#/components/schemas/connect-protocol-version'
+          example: 1
+        - name: Connect-Timeout-Ms
+          in: header
+          description: Define the timeout, in ms
+          schema:
+            $ref: '#/components/schemas/connect-timeout-header'
+          example: 1000
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/wackytracky.clientapi.v1.GetRbacRoleGroupsRequest'
+        required: true
+      responses:
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/connect.error'
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/wackytracky.clientapi.v1.GetRbacRoleGroupsResponse'
+  /api/wackytracky.clientapi.v1.WackyTrackyClientService/GetRbacRoleUsers:
+    post:
+      tags:
+        - wackytracky.clientapi.v1.WackyTrackyClientService
+      summary: GetRbacRoleUsers
+      operationId: wackytracky.clientapi.v1.WackyTrackyClientService.GetRbacRoleUsers
+      parameters:
+        - name: Connect-Protocol-Version
+          in: header
+          description: Define the version of the Connect protocol
+          schema:
+            $ref: '#/components/schemas/connect-protocol-version'
+          example: 1
+        - name: Connect-Timeout-Ms
+          in: header
+          description: Define the timeout, in ms
+          schema:
+            $ref: '#/components/schemas/connect-timeout-header'
+          example: 1000
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/wackytracky.clientapi.v1.GetRbacRoleUsersRequest'
+        required: true
+      responses:
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/connect.error'
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/wackytracky.clientapi.v1.GetRbacRoleUsersResponse'
+  /api/wackytracky.clientapi.v1.WackyTrackyClientService/GetSavedSearches:
+    post:
+      tags:
+        - wackytracky.clientapi.v1.WackyTrackyClientService
+      summary: GetSavedSearches
+      operationId: wackytracky.clientapi.v1.WackyTrackyClientService.GetSavedSearches
+      parameters:
+        - name: Connect-Protocol-Version
+          in: header
+          description: Define the version of the Connect protocol
+          schema:
+            $ref: '#/components/schemas/connect-protocol-version'
+          example: 1
+        - name: Connect-Timeout-Ms
+          in: header
+          description: Define the timeout, in ms
+          schema:
+            $ref: '#/components/schemas/connect-timeout-header'
+          example: 1000
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/wackytracky.clientapi.v1.GetSavedSearchesRequest'
+        required: true
+      responses:
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/connect.error'
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/wackytracky.clientapi.v1.GetSavedSearchesResponse'
+  /api/wackytracky.clientapi.v1.WackyTrackyClientService/GetStatus:
+    post:
+      tags:
+        - wackytracky.clientapi.v1.WackyTrackyClientService
+      summary: GetStatus
+      operationId: wackytracky.clientapi.v1.WackyTrackyClientService.GetStatus
+      parameters:
+        - name: Connect-Protocol-Version
+          in: header
+          description: Define the version of the Connect protocol
+          schema:
+            $ref: '#/components/schemas/connect-protocol-version'
+          example: 1
+        - name: Connect-Timeout-Ms
+          in: header
+          description: Define the timeout, in ms
+          schema:
+            $ref: '#/components/schemas/connect-timeout-header'
+          example: 1000
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/wackytracky.clientapi.v1.GetStatusRequest'
+        required: true
+      responses:
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/connect.error'
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/wackytracky.clientapi.v1.GetStatusResponse'
+  /api/wackytracky.clientapi.v1.WackyTrackyClientService/GetTags:
+    post:
+      tags:
+        - wackytracky.clientapi.v1.WackyTrackyClientService
+      summary: GetTags
+      operationId: wackytracky.clientapi.v1.WackyTrackyClientService.GetTags
+      parameters:
+        - name: Connect-Protocol-Version
+          in: header
+          description: Define the version of the Connect protocol
+          schema:
+            $ref: '#/components/schemas/connect-protocol-version'
+          example: 1
+        - name: Connect-Timeout-Ms
+          in: header
+          description: Define the timeout, in ms
+          schema:
+            $ref: '#/components/schemas/connect-timeout-header'
+          example: 1000
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/wackytracky.clientapi.v1.GetTagsRequest'
+        required: true
+      responses:
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/connect.error'
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/wackytracky.clientapi.v1.GetTagsResponse'
+  /api/wackytracky.clientapi.v1.WackyTrackyClientService/GetTaskMetadata:
+    post:
+      tags:
+        - wackytracky.clientapi.v1.WackyTrackyClientService
+      summary: GetTaskMetadata
+      operationId: wackytracky.clientapi.v1.WackyTrackyClientService.GetTaskMetadata
+      parameters:
+        - name: Connect-Protocol-Version
+          in: header
+          description: Define the version of the Connect protocol
+          schema:
+            $ref: '#/components/schemas/connect-protocol-version'
+          example: 1
+        - name: Connect-Timeout-Ms
+          in: header
+          description: Define the timeout, in ms
+          schema:
+            $ref: '#/components/schemas/connect-timeout-header'
+          example: 1000
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/wackytracky.clientapi.v1.GetTaskMetadataRequest'
+        required: true
+      responses:
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/connect.error'
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/wackytracky.clientapi.v1.GetTaskMetadataResponse'
+  /api/wackytracky.clientapi.v1.WackyTrackyClientService/GetTaskPropertyProperties:
+    post:
+      tags:
+        - wackytracky.clientapi.v1.WackyTrackyClientService
+      summary: GetTaskPropertyProperties
+      operationId: wackytracky.clientapi.v1.WackyTrackyClientService.GetTaskPropertyProperties
+      parameters:
+        - name: Connect-Protocol-Version
+          in: header
+          description: Define the version of the Connect protocol
+          schema:
+            $ref: '#/components/schemas/connect-protocol-version'
+          example: 1
+        - name: Connect-Timeout-Ms
+          in: header
+          description: Define the timeout, in ms
+          schema:
+            $ref: '#/components/schemas/connect-timeout-header'
+          example: 1000
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/wackytracky.clientapi.v1.GetTaskPropertyPropertiesRequest'
+        required: true
+      responses:
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/connect.error'
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/wackytracky.clientapi.v1.GetTaskPropertyPropertiesResponse'
+  /api/wackytracky.clientapi.v1.WackyTrackyClientService/GetUser:
+    post:
+      tags:
+        - wackytracky.clientapi.v1.WackyTrackyClientService
+      summary: GetUser
+      operationId: wackytracky.clientapi.v1.WackyTrackyClientService.GetUser
+      parameters:
+        - name: Connect-Protocol-Version
+          in: header
+          description: Define the version of the Connect protocol
+          schema:
+            $ref: '#/components/schemas/connect-protocol-version'
+          example: 1
+        - name: Connect-Timeout-Ms
+          in: header
+          description: Define the timeout, in ms
+          schema:
+            $ref: '#/components/schemas/connect-timeout-header'
+          example: 1000
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/wackytracky.clientapi.v1.GetUserRequest'
+        required: true
+      responses:
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/connect.error'
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/wackytracky.clientapi.v1.GetUserResponse'
+  /api/wackytracky.clientapi.v1.WackyTrackyClientService/GetUserGroupMembers:
+    post:
+      tags:
+        - wackytracky.clientapi.v1.WackyTrackyClientService
+      summary: GetUserGroupMembers
+      operationId: wackytracky.clientapi.v1.WackyTrackyClientService.GetUserGroupMembers
+      parameters:
+        - name: Connect-Protocol-Version
+          in: header
+          description: Define the version of the Connect protocol
+          schema:
+            $ref: '#/components/schemas/connect-protocol-version'
+          example: 1
+        - name: Connect-Timeout-Ms
+          in: header
+          description: Define the timeout, in ms
+          schema:
+            $ref: '#/components/schemas/connect-timeout-header'
+          example: 1000
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/wackytracky.clientapi.v1.GetUserGroupMembersRequest'
+        required: true
+      responses:
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/connect.error'
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/wackytracky.clientapi.v1.GetUserGroupMembersResponse'
+  /api/wackytracky.clientapi.v1.WackyTrackyClientService/GetUserGroupRbacRoles:
+    post:
+      tags:
+        - wackytracky.clientapi.v1.WackyTrackyClientService
+      summary: GetUserGroupRbacRoles
+      operationId: wackytracky.clientapi.v1.WackyTrackyClientService.GetUserGroupRbacRoles
+      parameters:
+        - name: Connect-Protocol-Version
+          in: header
+          description: Define the version of the Connect protocol
+          schema:
+            $ref: '#/components/schemas/connect-protocol-version'
+          example: 1
+        - name: Connect-Timeout-Ms
+          in: header
+          description: Define the timeout, in ms
+          schema:
+            $ref: '#/components/schemas/connect-timeout-header'
+          example: 1000
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/wackytracky.clientapi.v1.GetUserGroupRbacRolesRequest'
+        required: true
+      responses:
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/connect.error'
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/wackytracky.clientapi.v1.GetUserGroupRbacRolesResponse'
+  /api/wackytracky.clientapi.v1.WackyTrackyClientService/GetUserRbacRoles:
+    post:
+      tags:
+        - wackytracky.clientapi.v1.WackyTrackyClientService
+      summary: GetUserRbacRoles
+      operationId: wackytracky.clientapi.v1.WackyTrackyClientService.GetUserRbacRoles
+      parameters:
+        - name: Connect-Protocol-Version
+          in: header
+          description: Define the version of the Connect protocol
+          schema:
+            $ref: '#/components/schemas/connect-protocol-version'
+          example: 1
+        - name: Connect-Timeout-Ms
+          in: header
+          description: Define the timeout, in ms
+          schema:
+            $ref: '#/components/schemas/connect-timeout-header'
+          example: 1000
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/wackytracky.clientapi.v1.GetUserRbacRolesRequest'
+        required: true
+      responses:
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/connect.error'
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/wackytracky.clientapi.v1.GetUserRbacRolesResponse'
+  /api/wackytracky.clientapi.v1.WackyTrackyClientService/GetUsers:
+    post:
+      tags:
+        - wackytracky.clientapi.v1.WackyTrackyClientService
+      summary: GetUsers
+      operationId: wackytracky.clientapi.v1.WackyTrackyClientService.GetUsers
+      parameters:
+        - name: Connect-Protocol-Version
+          in: header
+          description: Define the version of the Connect protocol
+          schema:
+            $ref: '#/components/schemas/connect-protocol-version'
+          example: 1
+        - name: Connect-Timeout-Ms
+          in: header
+          description: Define the timeout, in ms
+          schema:
+            $ref: '#/components/schemas/connect-timeout-header'
+          example: 1000
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/wackytracky.clientapi.v1.GetUsersRequest'
+        required: true
+      responses:
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/connect.error'
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/wackytracky.clientapi.v1.GetUsersResponse'
+  /api/wackytracky.clientapi.v1.WackyTrackyClientService/ImpersonateUser:
+    post:
+      tags:
+        - wackytracky.clientapi.v1.WackyTrackyClientService
+      summary: ImpersonateUser
+      operationId: wackytracky.clientapi.v1.WackyTrackyClientService.ImpersonateUser
+      parameters:
+        - name: Connect-Protocol-Version
+          in: header
+          description: Define the version of the Connect protocol
+          schema:
+            $ref: '#/components/schemas/connect-protocol-version'
+          example: 1
+        - name: Connect-Timeout-Ms
+          in: header
+          description: Define the timeout, in ms
+          schema:
+            $ref: '#/components/schemas/connect-timeout-header'
+          example: 1000
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/wackytracky.clientapi.v1.ImpersonateUserRequest'
+        required: true
+      responses:
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/connect.error'
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/wackytracky.clientapi.v1.ImpersonateUserResponse'
+  /api/wackytracky.clientapi.v1.WackyTrackyClientService/Init:
+    post:
+      tags:
+        - wackytracky.clientapi.v1.WackyTrackyClientService
+      summary: Init
+      operationId: wackytracky.clientapi.v1.WackyTrackyClientService.Init
+      parameters:
+        - name: Connect-Protocol-Version
+          in: header
+          description: Define the version of the Connect protocol
+          schema:
+            $ref: '#/components/schemas/connect-protocol-version'
+          example: 1
+        - name: Connect-Timeout-Ms
+          in: header
+          description: Define the timeout, in ms
+          schema:
+            $ref: '#/components/schemas/connect-timeout-header'
+          example: 1000
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/wackytracky.clientapi.v1.InitRequest'
+        required: true
+      responses:
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/connect.error'
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/wackytracky.clientapi.v1.InitResponse'
+  /api/wackytracky.clientapi.v1.WackyTrackyClientService/ListApiKeys:
+    post:
+      tags:
+        - wackytracky.clientapi.v1.WackyTrackyClientService
+      summary: ListApiKeys
+      operationId: wackytracky.clientapi.v1.WackyTrackyClientService.ListApiKeys
+      parameters:
+        - name: Connect-Protocol-Version
+          in: header
+          description: Define the version of the Connect protocol
+          schema:
+            $ref: '#/components/schemas/connect-protocol-version'
+          example: 1
+        - name: Connect-Timeout-Ms
+          in: header
+          description: Define the timeout, in ms
+          schema:
+            $ref: '#/components/schemas/connect-timeout-header'
+          example: 1000
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/wackytracky.clientapi.v1.ListApiKeysRequest'
+        required: true
+      responses:
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/connect.error'
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/wackytracky.clientapi.v1.ListApiKeysResponse'
+  /api/wackytracky.clientapi.v1.WackyTrackyClientService/ListRbacPermissions:
+    post:
+      tags:
+        - wackytracky.clientapi.v1.WackyTrackyClientService
+      summary: ListRbacPermissions
+      operationId: wackytracky.clientapi.v1.WackyTrackyClientService.ListRbacPermissions
+      parameters:
+        - name: Connect-Protocol-Version
+          in: header
+          description: Define the version of the Connect protocol
+          schema:
+            $ref: '#/components/schemas/connect-protocol-version'
+          example: 1
+        - name: Connect-Timeout-Ms
+          in: header
+          description: Define the timeout, in ms
+          schema:
+            $ref: '#/components/schemas/connect-timeout-header'
+          example: 1000
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/wackytracky.clientapi.v1.ListRbacPermissionsRequest'
+        required: true
+      responses:
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/connect.error'
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/wackytracky.clientapi.v1.ListRbacPermissionsResponse'
+  /api/wackytracky.clientapi.v1.WackyTrackyClientService/ListRbacRoles:
+    post:
+      tags:
+        - wackytracky.clientapi.v1.WackyTrackyClientService
+      summary: ListRbacRoles
+      operationId: wackytracky.clientapi.v1.WackyTrackyClientService.ListRbacRoles
+      parameters:
+        - name: Connect-Protocol-Version
+          in: header
+          description: Define the version of the Connect protocol
+          schema:
+            $ref: '#/components/schemas/connect-protocol-version'
+          example: 1
+        - name: Connect-Timeout-Ms
+          in: header
+          description: Define the timeout, in ms
+          schema:
+            $ref: '#/components/schemas/connect-timeout-header'
+          example: 1000
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/wackytracky.clientapi.v1.ListRbacRolesRequest'
+        required: true
+      responses:
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/connect.error'
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/wackytracky.clientapi.v1.ListRbacRolesResponse'
+  /api/wackytracky.clientapi.v1.WackyTrackyClientService/ListTasks:
+    post:
+      tags:
+        - wackytracky.clientapi.v1.WackyTrackyClientService
+      summary: ListTasks
+      operationId: wackytracky.clientapi.v1.WackyTrackyClientService.ListTasks
+      parameters:
+        - name: Connect-Protocol-Version
+          in: header
+          description: Define the version of the Connect protocol
+          schema:
+            $ref: '#/components/schemas/connect-protocol-version'
+          example: 1
+        - name: Connect-Timeout-Ms
+          in: header
+          description: Define the timeout, in ms
+          schema:
+            $ref: '#/components/schemas/connect-timeout-header'
+          example: 1000
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/wackytracky.clientapi.v1.ListTasksRequest'
+        required: true
+      responses:
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/connect.error'
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/wackytracky.clientapi.v1.ListTasksResponse'
+  /api/wackytracky.clientapi.v1.WackyTrackyClientService/ListUserGroups:
+    post:
+      tags:
+        - wackytracky.clientapi.v1.WackyTrackyClientService
+      summary: ListUserGroups
+      operationId: wackytracky.clientapi.v1.WackyTrackyClientService.ListUserGroups
+      parameters:
+        - name: Connect-Protocol-Version
+          in: header
+          description: Define the version of the Connect protocol
+          schema:
+            $ref: '#/components/schemas/connect-protocol-version'
+          example: 1
+        - name: Connect-Timeout-Ms
+          in: header
+          description: Define the timeout, in ms
+          schema:
+            $ref: '#/components/schemas/connect-timeout-header'
+          example: 1000
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/wackytracky.clientapi.v1.ListUserGroupsRequest'
+        required: true
+      responses:
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/connect.error'
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/wackytracky.clientapi.v1.ListUserGroupsResponse'
+  /api/wackytracky.clientapi.v1.WackyTrackyClientService/LoginWithUsernameAndPassword:
+    post:
+      tags:
+        - wackytracky.clientapi.v1.WackyTrackyClientService
+      summary: LoginWithUsernameAndPassword
+      operationId: wackytracky.clientapi.v1.WackyTrackyClientService.LoginWithUsernameAndPassword
+      parameters:
+        - name: Connect-Protocol-Version
+          in: header
+          description: Define the version of the Connect protocol
+          schema:
+            $ref: '#/components/schemas/connect-protocol-version'
+          example: 1
+        - name: Connect-Timeout-Ms
+          in: header
+          description: Define the timeout, in ms
+          schema:
+            $ref: '#/components/schemas/connect-timeout-header'
+          example: 1000
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/wackytracky.clientapi.v1.LoginWithUsernameAndPasswordRequest'
+        required: true
+      responses:
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/connect.error'
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/wackytracky.clientapi.v1.LoginWithUsernameAndPasswordResponse'
+  /api/wackytracky.clientapi.v1.WackyTrackyClientService/Logout:
+    post:
+      tags:
+        - wackytracky.clientapi.v1.WackyTrackyClientService
+      summary: Logout
+      operationId: wackytracky.clientapi.v1.WackyTrackyClientService.Logout
+      parameters:
+        - name: Connect-Protocol-Version
+          in: header
+          description: Define the version of the Connect protocol
+          schema:
+            $ref: '#/components/schemas/connect-protocol-version'
+          example: 1
+        - name: Connect-Timeout-Ms
+          in: header
+          description: Define the timeout, in ms
+          schema:
+            $ref: '#/components/schemas/connect-timeout-header'
+          example: 1000
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/wackytracky.clientapi.v1.LogoutRequest'
+        required: true
+      responses:
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/connect.error'
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/wackytracky.clientapi.v1.LogoutResponse'
+  /api/wackytracky.clientapi.v1.WackyTrackyClientService/MoveTask:
+    post:
+      tags:
+        - wackytracky.clientapi.v1.WackyTrackyClientService
+      summary: MoveTask
+      operationId: wackytracky.clientapi.v1.WackyTrackyClientService.MoveTask
+      parameters:
+        - name: Connect-Protocol-Version
+          in: header
+          description: Define the version of the Connect protocol
+          schema:
+            $ref: '#/components/schemas/connect-protocol-version'
+          example: 1
+        - name: Connect-Timeout-Ms
+          in: header
+          description: Define the timeout, in ms
+          schema:
+            $ref: '#/components/schemas/connect-timeout-header'
+          example: 1000
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/wackytracky.clientapi.v1.MoveTaskRequest'
+        required: true
+      responses:
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/connect.error'
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/wackytracky.clientapi.v1.MoveTaskResponse'
+  /api/wackytracky.clientapi.v1.WackyTrackyClientService/RepoStatus:
+    post:
+      tags:
+        - wackytracky.clientapi.v1.WackyTrackyClientService
+      summary: RepoStatus
+      operationId: wackytracky.clientapi.v1.WackyTrackyClientService.RepoStatus
+      parameters:
+        - name: Connect-Protocol-Version
+          in: header
+          description: Define the version of the Connect protocol
+          schema:
+            $ref: '#/components/schemas/connect-protocol-version'
+          example: 1
+        - name: Connect-Timeout-Ms
+          in: header
+          description: Define the timeout, in ms
+          schema:
+            $ref: '#/components/schemas/connect-timeout-header'
+          example: 1000
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/wackytracky.clientapi.v1.RepoStatusRequest'
+        required: true
+      responses:
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/connect.error'
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/wackytracky.clientapi.v1.RepoStatusResponse'
+  /api/wackytracky.clientapi.v1.WackyTrackyClientService/RepoSync:
+    post:
+      tags:
+        - wackytracky.clientapi.v1.WackyTrackyClientService
+      summary: RepoSync
+      operationId: wackytracky.clientapi.v1.WackyTrackyClientService.RepoSync
+      parameters:
+        - name: Connect-Protocol-Version
+          in: header
+          description: Define the version of the Connect protocol
+          schema:
+            $ref: '#/components/schemas/connect-protocol-version'
+          example: 1
+        - name: Connect-Timeout-Ms
+          in: header
+          description: Define the timeout, in ms
+          schema:
+            $ref: '#/components/schemas/connect-timeout-header'
+          example: 1000
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/wackytracky.clientapi.v1.RepoSyncRequest'
+        required: true
+      responses:
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/connect.error'
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/wackytracky.clientapi.v1.RepoSyncResponse'
+  /api/wackytracky.clientapi.v1.WackyTrackyClientService/ResetUserPassword:
+    post:
+      tags:
+        - wackytracky.clientapi.v1.WackyTrackyClientService
+      summary: ResetUserPassword
+      operationId: wackytracky.clientapi.v1.WackyTrackyClientService.ResetUserPassword
+      parameters:
+        - name: Connect-Protocol-Version
+          in: header
+          description: Define the version of the Connect protocol
+          schema:
+            $ref: '#/components/schemas/connect-protocol-version'
+          example: 1
+        - name: Connect-Timeout-Ms
+          in: header
+          description: Define the timeout, in ms
+          schema:
+            $ref: '#/components/schemas/connect-timeout-header'
+          example: 1000
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/wackytracky.clientapi.v1.ResetUserPasswordRequest'
+        required: true
+      responses:
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/connect.error'
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/wackytracky.clientapi.v1.ResetUserPasswordResponse'
+  /api/wackytracky.clientapi.v1.WackyTrackyClientService/RuleStatus:
+    post:
+      tags:
+        - wackytracky.clientapi.v1.WackyTrackyClientService
+      summary: RuleStatus
+      operationId: wackytracky.clientapi.v1.WackyTrackyClientService.RuleStatus
+      parameters:
+        - name: Connect-Protocol-Version
+          in: header
+          description: Define the version of the Connect protocol
+          schema:
+            $ref: '#/components/schemas/connect-protocol-version'
+          example: 1
+        - name: Connect-Timeout-Ms
+          in: header
+          description: Define the timeout, in ms
+          schema:
+            $ref: '#/components/schemas/connect-timeout-header'
+          example: 1000
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/wackytracky.clientapi.v1.RuleStatusRequest'
+        required: true
+      responses:
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/connect.error'
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/wackytracky.clientapi.v1.RuleStatusResponse'
+  /api/wackytracky.clientapi.v1.WackyTrackyClientService/RuleTest:
+    post:
+      tags:
+        - wackytracky.clientapi.v1.WackyTrackyClientService
+      summary: RuleTest
+      operationId: wackytracky.clientapi.v1.WackyTrackyClientService.RuleTest
+      parameters:
+        - name: Connect-Protocol-Version
+          in: header
+          description: Define the version of the Connect protocol
+          schema:
+            $ref: '#/components/schemas/connect-protocol-version'
+          example: 1
+        - name: Connect-Timeout-Ms
+          in: header
+          description: Define the timeout, in ms
+          schema:
+            $ref: '#/components/schemas/connect-timeout-header'
+          example: 1000
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/wackytracky.clientapi.v1.RuleTestRequest'
+        required: true
+      responses:
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/connect.error'
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/wackytracky.clientapi.v1.RuleTestResponse'
+  /api/wackytracky.clientapi.v1.WackyTrackyClientService/SearchTasks:
+    post:
+      tags:
+        - wackytracky.clientapi.v1.WackyTrackyClientService
+      summary: SearchTasks
+      operationId: wackytracky.clientapi.v1.WackyTrackyClientService.SearchTasks
+      parameters:
+        - name: Connect-Protocol-Version
+          in: header
+          description: Define the version of the Connect protocol
+          schema:
+            $ref: '#/components/schemas/connect-protocol-version'
+          example: 1
+        - name: Connect-Timeout-Ms
+          in: header
+          description: Define the timeout, in ms
+          schema:
+            $ref: '#/components/schemas/connect-timeout-header'
+          example: 1000
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/wackytracky.clientapi.v1.SearchTasksRequest'
+        required: true
+      responses:
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/connect.error'
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/wackytracky.clientapi.v1.SearchTasksResponse'
+  /api/wackytracky.clientapi.v1.WackyTrackyClientService/SetSavedSearches:
+    post:
+      tags:
+        - wackytracky.clientapi.v1.WackyTrackyClientService
+      summary: SetSavedSearches
+      operationId: wackytracky.clientapi.v1.WackyTrackyClientService.SetSavedSearches
+      parameters:
+        - name: Connect-Protocol-Version
+          in: header
+          description: Define the version of the Connect protocol
+          schema:
+            $ref: '#/components/schemas/connect-protocol-version'
+          example: 1
+        - name: Connect-Timeout-Ms
+          in: header
+          description: Define the timeout, in ms
+          schema:
+            $ref: '#/components/schemas/connect-timeout-header'
+          example: 1000
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/wackytracky.clientapi.v1.SetSavedSearchesRequest'
+        required: true
+      responses:
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/connect.error'
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/wackytracky.clientapi.v1.SetSavedSearchesResponse'
+  /api/wackytracky.clientapi.v1.WackyTrackyClientService/SetTaskMetadata:
+    post:
+      tags:
+        - wackytracky.clientapi.v1.WackyTrackyClientService
+      summary: SetTaskMetadata
+      operationId: wackytracky.clientapi.v1.WackyTrackyClientService.SetTaskMetadata
+      parameters:
+        - name: Connect-Protocol-Version
+          in: header
+          description: Define the version of the Connect protocol
+          schema:
+            $ref: '#/components/schemas/connect-protocol-version'
+          example: 1
+        - name: Connect-Timeout-Ms
+          in: header
+          description: Define the timeout, in ms
+          schema:
+            $ref: '#/components/schemas/connect-timeout-header'
+          example: 1000
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/wackytracky.clientapi.v1.SetTaskMetadataRequest'
+        required: true
+      responses:
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/connect.error'
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/wackytracky.clientapi.v1.SetTaskMetadataResponse'
+  /api/wackytracky.clientapi.v1.WackyTrackyClientService/SetTaskPropertyProperty:
+    post:
+      tags:
+        - wackytracky.clientapi.v1.WackyTrackyClientService
+      summary: SetTaskPropertyProperty
+      operationId: wackytracky.clientapi.v1.WackyTrackyClientService.SetTaskPropertyProperty
+      parameters:
+        - name: Connect-Protocol-Version
+          in: header
+          description: Define the version of the Connect protocol
+          schema:
+            $ref: '#/components/schemas/connect-protocol-version'
+          example: 1
+        - name: Connect-Timeout-Ms
+          in: header
+          description: Define the timeout, in ms
+          schema:
+            $ref: '#/components/schemas/connect-timeout-header'
+          example: 1000
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/wackytracky.clientapi.v1.SetTaskPropertyPropertyRequest'
+        required: true
+      responses:
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/connect.error'
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/wackytracky.clientapi.v1.SetTaskPropertyPropertyResponse'
+  /api/wackytracky.clientapi.v1.WackyTrackyClientService/SetUserGroupMembers:
+    post:
+      tags:
+        - wackytracky.clientapi.v1.WackyTrackyClientService
+      summary: SetUserGroupMembers
+      operationId: wackytracky.clientapi.v1.WackyTrackyClientService.SetUserGroupMembers
+      parameters:
+        - name: Connect-Protocol-Version
+          in: header
+          description: Define the version of the Connect protocol
+          schema:
+            $ref: '#/components/schemas/connect-protocol-version'
+          example: 1
+        - name: Connect-Timeout-Ms
+          in: header
+          description: Define the timeout, in ms
+          schema:
+            $ref: '#/components/schemas/connect-timeout-header'
+          example: 1000
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/wackytracky.clientapi.v1.SetUserGroupMembersRequest'
+        required: true
+      responses:
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/connect.error'
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/wackytracky.clientapi.v1.SetUserGroupMembersResponse'
+  /api/wackytracky.clientapi.v1.WackyTrackyClientService/SetUserGroupRbacRoles:
+    post:
+      tags:
+        - wackytracky.clientapi.v1.WackyTrackyClientService
+      summary: SetUserGroupRbacRoles
+      operationId: wackytracky.clientapi.v1.WackyTrackyClientService.SetUserGroupRbacRoles
+      parameters:
+        - name: Connect-Protocol-Version
+          in: header
+          description: Define the version of the Connect protocol
+          schema:
+            $ref: '#/components/schemas/connect-protocol-version'
+          example: 1
+        - name: Connect-Timeout-Ms
+          in: header
+          description: Define the timeout, in ms
+          schema:
+            $ref: '#/components/schemas/connect-timeout-header'
+          example: 1000
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/wackytracky.clientapi.v1.SetUserGroupRbacRolesRequest'
+        required: true
+      responses:
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/connect.error'
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/wackytracky.clientapi.v1.SetUserGroupRbacRolesResponse'
+  /api/wackytracky.clientapi.v1.WackyTrackyClientService/StopImpersonation:
+    post:
+      tags:
+        - wackytracky.clientapi.v1.WackyTrackyClientService
+      summary: StopImpersonation
+      operationId: wackytracky.clientapi.v1.WackyTrackyClientService.StopImpersonation
+      parameters:
+        - name: Connect-Protocol-Version
+          in: header
+          description: Define the version of the Connect protocol
+          schema:
+            $ref: '#/components/schemas/connect-protocol-version'
+          example: 1
+        - name: Connect-Timeout-Ms
+          in: header
+          description: Define the timeout, in ms
+          schema:
+            $ref: '#/components/schemas/connect-timeout-header'
+          example: 1000
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/wackytracky.clientapi.v1.StopImpersonationRequest'
+        required: true
+      responses:
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/connect.error'
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/wackytracky.clientapi.v1.StopImpersonationResponse'
+  /api/wackytracky.clientapi.v1.WackyTrackyClientService/Tag:
+    post:
+      tags:
+        - wackytracky.clientapi.v1.WackyTrackyClientService
+      summary: Tag
+      operationId: wackytracky.clientapi.v1.WackyTrackyClientService.Tag
+      parameters:
+        - name: Connect-Protocol-Version
+          in: header
+          description: Define the version of the Connect protocol
+          schema:
+            $ref: '#/components/schemas/connect-protocol-version'
+          example: 1
+        - name: Connect-Timeout-Ms
+          in: header
+          description: Define the timeout, in ms
+          schema:
+            $ref: '#/components/schemas/connect-timeout-header'
+          example: 1000
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/wackytracky.clientapi.v1.TagRequest'
+        required: true
+      responses:
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/connect.error'
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/wackytracky.clientapi.v1.TagResponse'
+  /api/wackytracky.clientapi.v1.WackyTrackyClientService/UpdateList:
+    post:
+      tags:
+        - wackytracky.clientapi.v1.WackyTrackyClientService
+      summary: UpdateList
+      operationId: wackytracky.clientapi.v1.WackyTrackyClientService.UpdateList
+      parameters:
+        - name: Connect-Protocol-Version
+          in: header
+          description: Define the version of the Connect protocol
+          schema:
+            $ref: '#/components/schemas/connect-protocol-version'
+          example: 1
+        - name: Connect-Timeout-Ms
+          in: header
+          description: Define the timeout, in ms
+          schema:
+            $ref: '#/components/schemas/connect-timeout-header'
+          example: 1000
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/wackytracky.clientapi.v1.UpdateListRequest'
+        required: true
+      responses:
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/connect.error'
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/wackytracky.clientapi.v1.UpdateListResponse'
+  /api/wackytracky.clientapi.v1.WackyTrackyClientService/UpdateRbacRole:
+    post:
+      tags:
+        - wackytracky.clientapi.v1.WackyTrackyClientService
+      summary: UpdateRbacRole
+      operationId: wackytracky.clientapi.v1.WackyTrackyClientService.UpdateRbacRole
+      parameters:
+        - name: Connect-Protocol-Version
+          in: header
+          description: Define the version of the Connect protocol
+          schema:
+            $ref: '#/components/schemas/connect-protocol-version'
+          example: 1
+        - name: Connect-Timeout-Ms
+          in: header
+          description: Define the timeout, in ms
+          schema:
+            $ref: '#/components/schemas/connect-timeout-header'
+          example: 1000
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/wackytracky.clientapi.v1.UpdateRbacRoleRequest'
+        required: true
+      responses:
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/connect.error'
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/wackytracky.clientapi.v1.RbacRole'
+  /api/wackytracky.clientapi.v1.WackyTrackyClientService/UpdateTask:
+    post:
+      tags:
+        - wackytracky.clientapi.v1.WackyTrackyClientService
+      summary: UpdateTask
+      operationId: wackytracky.clientapi.v1.WackyTrackyClientService.UpdateTask
+      parameters:
+        - name: Connect-Protocol-Version
+          in: header
+          description: Define the version of the Connect protocol
+          schema:
+            $ref: '#/components/schemas/connect-protocol-version'
+          example: 1
+        - name: Connect-Timeout-Ms
+          in: header
+          description: Define the timeout, in ms
+          schema:
+            $ref: '#/components/schemas/connect-timeout-header'
+          example: 1000
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/wackytracky.clientapi.v1.UpdateTaskRequest'
+        required: true
+      responses:
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/connect.error'
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/wackytracky.clientapi.v1.UpdateTaskResponse'
+  /api/wackytracky.clientapi.v1.WackyTrackyClientService/Version:
+    post:
+      tags:
+        - wackytracky.clientapi.v1.WackyTrackyClientService
+      summary: Version
+      operationId: wackytracky.clientapi.v1.WackyTrackyClientService.Version
+      parameters:
+        - name: Connect-Protocol-Version
+          in: header
+          description: Define the version of the Connect protocol
+          schema:
+            $ref: '#/components/schemas/connect-protocol-version'
+          example: 1
+        - name: Connect-Timeout-Ms
+          in: header
+          description: Define the timeout, in ms
+          schema:
+            $ref: '#/components/schemas/connect-timeout-header'
+          example: 1000
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/wackytracky.clientapi.v1.VersionRequest'
+        required: true
+      responses:
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/connect.error'
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/wackytracky.clientapi.v1.VersionResponse'
+components:
+  schemas:
+    connect-protocol-version:
+      type: number
+      examples:
+        - 1
+      title: Connect-Protocol-Version
+      description: Define the version of the Connect protocol
+      const: 1
+    connect-timeout-header:
+      type: number
+      examples:
+        - 1000
+      title: Connect-Timeout-Ms
+      description: Define the timeout, in ms
+    connect.error:
+      type: object
+      properties:
+        code:
+          type: string
+          examples:
+            - not_found
+          enum:
+            - canceled
+            - unknown
+            - invalid_argument
+            - deadline_exceeded
+            - not_found
+            - already_exists
+            - permission_denied
+            - resource_exhausted
+            - failed_precondition
+            - aborted
+            - out_of_range
+            - unimplemented
+            - internal
+            - unavailable
+            - data_loss
+            - unauthenticated
+          description: The status code, which should be an enum value of [google.rpc.Code][google.rpc.Code].
+        message:
+          type: string
+          description: A developer-facing error message, which should be in English. Any user-facing error message should be localized and sent in the [google.rpc.Status.details][google.rpc.Status.details] field, or localized by the client.
+        details:
+          type: array
+          items:
+            $ref: '#/components/schemas/connect.error_details.Any'
+          description: A list of messages that carry the error details. There is no limit on the number of messages.
+      title: Connect Error
+      additionalProperties: true
+      description: 'Error type returned by Connect: https://connectrpc.com/docs/go/errors/#http-representation'
+    connect.error_details.Any:
+      type: object
+      properties:
+        type:
+          type: string
+          description: 'A URL that acts as a globally unique identifier for the type of the serialized message. For example: `type.googleapis.com/google.rpc.ErrorInfo`.'
+        value:
+          type: string
+          format: byte
+          description: The Protobuf message, serialized as bytes and base64-encoded. The specific message type is identified by the `type` field.
+        debug:
+          type: object
+          title: Debug
+          additionalProperties: true
+          description: Deserialized error detail payload. The 'type' field indicates the schema. This field is for easier debugging and should not be relied upon for application logic.
+      additionalProperties: true
+      description: Contains an arbitrary serialized message along with a @type that describes the type of the serialized message, with an additional debug field for ConnectRPC error details.
+    wackytracky.clientapi.v1.ApiKey:
+      type: object
+      properties:
+        id:
+          type: integer
+          title: id
+          format: int32
+        name:
+          type: string
+          title: name
+        createdAt:
+          type: string
+          title: created_at
+        lastUsedAt:
+          type: string
+          title: last_used_at
+        readOnly:
+          type: boolean
+          title: read_only
+      title: ApiKey
+      additionalProperties: false
+    wackytracky.clientapi.v1.ChangePasswordRequest:
+      type: object
+      properties:
+        currentPassword:
+          type: string
+          title: current_password
+        newPassword:
+          type: string
+          title: new_password
+      title: ChangePasswordRequest
+      additionalProperties: false
+    wackytracky.clientapi.v1.ChangePasswordResponse:
+      type: object
+      properties:
+        standardResponse:
+          allOf:
+            - $ref: '#/components/schemas/wackytracky.clientapi.v1.StandardResponse'
+          title: standard_response
+      title: ChangePasswordResponse
+      additionalProperties: false
+    wackytracky.clientapi.v1.CreateApiKeyRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          title: name
+        readOnly:
+          type: boolean
+          title: read_only
+      title: CreateApiKeyRequest
+      additionalProperties: false
+    wackytracky.clientapi.v1.CreateApiKeyResponse:
+      type: object
+      properties:
+        key:
+          allOf:
+            - $ref: '#/components/schemas/wackytracky.clientapi.v1.ApiKey'
+          title: key
+        secret:
+          type: string
+          title: secret
+      title: CreateApiKeyResponse
+      additionalProperties: false
+    wackytracky.clientapi.v1.CreateListRequest:
+      type: object
+      properties:
+        title:
+          type: string
+          title: title
+      title: CreateListRequest
+      additionalProperties: false
+    wackytracky.clientapi.v1.CreateListResponse:
+      type: object
+      title: CreateListResponse
+      additionalProperties: false
+    wackytracky.clientapi.v1.CreateRbacRoleRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          title: name
+        description:
+          type: string
+          title: description
+        permissionIds:
+          type: array
+          items:
+            type: integer
+            format: int32
+          title: permission_ids
+      title: CreateRbacRoleRequest
+      additionalProperties: false
+    wackytracky.clientapi.v1.CreateRbacRoleResponse:
+      type: object
+      properties:
+        role:
+          allOf:
+            - $ref: '#/components/schemas/wackytracky.clientapi.v1.RbacRole'
+          title: role
+      title: CreateRbacRoleResponse
+      additionalProperties: false
+    wackytracky.clientapi.v1.CreateTaskRequest:
+      type: object
+      properties:
+        content:
+          type: string
+          title: content
+        parentListId:
+          type: string
+          title: parent_list_id
+          description: optional; when set, task is added to this list
+        parentTaskId:
+          type: string
+          title: parent_task_id
+          description: optional; when set, task is created as subtask of this task
+      title: CreateTaskRequest
+      additionalProperties: false
+    wackytracky.clientapi.v1.CreateTaskResponse:
+      type: object
+      properties:
+        task:
+          allOf:
+            - $ref: '#/components/schemas/wackytracky.clientapi.v1.Task'
+          title: task
+      title: CreateTaskResponse
+      additionalProperties: false
+    wackytracky.clientapi.v1.CreateUserGroupRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          title: name
+      title: CreateUserGroupRequest
+      additionalProperties: false
+    wackytracky.clientapi.v1.CreateUserGroupResponse:
+      type: object
+      properties:
+        group:
+          allOf:
+            - $ref: '#/components/schemas/wackytracky.clientapi.v1.UserGroup'
+          title: group
+      title: CreateUserGroupResponse
+      additionalProperties: false
+    wackytracky.clientapi.v1.CreateUserRequest:
+      type: object
+      properties:
+        username:
+          type: string
+          title: username
+        password:
+          type: string
+          title: password
+      title: CreateUserRequest
+      additionalProperties: false
+    wackytracky.clientapi.v1.CreateUserResponse:
+      type: object
+      properties:
+        standardResponse:
+          allOf:
+            - $ref: '#/components/schemas/wackytracky.clientapi.v1.StandardResponse'
+          title: standard_response
+        user:
+          allOf:
+            - $ref: '#/components/schemas/wackytracky.clientapi.v1.UserAccount'
+          title: user
+      title: CreateUserResponse
+      additionalProperties: false
+    wackytracky.clientapi.v1.DeleteApiKeyRequest:
+      type: object
+      properties:
+        id:
+          type: integer
+          title: id
+          format: int32
+      title: DeleteApiKeyRequest
+      additionalProperties: false
+    wackytracky.clientapi.v1.DeleteApiKeyResponse:
+      type: object
+      title: DeleteApiKeyResponse
+      additionalProperties: false
+    wackytracky.clientapi.v1.DeleteListRequest:
+      type: object
+      properties:
+        id:
+          type: string
+          title: id
+      title: DeleteListRequest
+      additionalProperties: false
+    wackytracky.clientapi.v1.DeleteListResponse:
+      type: object
+      title: DeleteListResponse
+      additionalProperties: false
+    wackytracky.clientapi.v1.DeleteRbacRoleRequest:
+      type: object
+      properties:
+        id:
+          type: integer
+          title: id
+          format: int32
+      title: DeleteRbacRoleRequest
+      additionalProperties: false
+    wackytracky.clientapi.v1.DeleteRbacRoleResponse:
+      type: object
+      title: DeleteRbacRoleResponse
+      additionalProperties: false
+    wackytracky.clientapi.v1.DeleteUserGroupRequest:
+      type: object
+      properties:
+        groupId:
+          type: integer
+          title: group_id
+          format: int32
+      title: DeleteUserGroupRequest
+      additionalProperties: false
+    wackytracky.clientapi.v1.DeleteUserGroupResponse:
+      type: object
+      title: DeleteUserGroupResponse
+      additionalProperties: false
+    wackytracky.clientapi.v1.DeleteUserRequest:
+      type: object
+      properties:
+        userId:
+          type: integer
+          title: user_id
+          format: int32
+      title: DeleteUserRequest
+      additionalProperties: false
+    wackytracky.clientapi.v1.DeleteUserResponse:
+      type: object
+      properties:
+        standardResponse:
+          allOf:
+            - $ref: '#/components/schemas/wackytracky.clientapi.v1.StandardResponse'
+          title: standard_response
+      title: DeleteUserResponse
+      additionalProperties: false
+    wackytracky.clientapi.v1.DoneTaskRequest:
+      type: object
+      properties:
+        id:
+          type: string
+          title: id
+          description: task id to mark done
+      title: DoneTaskRequest
+      additionalProperties: false
+    wackytracky.clientapi.v1.DoneTaskResponse:
+      type: object
+      title: DoneTaskResponse
+      additionalProperties: false
+    wackytracky.clientapi.v1.GetListsRequest:
+      type: object
+      title: GetListsRequest
+      additionalProperties: false
+    wackytracky.clientapi.v1.GetListsResponse:
+      type: object
+      properties:
+        lists:
+          type: array
+          items:
+            $ref: '#/components/schemas/wackytracky.clientapi.v1.List'
+          title: lists
+      title: GetListsResponse
+      additionalProperties: false
+    wackytracky.clientapi.v1.GetMyPermissionsAuditRequest:
+      type: object
+      title: GetMyPermissionsAuditRequest
+      additionalProperties: false
+    wackytracky.clientapi.v1.GetMyPermissionsAuditResponse:
+      type: object
+      properties:
+        groupNames:
+          type: array
+          items:
+            type: string
+          title: group_names
+        roleNames:
+          type: array
+          items:
+            type: string
+          title: role_names
+        isSuperuser:
+          type: boolean
+          title: is_superuser
+        permissions:
+          type: array
+          items:
+            $ref: '#/components/schemas/wackytracky.clientapi.v1.MyPermissionAuditRow'
+          title: permissions
+      title: GetMyPermissionsAuditResponse
+      additionalProperties: false
+    wackytracky.clientapi.v1.GetRbacRoleGroupsRequest:
+      type: object
+      properties:
+        roleId:
+          type: integer
+          title: role_id
+          format: int32
+      title: GetRbacRoleGroupsRequest
+      additionalProperties: false
+    wackytracky.clientapi.v1.GetRbacRoleGroupsResponse:
+      type: object
+      properties:
+        groupNames:
+          type: array
+          items:
+            type: string
+          title: group_names
+      title: GetRbacRoleGroupsResponse
+      additionalProperties: false
+    wackytracky.clientapi.v1.GetRbacRoleUsersRequest:
+      type: object
+      properties:
+        roleId:
+          type: integer
+          title: role_id
+          format: int32
+      title: GetRbacRoleUsersRequest
+      additionalProperties: false
+    wackytracky.clientapi.v1.GetRbacRoleUsersResponse:
+      type: object
+      properties:
+        usernames:
+          type: array
+          items:
+            type: string
+          title: usernames
+      title: GetRbacRoleUsersResponse
+      additionalProperties: false
+    wackytracky.clientapi.v1.GetSavedSearchesRequest:
+      type: object
+      title: GetSavedSearchesRequest
+      additionalProperties: false
+    wackytracky.clientapi.v1.GetSavedSearchesResponse:
+      type: object
+      properties:
+        savedSearches:
+          type: array
+          items:
+            $ref: '#/components/schemas/wackytracky.clientapi.v1.SavedSearch'
+          title: saved_searches
+      title: GetSavedSearchesResponse
+      additionalProperties: false
+    wackytracky.clientapi.v1.GetStatusRequest:
+      type: object
+      title: GetStatusRequest
+      additionalProperties: false
+    wackytracky.clientapi.v1.GetStatusResponse:
+      type: object
+      properties:
+        username:
+          type: string
+          title: username
+        isLoggedIn:
+          type: boolean
+          title: is_logged_in
+        rbacPermissions:
+          type: array
+          items:
+            type: string
+          title: rbac_permissions
+        rbacIsSuperuser:
+          type: boolean
+          title: rbac_is_superuser
+        isImpersonating:
+          type: boolean
+          title: is_impersonating
+        impersonatorUsername:
+          type: string
+          title: impersonator_username
+        usesSecureCookies:
+          type: boolean
+          title: uses_secure_cookies
+        accountCreatedAt:
+          type: string
+          title: account_created_at
+      title: GetStatusResponse
+      additionalProperties: false
+    wackytracky.clientapi.v1.GetTagsRequest:
+      type: object
+      title: GetTagsRequest
+      additionalProperties: false
+    wackytracky.clientapi.v1.GetTagsResponse:
+      type: object
+      properties:
+        tags:
+          type: array
+          items:
+            $ref: '#/components/schemas/wackytracky.clientapi.v1.Tag'
+          title: tags
+      title: GetTagsResponse
+      additionalProperties: false
+    wackytracky.clientapi.v1.GetTaskMetadataRequest:
+      type: object
+      properties:
+        taskId:
+          type: string
+          title: task_id
+      title: GetTaskMetadataRequest
+      additionalProperties: false
+      description: Task metadata (e.g. notes) — optional per driver
+    wackytracky.clientapi.v1.GetTaskMetadataResponse:
+      type: object
+      properties:
+        fields:
+          type: object
+          title: fields
+          additionalProperties:
+            type: string
+            title: value
+      title: GetTaskMetadataResponse
+      additionalProperties: false
+    wackytracky.clientapi.v1.GetTaskPropertyPropertiesRequest:
+      type: object
+      title: GetTaskPropertyPropertiesRequest
+      additionalProperties: false
+    wackytracky.clientapi.v1.GetTaskPropertyPropertiesResponse:
+      type: object
+      properties:
+        tagProperties:
+          type: object
+          title: tag_properties
+          additionalProperties:
+            allOf:
+              - $ref: '#/components/schemas/wackytracky.clientapi.v1.TaskPropertyProps'
+            title: value
+          description: tag name -> props (e.g. css)
+        contextProperties:
+          type: object
+          title: context_properties
+          additionalProperties:
+            allOf:
+              - $ref: '#/components/schemas/wackytracky.clientapi.v1.TaskPropertyProps'
+            title: value
+          description: context name -> props
+      title: GetTaskPropertyPropertiesResponse
+      additionalProperties: false
+    wackytracky.clientapi.v1.GetUserGroupMembersRequest:
+      type: object
+      properties:
+        groupId:
+          type: integer
+          title: group_id
+          format: int32
+      title: GetUserGroupMembersRequest
+      additionalProperties: false
+    wackytracky.clientapi.v1.GetUserGroupMembersResponse:
+      type: object
+      properties:
+        members:
+          type: array
+          items:
+            $ref: '#/components/schemas/wackytracky.clientapi.v1.UserAccount'
+          title: members
+      title: GetUserGroupMembersResponse
+      additionalProperties: false
+    wackytracky.clientapi.v1.GetUserGroupRbacRolesRequest:
+      type: object
+      properties:
+        groupId:
+          type: integer
+          title: group_id
+          format: int32
+      title: GetUserGroupRbacRolesRequest
+      additionalProperties: false
+    wackytracky.clientapi.v1.GetUserGroupRbacRolesResponse:
+      type: object
+      properties:
+        roleIds:
+          type: array
+          items:
+            type: integer
+            format: int32
+          title: role_ids
+      title: GetUserGroupRbacRolesResponse
+      additionalProperties: false
+    wackytracky.clientapi.v1.GetUserRbacRolesRequest:
+      type: object
+      properties:
+        userId:
+          type: integer
+          title: user_id
+          format: int32
+      title: GetUserRbacRolesRequest
+      additionalProperties: false
+    wackytracky.clientapi.v1.GetUserRbacRolesResponse:
+      type: object
+      properties:
+        roles:
+          type: array
+          items:
+            $ref: '#/components/schemas/wackytracky.clientapi.v1.RbacRole'
+          title: roles
+      title: GetUserRbacRolesResponse
+      additionalProperties: false
+    wackytracky.clientapi.v1.GetUserRequest:
+      type: object
+      properties:
+        userId:
+          type: integer
+          title: user_id
+          format: int32
+      title: GetUserRequest
+      additionalProperties: false
+    wackytracky.clientapi.v1.GetUserResponse:
+      type: object
+      properties:
+        user:
+          allOf:
+            - $ref: '#/components/schemas/wackytracky.clientapi.v1.UserAccount'
+          title: user
+        userGroups:
+          type: array
+          items:
+            $ref: '#/components/schemas/wackytracky.clientapi.v1.UserGroup'
+          title: user_groups
+      title: GetUserResponse
+      additionalProperties: false
+    wackytracky.clientapi.v1.GetUsersRequest:
+      type: object
+      title: GetUsersRequest
+      additionalProperties: false
+    wackytracky.clientapi.v1.GetUsersResponse:
+      type: object
+      properties:
+        users:
+          type: array
+          items:
+            $ref: '#/components/schemas/wackytracky.clientapi.v1.UserAccount'
+          title: users
+      title: GetUsersResponse
+      additionalProperties: false
+    wackytracky.clientapi.v1.ImpersonateUserRequest:
+      type: object
+      properties:
+        userId:
+          type: integer
+          title: user_id
+          format: int32
+      title: ImpersonateUserRequest
+      additionalProperties: false
+    wackytracky.clientapi.v1.ImpersonateUserResponse:
+      type: object
+      properties:
+        standardResponse:
+          allOf:
+            - $ref: '#/components/schemas/wackytracky.clientapi.v1.StandardResponse'
+          title: standard_response
+      title: ImpersonateUserResponse
+      additionalProperties: false
+    wackytracky.clientapi.v1.InitRequest:
+      type: object
+      title: InitRequest
+      additionalProperties: false
+    wackytracky.clientapi.v1.InitResponse:
+      type: object
+      properties:
+        wallpaper:
+          type: string
+          title: wallpaper
+        showFooter:
+          type: boolean
+          title: show_footer
+        showNewVersions:
+          type: boolean
+          title: show_new_versions
+        availableVersion:
+          type: string
+          title: available_version
+        currentVersion:
+          type: string
+          title: current_version
+        pageTitle:
+          type: string
+          title: page_title
+        showVersionNumber:
+          type: boolean
+          title: show_version_number
+      title: InitResponse
+      additionalProperties: false
+    wackytracky.clientapi.v1.List:
+      type: object
+      properties:
+        id:
+          type: string
+          title: id
+        title:
+          type: string
+          title: title
+        countItems:
+          type: integer
+          title: count_items
+          format: int32
+      title: List
+      additionalProperties: false
+    wackytracky.clientapi.v1.ListApiKeysRequest:
+      type: object
+      title: ListApiKeysRequest
+      additionalProperties: false
+    wackytracky.clientapi.v1.ListApiKeysResponse:
+      type: object
+      properties:
+        keys:
+          type: array
+          items:
+            $ref: '#/components/schemas/wackytracky.clientapi.v1.ApiKey'
+          title: keys
+      title: ListApiKeysResponse
+      additionalProperties: false
+    wackytracky.clientapi.v1.ListRbacPermissionsRequest:
+      type: object
+      title: ListRbacPermissionsRequest
+      additionalProperties: false
+    wackytracky.clientapi.v1.ListRbacPermissionsResponse:
+      type: object
+      properties:
+        permissions:
+          type: array
+          items:
+            $ref: '#/components/schemas/wackytracky.clientapi.v1.RbacPermission'
+          title: permissions
+      title: ListRbacPermissionsResponse
+      additionalProperties: false
+    wackytracky.clientapi.v1.ListRbacRolesRequest:
+      type: object
+      title: ListRbacRolesRequest
+      additionalProperties: false
+    wackytracky.clientapi.v1.ListRbacRolesResponse:
+      type: object
+      properties:
+        roles:
+          type: array
+          items:
+            $ref: '#/components/schemas/wackytracky.clientapi.v1.RbacRole'
+          title: roles
+      title: ListRbacRolesResponse
+      additionalProperties: false
+    wackytracky.clientapi.v1.ListTasksRequest:
+      type: object
+      properties:
+        parentId:
+          type: string
+          title: parent_id
+        parentType:
+          type: string
+          title: parent_type
+      title: ListTasksRequest
+      additionalProperties: false
+    wackytracky.clientapi.v1.ListTasksResponse:
+      type: object
+      properties:
+        tasks:
+          type: array
+          items:
+            $ref: '#/components/schemas/wackytracky.clientapi.v1.Task'
+          title: tasks
+        tree:
+          type: object
+          title: tree
+          additionalProperties:
+            allOf:
+              - $ref: '#/components/schemas/wackytracky.clientapi.v1.TaskIdList'
+            title: value
+          description: 'tree: parent ID (list ID for roots) -> ordered child task IDs. Enables client to render hierarchy without extra calls.'
+        hiddenTagNames:
+          type: array
+          items:
+            type: string
+          title: hidden_tag_names
+          description: Tags/contexts whose hide-at-times rule is currently true; tasks with these are excluded from tasks/tree.
+        hiddenContextNames:
+          type: array
+          items:
+            type: string
+          title: hidden_context_names
+      title: ListTasksResponse
+      additionalProperties: false
+    wackytracky.clientapi.v1.ListUserGroupsRequest:
+      type: object
+      title: ListUserGroupsRequest
+      additionalProperties: false
+    wackytracky.clientapi.v1.ListUserGroupsResponse:
+      type: object
+      properties:
+        groups:
+          type: array
+          items:
+            $ref: '#/components/schemas/wackytracky.clientapi.v1.UserGroup'
+          title: groups
+      title: ListUserGroupsResponse
+      additionalProperties: false
+    wackytracky.clientapi.v1.LoginWithUsernameAndPasswordRequest:
+      type: object
+      properties:
+        username:
+          type: string
+          title: username
+        password:
+          type: string
+          title: password
+      title: LoginWithUsernameAndPasswordRequest
+      additionalProperties: false
+    wackytracky.clientapi.v1.LoginWithUsernameAndPasswordResponse:
+      type: object
+      properties:
+        standardResponse:
+          allOf:
+            - $ref: '#/components/schemas/wackytracky.clientapi.v1.StandardResponse'
+          title: standard_response
+        username:
+          type: string
+          title: username
+      title: LoginWithUsernameAndPasswordResponse
+      additionalProperties: false
+    wackytracky.clientapi.v1.LogoutRequest:
+      type: object
+      title: LogoutRequest
+      additionalProperties: false
+    wackytracky.clientapi.v1.LogoutResponse:
+      type: object
+      properties:
+        standardResponse:
+          allOf:
+            - $ref: '#/components/schemas/wackytracky.clientapi.v1.StandardResponse'
+          title: standard_response
+      title: LogoutResponse
+      additionalProperties: false
+    wackytracky.clientapi.v1.MoveTaskRequest:
+      type: object
+      properties:
+        taskId:
+          type: string
+          title: task_id
+        targetListId:
+          type: string
+          title: target_list_id
+      title: MoveTaskRequest
+      additionalProperties: false
+    wackytracky.clientapi.v1.MoveTaskResponse:
+      type: object
+      title: MoveTaskResponse
+      additionalProperties: false
+    wackytracky.clientapi.v1.MyPermissionAuditRow:
+      type: object
+      properties:
+        permission:
+          type: string
+          title: permission
+        granted:
+          type: boolean
+          title: granted
+        grantingGroups:
+          type: array
+          items:
+            type: string
+          title: granting_groups
+      title: MyPermissionAuditRow
+      additionalProperties: false
+    wackytracky.clientapi.v1.RbacPermission:
+      type: object
+      properties:
+        id:
+          type: integer
+          title: id
+          format: int32
+        name:
+          type: string
+          title: name
+        description:
+          type: string
+          title: description
+      title: RbacPermission
+      additionalProperties: false
+    wackytracky.clientapi.v1.RbacRole:
+      type: object
+      properties:
+        id:
+          type: integer
+          title: id
+          format: int32
+        name:
+          type: string
+          title: name
+        description:
+          type: string
+          title: description
+        permissionIds:
+          type: array
+          items:
+            type: integer
+            format: int32
+          title: permission_ids
+        groupCount:
+          type: integer
+          title: group_count
+          format: int32
+        userCount:
+          type: integer
+          title: user_count
+          format: int32
+      title: RbacRole
+      additionalProperties: false
+    wackytracky.clientapi.v1.RepoStatusRequest:
+      type: object
+      title: RepoStatusRequest
+      additionalProperties: false
+    wackytracky.clientapi.v1.RepoStatusResponse:
+      type: object
+      properties:
+        output:
+          type: string
+          title: output
+          description: git status output for the todotxt directory, or error message
+      title: RepoStatusResponse
+      additionalProperties: false
+    wackytracky.clientapi.v1.RepoSyncRequest:
+      type: object
+      properties:
+        serverName:
+          type: string
+          title: server_name
+      title: RepoSyncRequest
+      additionalProperties: false
+    wackytracky.clientapi.v1.RepoSyncResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          title: success
+        message:
+          type: string
+          title: message
+        steps:
+          type: array
+          items:
+            type: string
+          title: steps
+      title: RepoSyncResponse
+      additionalProperties: false
+    wackytracky.clientapi.v1.ResetUserPasswordRequest:
+      type: object
+      properties:
+        userId:
+          type: integer
+          title: user_id
+          format: int32
+        newPassword:
+          type: string
+          title: new_password
+      title: ResetUserPasswordRequest
+      additionalProperties: false
+    wackytracky.clientapi.v1.ResetUserPasswordResponse:
+      type: object
+      properties:
+        standardResponse:
+          allOf:
+            - $ref: '#/components/schemas/wackytracky.clientapi.v1.StandardResponse'
+          title: standard_response
+      title: ResetUserPasswordResponse
+      additionalProperties: false
+    wackytracky.clientapi.v1.RuleStatusRequest:
+      type: object
+      title: RuleStatusRequest
+      additionalProperties: false
+      description: RuleStatus returns current date/time components for hide-at-times rule builder (D=day short name, H=hour, M=minute).
+    wackytracky.clientapi.v1.RuleStatusResponse:
+      type: object
+      properties:
+        D:
+          type: string
+          title: D
+          description: 'short day name: Mon, Tue, ..., Sun'
+        H:
+          type: integer
+          title: H
+          format: int32
+          description: hour 0-23
+        M:
+          type: integer
+          title: M
+          format: int32
+          description: minute 0-59
+      title: RuleStatusResponse
+      additionalProperties: false
+    wackytracky.clientapi.v1.RuleTestRequest:
+      type: object
+      properties:
+        expression:
+          type: string
+          title: expression
+      title: RuleTestRequest
+      additionalProperties: false
+      description: RuleTest compiles and evaluates a hide-at-times expression; used by UI to validate and preview rules.
+    wackytracky.clientapi.v1.RuleTestResponse:
+      type: object
+      properties:
+        compiles:
+          type: boolean
+          title: compiles
+        compileError:
+          type: string
+          title: compile_error
+          description: set when compiles is false
+        result:
+          type: boolean
+          title: result
+          description: set when compiles is true (eval result)
+        evalError:
+          type: string
+          title: eval_error
+          description: set when compiles is true but eval failed
+      title: RuleTestResponse
+      additionalProperties: false
+    wackytracky.clientapi.v1.SavedSearch:
+      type: object
+      properties:
+        id:
+          type: string
+          title: id
+        name:
+          type: string
+          title: name
+        query:
+          type: string
+          title: query
+      title: SavedSearch
+      additionalProperties: false
+    wackytracky.clientapi.v1.SearchTasksRequest:
+      type: object
+      properties:
+        query:
+          type: string
+          title: query
+          description: freetext search; backends may optionally support it
+      title: SearchTasksRequest
+      additionalProperties: false
+    wackytracky.clientapi.v1.SearchTasksResponse:
+      type: object
+      properties:
+        tasks:
+          type: array
+          items:
+            $ref: '#/components/schemas/wackytracky.clientapi.v1.Task'
+          title: tasks
+      title: SearchTasksResponse
+      additionalProperties: false
+    wackytracky.clientapi.v1.SetSavedSearchesRequest:
+      type: object
+      properties:
+        savedSearches:
+          type: array
+          items:
+            $ref: '#/components/schemas/wackytracky.clientapi.v1.SavedSearch'
+          title: saved_searches
+      title: SetSavedSearchesRequest
+      additionalProperties: false
+    wackytracky.clientapi.v1.SetSavedSearchesResponse:
+      type: object
+      title: SetSavedSearchesResponse
+      additionalProperties: false
+    wackytracky.clientapi.v1.SetTaskMetadataRequest:
+      type: object
+      properties:
+        taskId:
+          type: string
+          title: task_id
+        field:
+          type: string
+          title: field
+        value:
+          type: string
+          title: value
+      title: SetTaskMetadataRequest
+      additionalProperties: false
+    wackytracky.clientapi.v1.SetTaskMetadataResponse:
+      type: object
+      title: SetTaskMetadataResponse
+      additionalProperties: false
+    wackytracky.clientapi.v1.SetTaskPropertyPropertyRequest:
+      type: object
+      properties:
+        propertyType:
+          type: string
+          title: property_type
+          description: '"tag" or "context"'
+        propertyName:
+          type: string
+          title: property_name
+        key:
+          type: string
+          title: key
+        value:
+          type: string
+          title: value
+      title: SetTaskPropertyPropertyRequest
+      additionalProperties: false
+    wackytracky.clientapi.v1.SetTaskPropertyPropertyResponse:
+      type: object
+      title: SetTaskPropertyPropertyResponse
+      additionalProperties: false
+    wackytracky.clientapi.v1.SetUserGroupMembersRequest:
+      type: object
+      properties:
+        groupId:
+          type: integer
+          title: group_id
+          format: int32
+        userIds:
+          type: array
+          items:
+            type: integer
+            format: int32
+          title: user_ids
+      title: SetUserGroupMembersRequest
+      additionalProperties: false
+    wackytracky.clientapi.v1.SetUserGroupMembersResponse:
+      type: object
+      properties:
+        standardResponse:
+          allOf:
+            - $ref: '#/components/schemas/wackytracky.clientapi.v1.StandardResponse'
+          title: standard_response
+      title: SetUserGroupMembersResponse
+      additionalProperties: false
+    wackytracky.clientapi.v1.SetUserGroupRbacRolesRequest:
+      type: object
+      properties:
+        groupId:
+          type: integer
+          title: group_id
+          format: int32
+        roleIds:
+          type: array
+          items:
+            type: integer
+            format: int32
+          title: role_ids
+      title: SetUserGroupRbacRolesRequest
+      additionalProperties: false
+    wackytracky.clientapi.v1.SetUserGroupRbacRolesResponse:
+      type: object
+      properties:
+        standardResponse:
+          allOf:
+            - $ref: '#/components/schemas/wackytracky.clientapi.v1.StandardResponse'
+          title: standard_response
+      title: SetUserGroupRbacRolesResponse
+      additionalProperties: false
+    wackytracky.clientapi.v1.StandardResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          title: success
+        message:
+          type: string
+          title: message
+      title: StandardResponse
+      additionalProperties: false
+    wackytracky.clientapi.v1.StopImpersonationRequest:
+      type: object
+      title: StopImpersonationRequest
+      additionalProperties: false
+    wackytracky.clientapi.v1.StopImpersonationResponse:
+      type: object
+      properties:
+        standardResponse:
+          allOf:
+            - $ref: '#/components/schemas/wackytracky.clientapi.v1.StandardResponse'
+          title: standard_response
+      title: StopImpersonationResponse
+      additionalProperties: false
+    wackytracky.clientapi.v1.Tag:
+      type: object
+      properties:
+        id:
+          type: string
+          title: id
+        title:
+          type: string
+          title: title
+      title: Tag
+      additionalProperties: false
+    wackytracky.clientapi.v1.TagRequest:
+      type: object
+      title: TagRequest
+      additionalProperties: false
+    wackytracky.clientapi.v1.TagResponse:
+      type: object
+      title: TagResponse
+      additionalProperties: false
+    wackytracky.clientapi.v1.Task:
+      type: object
+      properties:
+        id:
+          type: string
+          title: id
+        content:
+          type: string
+          title: content
+        parentId:
+          type: string
+          title: parent_id
+        parentType:
+          type: string
+          title: parent_type
+        countSubitems:
+          type: integer
+          title: count_subitems
+          format: int32
+        tags:
+          type: array
+          items:
+            type: string
+          title: tags
+          description: 'parsed from #hashtag in todo.txt lines'
+        contexts:
+          type: array
+          items:
+            type: string
+          title: contexts
+          description: parsed from @context in todo.txt lines (e.g. @home @work)
+        waitUntil:
+          type: string
+          title: wait_until
+          description: optional; ISO date-time; task is hidden from list/next-action until this time
+        priority:
+          type: string
+          title: priority
+          description: optional; single letter A–Z; stored as priority:X in todo.txt
+        dueDate:
+          type: string
+          title: due_date
+          description: optional; ISO date YYYY-MM-DD; stored in metadata like wait
+      title: Task
+      additionalProperties: false
+    wackytracky.clientapi.v1.TaskIdList:
+      type: object
+      properties:
+        ids:
+          type: array
+          items:
+            type: string
+          title: ids
+      title: TaskIdList
+      additionalProperties: false
+      description: TaskIdList holds ordered child task IDs for a parent in the tree.
+    wackytracky.clientapi.v1.TaskPropertyProps:
+      type: object
+      properties:
+        props:
+          type: object
+          title: props
+          additionalProperties:
+            type: string
+            title: value
+      title: TaskPropertyProps
+      additionalProperties: false
+      description: |-
+        TaskPropertyProperties: optional key/value settings per task property (e.g. tag #work, context @home).
+         Supported keys: css (arbitrary CSS for the tag/context chip style attribute), hide-at-times.
+    wackytracky.clientapi.v1.UpdateListRequest:
+      type: object
+      properties:
+        id:
+          type: string
+          title: id
+        title:
+          type: string
+          title: title
+      title: UpdateListRequest
+      additionalProperties: false
+    wackytracky.clientapi.v1.UpdateListResponse:
+      type: object
+      title: UpdateListResponse
+      additionalProperties: false
+    wackytracky.clientapi.v1.UpdateRbacRoleRequest:
+      type: object
+      properties:
+        id:
+          type: integer
+          title: id
+          format: int32
+        name:
+          type: string
+          title: name
+        description:
+          type: string
+          title: description
+        permissionIds:
+          type: array
+          items:
+            type: integer
+            format: int32
+          title: permission_ids
+      title: UpdateRbacRoleRequest
+      additionalProperties: false
+    wackytracky.clientapi.v1.UpdateTaskRequest:
+      type: object
+      properties:
+        id:
+          type: string
+          title: id
+        content:
+          type: string
+          title: content
+      title: UpdateTaskRequest
+      additionalProperties: false
+    wackytracky.clientapi.v1.UpdateTaskResponse:
+      type: object
+      properties:
+        task:
+          allOf:
+            - $ref: '#/components/schemas/wackytracky.clientapi.v1.Task'
+          title: task
+      title: UpdateTaskResponse
+      additionalProperties: false
+    wackytracky.clientapi.v1.UserAccount:
+      type: object
+      properties:
+        id:
+          type: integer
+          title: id
+          format: int32
+        username:
+          type: string
+          title: username
+        createdAt:
+          type: string
+          title: created_at
+        createdBy:
+          type: string
+          title: created_by
+        userGroups:
+          type: array
+          items:
+            $ref: '#/components/schemas/wackytracky.clientapi.v1.UserGroup'
+          title: user_groups
+      title: UserAccount
+      additionalProperties: false
+    wackytracky.clientapi.v1.UserGroup:
+      type: object
+      properties:
+        id:
+          type: integer
+          title: id
+          format: int32
+        name:
+          type: string
+          title: name
+        memberCount:
+          type: integer
+          title: member_count
+          format: int32
+      title: UserGroup
+      additionalProperties: false
+    wackytracky.clientapi.v1.VersionRequest:
+      type: object
+      title: VersionRequest
+      additionalProperties: false
+    wackytracky.clientapi.v1.VersionResponse:
+      type: object
+      properties:
+        version:
+          type: string
+          title: version
+        commit:
+          type: string
+          title: commit
+        date:
+          type: string
+          title: date
+      title: VersionResponse
+      additionalProperties: false
+security: []
+tags:
+  - name: wackytracky.clientapi.v1.WackyTrackyClientService

@@ -1,109 +1,119 @@
 <template>
-	<Section title="Settings">
-		<div class="options-section">
-			<h3 class="options-subheading">Keyboard shortcuts</h3>
-			<p class="options-hint">View and use keyboard shortcuts from the list view.</p>
-			<button type="button" class="options-btn" @click="openShortcutsDialog">Open shortcuts</button>
-		</div>
-		<div class="options-section">
-			<h3 class="options-subheading">Git sync</h3>
-			<label for="options-server-name" class="options-label">Server name</label>
-			<input
-				id="options-server-name"
-				v-model="serverName"
-				type="text"
-				class="options-text-input"
-				placeholder="e.g. homelab"
-				aria-describedby="options-server-name-desc"
-				autocomplete="off"
-			/>
-			<p id="options-server-name-desc" class="options-hint">
-				Used in git commit messages when you sync from the header: <code>wt sync: &lt;server name&gt;</code>.
-			</p>
-			<button
-				type="button"
-				class="options-btn"
-				:disabled="!isOnline || repoSyncRunning"
-				@click="showRepoStatus"
+	<Section
+		title="Settings"
+		:icon="Settings01Icon"
+		subtitle="Server and client settings."
+		:padding="true"
+	>
+		<FormLayout @submit.prevent>
+			<FormField
+				label="Keyboard shortcuts"
+				description="View and use keyboard shortcuts from the list view."
 			>
-				Show git status
-			</button>
-			<p class="options-hint">
-				View <code>git status</code> output for the todo.txt data directory (requires network).
-			</p>
-		</div>
-		<div class="options-section">
-			<label for="options-datetime-format" class="options-label">Date/time display format</label>
-			<select
-				id="options-datetime-format"
-				v-model="dateTimeDisplayFormat"
-				class="options-select"
-				aria-describedby="options-datetime-format-desc"
+				<button type="button" class="neutral" @click="openShortcutsDialog">
+					Open shortcuts
+				</button>
+			</FormField>
+
+			<FormField
+				label="Server name"
+				for="options-server-name"
+				description="Used in git commit messages when you sync from the header: wt sync: <server name>."
 			>
-				<option
-					v-for="opt in dateTimeFormatOptions"
-					:key="opt.value"
-					:value="opt.value"
+				<input
+					id="options-server-name"
+					v-model="serverName"
+					type="text"
+					placeholder="e.g. homelab"
+					autocomplete="off"
+				/>
+			</FormField>
+
+			<FormField
+				label="Git status"
+				description="View git status output for the todo.txt data directory (requires network)."
+			>
+				<button
+					type="button"
+					class="neutral"
+					:disabled="!isOnline || repoSyncRunning"
+					@click="showRepoStatus"
 				>
-					{{ opt.label }}
-				</option>
-			</select>
-			<p id="options-datetime-format-desc" class="options-hint">
-				How due dates and "wait until" times are shown in the task list and details.
-			</p>
-		</div>
-		<div class="options-section">
-			<label for="options-monospace-font" class="options-label">
-				<input
-					id="options-monospace-font"
+					Show git status
+				</button>
+			</FormField>
+
+			<FormField
+				label="Date/time display format"
+				for="options-datetime-format"
+				description="How due dates and wait-until times are shown in the task list and details."
+			>
+				<select id="options-datetime-format" v-model="dateTimeDisplayFormat">
+					<option
+						v-for="opt in dateTimeFormatOptions"
+						:key="opt.value"
+						:value="opt.value"
+					>
+						{{ opt.label }}
+					</option>
+				</select>
+			</FormField>
+
+			<FormField
+				label="Use monospace font"
+				description="Apply monospace font across the entire UI."
+				component-has-label
+			>
+				<RadioGroup
 					v-model="useMonospaceFont"
-					type="checkbox"
-					class="options-checkbox"
-					aria-describedby="options-monospace-font-desc"
+					name="options-monospace-font"
+					variant="boolean"
+					:options="booleanOptions"
 				/>
-				Use monospace font
-			</label>
-			<p id="options-monospace-font-desc" class="options-hint">
-				Apply monospace font across the entire UI.
-			</p>
-		</div>
-		<div class="options-section">
-			<label for="options-zen-mode" class="options-label">
-				<input
-					id="options-zen-mode"
+			</FormField>
+
+			<FormField
+				label="Zen mode"
+				description="Apply minimal styling for a distraction-free experience."
+				component-has-label
+			>
+				<RadioGroup
 					v-model="zenMode"
-					type="checkbox"
-					class="options-checkbox"
-					aria-describedby="options-zen-mode-desc"
+					name="options-zen-mode"
+					variant="boolean"
+					:options="booleanOptions"
 				/>
-				Zen mode
-			</label>
-			<p id="options-zen-mode-desc" class="options-hint">
-				Apply minimal styling for a distraction-free experience.
-			</p>
-		</div>
-		<div class="options-section">
-			<label for="options-hide-footer" class="options-label">
-				<input
-					id="options-hide-footer"
+			</FormField>
+
+			<FormField
+				label="Hide footer"
+				description="Hide the footer element at the bottom of the page."
+				component-has-label
+			>
+				<RadioGroup
 					v-model="hideFooter"
-					type="checkbox"
-					class="options-checkbox"
-					aria-describedby="options-hide-footer-desc"
+					name="options-hide-footer"
+					variant="boolean"
+					:options="booleanOptions"
 				/>
-				Hide footer
-			</label>
-			<p id="options-hide-footer-desc" class="options-hint">
-				Hide the footer element at the bottom of the page.
-			</p>
-		</div>
+			</FormField>
+		</FormLayout>
 	</Section>
 </template>
 
 <script setup>
 import { inject } from 'vue';
+import FormField from 'picocrank/vue/components/FormField.vue';
+import FormLayout from 'picocrank/vue/components/FormLayout.vue';
+import RadioGroup from 'picocrank/vue/components/RadioGroup.vue';
 import Section from 'picocrank/vue/components/Section.vue';
+import { Settings01Icon } from '@hugeicons/core-free-icons';
 import { useSettings } from '../composables/useSettings.js';
+
+const booleanOptions = [
+	{ label: 'Yes', value: true },
+	{ label: 'No', value: false },
+];
 
 const openShortcutsDialog = inject('openShortcutsDialog', () => {});
 const showRepoStatus = inject('showRepoStatus', () => {});
@@ -118,63 +128,3 @@ const {
 	serverName,
 } = useSettings();
 </script>
-
-<style scoped>
-.options-section {
-	margin-bottom: 1.25rem;
-}
-.options-label {
-	display: block;
-	margin-bottom: 0.35rem;
-	font-weight: 500;
-	font-size: 0.95rem;
-}
-.options-select {
-	padding: 0.4rem 0.6rem;
-	min-width: 12rem;
-	border: 1px solid #ccc;
-	border-radius: 0.35rem;
-	font-size: 0.95rem;
-	background: var(--femtocrank-bg, #fff);
-}
-.options-text-input {
-	display: block;
-	padding: 0.4rem 0.6rem;
-	min-width: 12rem;
-	max-width: 24rem;
-	width: 100%;
-	border: 1px solid #ccc;
-	border-radius: 0.35rem;
-	font-size: 0.95rem;
-	background: var(--femtocrank-bg, #fff);
-}
-.options-hint {
-	margin: 0.35rem 0 0 0;
-	color: #666;
-	font-size: 0.875rem;
-}
-.options-subheading {
-	margin: 0 0 0.35rem 0;
-	font-size: 1rem;
-	font-weight: 600;
-}
-.options-btn {
-	padding: 0.4rem 0.75rem;
-	margin-top: 0.5rem;
-	border: 1px solid #ccc;
-	border-radius: 0.35rem;
-	background: var(--femtocrank-bg, #fff);
-	font-size: 0.95rem;
-	cursor: pointer;
-}
-.options-btn:hover:not(:disabled) {
-	background: #f0f0f0;
-}
-.options-btn:disabled {
-	opacity: 0.6;
-	cursor: not-allowed;
-}
-.options-checkbox {
-	margin-right: 0.5rem;
-}
-</style>

@@ -1,14 +1,23 @@
 <template>
+	<main v-if="!authReady" class="login-shell">
+		<p>Loading…</p>
+	</main>
+	<main v-else-if="!isLoggedIn" class="login-shell">
+		<LoginForm @login-success="onLogin" />
+	</main>
+	<template v-else>
 	<div v-if="!isOnline" class="offline-banner" role="status" aria-live="polite">
 		You are offline. Editing and adding tasks (inbox only) are saved locally and will sync when you reconnect.
 	</div>
 	<Header
-		ref="headerRef"
 		title="WackyTracky"
 		:logo-url="logoUrl"
 		:sidebar-enabled="false"
 		:breadcrumbs="false"
 		:show-branding="!isPwa"
+		:username="username"
+		@logo-click="goHome"
+		@user-click="goToUserControlPanel"
 	>
 		<template #toolbar>
 			<div class="toolbar-row">
@@ -57,20 +66,16 @@
 					</button>
 				</div>
 			</div>
-		</template>
-		<template #user-info>
-			<div class="user-info">
-				<button type="button" class="options-btn display-mode-btn" :title="displayModeLabel" aria-label="Display mode" @click="cycleDisplayMode">
-					<HugeiconsIcon :icon="displayModeIcon" width="1.1em" height="1.1em" />
-					<span class="display-mode-label">{{ displayModeLabel }}</span>
-				</button>
-				<button type="button" class="options-btn repo-sync-btn" :disabled="!isOnline || repoSyncRunning" @click="startRepoSync" title="Git add, commit, and push todotxt directory (requires network)" aria-label="Sync to git remote">
-					<HugeiconsIcon :icon="CloudUploadIcon" width="1.1em" height="1.1em" />
-				</button>
-				<button type="button" class="options-btn options-settings-btn" @click="goToOptions" title="Options" aria-label="Options">
-					<HugeiconsIcon :icon="Settings01Icon" width="1.1em" height="1.1em" />
-				</button>
-			</div>
+			<button type="button" class="options-btn display-mode-btn" :title="displayModeLabel" aria-label="Display mode" @click="cycleDisplayMode">
+				<HugeiconsIcon :icon="displayModeIcon" width="1.1em" height="1.1em" />
+				<span class="display-mode-label">{{ displayModeLabel }}</span>
+			</button>
+			<button type="button" class="options-btn repo-sync-btn" :disabled="!isOnline || repoSyncRunning" @click="startRepoSync" title="Git add, commit, and push todotxt directory (requires network)" aria-label="Sync to git remote">
+				<HugeiconsIcon :icon="CloudUploadIcon" width="1.1em" height="1.1em" />
+			</button>
+			<button type="button" class="options-btn options-settings-btn" @click="goToOptions" title="Options" aria-label="Options">
+				<HugeiconsIcon :icon="Settings01Icon" width="1.1em" height="1.1em" />
+			</button>
 		</template>
 	</Header>
 	<div v-if="navOptionsOpen" class="nav-options-overlay" @click.self="navOptionsOpen = false">
@@ -209,19 +214,28 @@
 				<main>
 					<router-view :key="$route.fullPath" />
 				</main>
-				<footer class="app-footer">
-					<span>
-						<a href="https://jamesread.github.io/WackyTracky/" target="_blank" rel="noopener noreferrer" class="footer-brand">WackyTracky</a>
-					</span>
-					<span>
-						<button type="button" class="footer-shortcuts-btn" @click="openShortcutsDialog" aria-label="Keyboard shortcuts">
-							Shortcuts
-						</button>
-					</span>
-				</footer>
+				<AppFooter
+					v-if="showAppFooter"
+					app-name="WackyTracky"
+					:logo-url="logoUrl"
+					:current-version="initCurrentVersion"
+					:show-version-number="initShowVersionNumber"
+					:show-new-versions="initShowNewVersions"
+					:available-version="initAvailableVersion"
+					docs-url="https://jamesread.github.io/WackyTracky/"
+					issues-url="https://github.com/wacky-tracky/WackyTracky/issues"
+					update-url="https://github.com/wacky-tracky/WackyTracky/releases"
+				>
+					<template #extra-links>
+						<span>
+							<a href="#" @click.prevent="openShortcutsDialog">Shortcuts</a>
+						</span>
+					</template>
+				</AppFooter>
 			</div>
 		</div>
 	</Navigation>
+	</template>
 </template>
 
 <script setup>
@@ -231,9 +245,14 @@ import { HugeiconsIcon } from '@hugeicons/vue';
 import Header from 'picocrank/vue/components/Header.vue';
 import Navigation from 'picocrank/vue/components/Navigation.vue';
 import NavOptions from './components/NavOptions.vue';
+import LoginForm from './components/LoginForm.vue';
+import AppFooter from './components/AppFooter.vue';
 import { CloudUploadIcon, PinIcon, Settings01Icon, Folder01Icon, PlayIcon, AlarmClockIcon } from '@hugeicons/core-free-icons';
 import { useOffline } from './composables/useOffline.js';
 import { useSettings } from './composables/useSettings.js';
+import { fetchAppStatus, useAppStatus } from '../../js/modules/appStatus.js';
+import { fetchAppInit, useAppInit } from '../../js/modules/appInit.js';
+import { canAccessControlPanelFromStatus } from '../../js/modules/rbacAccess.js';
 import {
 	addOfflineTask,
 	setOfflineEdit,
@@ -251,8 +270,30 @@ const router = useRouter();
 const route = useRoute();
 const { isOnline } = useOffline();
 const { useMonospaceFont, zenMode, hideFooter, serverName, syncSettingsFromStorage } = useSettings();
+const appStatus = useAppStatus();
+const appInit = useAppInit();
+const authReady = ref(false);
+const isLoggedIn = computed(() => Boolean(appStatus.status?.isLoggedIn));
+const username = computed(() => (isLoggedIn.value ? (appStatus.status?.username || '') : ''));
+const initShowFooter = computed(() => appInit.init?.showFooter !== false);
+const initShowVersionNumber = computed(() => appInit.init?.showVersionNumber !== false);
+const initShowNewVersions = computed(() => Boolean(appInit.init?.showNewVersions));
+const initCurrentVersion = computed(() => String(appInit.init?.currentVersion || ''));
+const initAvailableVersion = computed(() => String(appInit.init?.availableVersion || ''));
+const showAppFooter = computed(() => initShowFooter.value && !hideFooter.value);
+let loggedInShellReady = false;
+
+async function onLogin() {
+	await fetchAppStatus({ force: true });
+	authReady.value = true;
+	await initLoggedInShell();
+}
+
+function goToUserControlPanel() {
+	navOptionsOpen.value = false;
+	router.push({ name: 'userControlPanel' });
+}
 const navigation = ref(null);
-const headerRef = ref(null);
 const taskInputRef = ref(null);
 const taskDraft = ref('');
 const editingTaskId = ref(null);
@@ -801,6 +842,14 @@ async function getLists() {
 		}
 	}
 	navigation.value.addSeparator('nav-settings');
+	try {
+		const st = await fetchAppStatus();
+		if (canAccessControlPanelFromStatus(st)) {
+			navigation.value.addRouterLink('controlPanel', 'System Control Panel');
+		}
+	} catch {
+		// status unavailable — omit control panel link
+	}
 	navigation.value.addRouterLink('TaskPropertyProperties', 'TPPs');
 	navigation.value.addRouterLink('Settings', 'Settings');
 	navigation.value.addRouterLink('Diagnostics', 'Diagnostics');
@@ -951,8 +1000,6 @@ watch(isOnline, (online) => {
 	}
 });
 
-let headerLogoClickCleanup = null;
-
 watch(refreshTrigger, () => { getLists(); });
 watch(savedSearchDropdownOpen, (open) => {
 	if (open) {
@@ -988,14 +1035,17 @@ watch(hideFooter, (enabled) => {
 		document.body.classList.remove('hide-footer');
 	}
 }, { immediate: true });
-onMounted(() => {
-	syncSettingsFromStorage();
-	if (useMonospaceFont.value) document.body.classList.add('monospace-font');
-	else document.body.classList.remove('monospace-font');
-	if (zenMode.value) document.body.classList.add('zen-mode');
-	else document.body.classList.remove('zen-mode');
-	if (hideFooter.value) document.body.classList.add('hide-footer');
-	else document.body.classList.remove('hide-footer');
+async function initLoggedInShell() {
+	if (loggedInShellReady) {
+		await getLists();
+		return;
+	}
+	loggedInShellReady = true;
+	try {
+		await fetchAppInit({ force: true });
+	} catch {
+		// footer falls back to defaults via useAppInit
+	}
 	displayModeMqStandalone = window.matchMedia('(display-mode: standalone)');
 	displayModeMqWco = window.matchMedia('(display-mode: window-controls-overlay)');
 	updatePwaDisplayMode();
@@ -1003,26 +1053,33 @@ onMounted(() => {
 	displayModeMqWco.addEventListener('change', updatePwaDisplayMode);
 	loadSavedSearches();
 	loadTaskPropertyProperties();
-	getLists();
+	await getLists();
 	window.addEventListener('online', syncOfflineChanges);
 	document.addEventListener('keydown', onCtrlF);
 	document.addEventListener('keydown', onCtrlN);
 	document.addEventListener('keydown', onCtrlK);
 	document.addEventListener('keydown', onKeyM);
 	document.addEventListener('keydown', onShortcutsOpenKeydown);
-	// Clicking header logo/title navigates to index
-	nextTick(() => {
-		const el = headerRef.value?.$el;
-		const branding = el?.querySelector?.('.image-and-title');
-		if (branding) {
-			branding.style.cursor = 'pointer';
-			branding.addEventListener('click', goHome);
-			headerLogoClickCleanup = () => {
-				branding.removeEventListener('click', goHome);
-			};
-		}
-	});
 	document.addEventListener('click', onSavedSearchSelectClickOutside);
+}
+
+onMounted(async () => {
+	syncSettingsFromStorage();
+	if (useMonospaceFont.value) document.body.classList.add('monospace-font');
+	else document.body.classList.remove('monospace-font');
+	if (zenMode.value) document.body.classList.add('zen-mode');
+	else document.body.classList.remove('zen-mode');
+	if (hideFooter.value) document.body.classList.add('hide-footer');
+	else document.body.classList.remove('hide-footer');
+	try {
+		await fetchAppStatus();
+	} catch {
+		// login form shown when not logged in
+	}
+	authReady.value = true;
+	if (isLoggedIn.value) {
+		await initLoggedInShell();
+	}
 });
 onUnmounted(() => {
 	stopRepoSyncProgress();
@@ -1035,7 +1092,6 @@ onUnmounted(() => {
 	document.removeEventListener('keydown', onKeyM);
 	document.removeEventListener('keydown', onShortcutsOpenKeydown);
 	document.removeEventListener('click', onSavedSearchSelectClickOutside);
-	headerLogoClickCleanup?.();
 });
 
 function onSavedSearchSelectClickOutside(e) {
@@ -1056,15 +1112,15 @@ function onSavedSearchSelectClickOutside(e) {
 .toolbar-row {
 	display: flex;
 	align-items: center;
+	align-self: center;
 	gap: 0.5rem;
 	flex-grow: 2;
 	min-width: 0;
 }
 
-/* Shared height, padding, margin for header controls */
+/* Shared height for inset toolbar controls (not header chrome buttons) */
 .toolbar-input,
-.saved-search-select-trigger,
-.options-btn {
+.saved-search-select-trigger {
 	box-sizing: border-box;
 	height: 2rem;
 	padding: 0.35rem 0.6rem;
@@ -1111,10 +1167,12 @@ function onSavedSearchSelectClickOutside(e) {
 	display: flex;
 	flex-wrap: wrap;
 	align-items: center;
+	align-self: center;
 	gap: 0.5rem;
 }
 .toolbar-saved-searches-select {
 	position: relative;
+	align-self: center;
 }
 .saved-search-select-trigger {
 	display: flex;
@@ -1209,35 +1267,40 @@ function onSavedSearchSelectClickOutside(e) {
 .save-search-btn:hover {
 	background: rgba(255, 255, 255, 0.15);
 }
-.options-settings-btn {
-	margin-right: 0.5rem;
-}
-.user-info {
-	display: flex;
-	align-items: center;
-	gap: 0.5rem;
-}
-
 @media (display-mode: window-controls-overlay) {
-	.user-info {
+	:deep(.header-actions) {
 		padding-right: calc(100vw - env(titlebar-area-x, 0px) - env(titlebar-area-width, 100vw));
 	}
 }
+/* Match PicoCrank header action chrome (full-height, borderless) */
 .options-btn {
 	display: inline-flex;
 	align-items: center;
+	align-self: stretch;
 	gap: 0.35rem;
-	border-color: rgba(255, 255, 255, 0.5);
+	height: auto;
+	margin: 0;
+	padding: 0 0.6em;
+	border: 0;
+	border-radius: 0;
 	background: transparent;
-	color: #fff;
+	color: var(--header-fg-color, #fff);
+	font-size: inherit;
+	font-weight: normal;
+	line-height: 1;
 	cursor: pointer;
 }
-.options-btn:hover {
-	background: rgba(255, 255, 255, 0.15);
+.options-btn:hover:not(:disabled) {
+	background: var(--header-hover-background-color, rgba(255, 255, 255, 0.15));
+	color: var(--header-hover-text-color, #fff);
+}
+.options-btn:disabled {
+	opacity: 0.45;
+	cursor: not-allowed;
 }
 .display-mode-label {
 	margin-left: 0;
-	font-size: inherit;
+	font-size: 0.875rem;
 }
 .repo-status-overlay {
 	position: fixed;
@@ -1363,35 +1426,6 @@ function onSavedSearchSelectClickOutside(e) {
 }
 #content main {
 	flex: 1;
-}
-.app-footer {
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	gap: 0.75rem;
-	padding: 0.5rem 1rem;
-	font-size: 0.75rem;
-	color: #666;
-}
-.app-footer .footer-brand {
-	color: inherit;
-	text-decoration: none;
-}
-.app-footer .footer-brand:hover {
-	text-decoration: underline;
-}
-.footer-shortcuts-btn {
-	padding: 0;
-	border: none;
-	background: none;
-	color: inherit;
-	font-size: inherit;
-	font-weight: normal;
-	cursor: pointer;
-	text-decoration: none;
-}
-.footer-shortcuts-btn:hover {
-	text-decoration: underline;
 }
 
 .save-search-overlay,
@@ -1569,5 +1603,10 @@ function onSavedSearchSelectClickOutside(e) {
 }
 .shortcuts-close-btn:hover {
 	background: #f0f0f0;
+}
+.login-shell {
+	max-width: 28rem;
+	margin: 4rem auto;
+	padding: 0 1rem;
 }
 </style>

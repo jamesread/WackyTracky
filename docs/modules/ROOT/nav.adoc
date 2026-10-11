@@ -1,0 +1,14 @@
+* xref:index.adoc[Introduction]
+* Installation
+** xref:install/docker-compose.adoc[Docker Compose]
+* xref:authentication.adoc[Authentication]
+* Backends
+** xref:backends/index.adoc[Overview]
+** xref:backends/todotxt.adoc[todo.txt]
+** xref:backends/neo4j.adoc[Neo4j]
+** xref:backends/yamlfiles.adoc[YAML files]
+* API
+** xref:api/index.adoc[Overview]
+** xref:api/reference.adoc[Reference]
+** xref:api/search.adoc[Search]
+** xref:api/mcp.adoc[MCP server]

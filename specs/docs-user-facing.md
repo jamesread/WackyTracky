@@ -44,7 +44,7 @@ If a configuration option or behavior *must* be explained, describe it in terms 
 
 ## Scope
 
-- **Applies to:** All content under **docs/** (e.g. MkDocs `source/` and any other user-facing doc assets).
+- **Applies to:** All content under **docs/** (Antora modules under `docs/modules/` and any other user-facing doc assets).
 - **When adding or editing docs:** Keep the audience (entry-level self-hosters with Docker) and the “usage + configuration only” rule in mind. Avoid slipping in developer-only or implementation-only sections unless they are clearly separated (e.g. an optional “Advanced” section that still stays user-oriented).
 
 ---
