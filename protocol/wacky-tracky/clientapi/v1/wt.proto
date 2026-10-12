@@ -237,6 +237,9 @@ message GetStatusResponse {
 	string impersonator_username = 6;
 	bool uses_secure_cookies = 7;
 	string account_created_at = 8;
+	// Task backend driver from config (database.driver). Only set when the
+	// caller may view system status (superuser, system.logs, or control-panel privileges).
+	string database_driver = 9;
 }
 
 message LoginWithUsernameAndPasswordRequest {

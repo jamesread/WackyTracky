@@ -73,14 +73,8 @@
 			<button type="button" class="options-btn repo-sync-btn" :disabled="!isOnline || repoSyncRunning" @click="startRepoSync" title="Git add, commit, and push todotxt directory (requires network)" aria-label="Sync to git remote">
 				<HugeiconsIcon :icon="CloudUploadIcon" width="1.1em" height="1.1em" />
 			</button>
-			<button type="button" class="options-btn options-settings-btn" @click="goToOptions" title="Options" aria-label="Options">
-				<HugeiconsIcon :icon="Settings01Icon" width="1.1em" height="1.1em" />
-			</button>
 		</template>
 	</Header>
-	<div v-if="navOptionsOpen" class="nav-options-overlay" @click.self="navOptionsOpen = false">
-		<NavOptions />
-	</div>
 	<div v-if="repoStatusModal" class="repo-status-overlay" @click.self="repoStatusModal = null">
 		<div class="repo-status-dialog" role="dialog" aria-labelledby="repo-status-title" aria-modal="true">
 			<h2 id="repo-status-title" class="repo-status-title">Repo status (todotxt directory)</h2>
@@ -244,15 +238,13 @@ import { useRouter, useRoute } from 'vue-router';
 import { HugeiconsIcon } from '@hugeicons/vue';
 import Header from 'picocrank/vue/components/Header.vue';
 import Navigation from 'picocrank/vue/components/Navigation.vue';
-import NavOptions from './components/NavOptions.vue';
 import LoginForm from './components/LoginForm.vue';
 import AppFooter from './components/AppFooter.vue';
-import { CloudUploadIcon, PinIcon, Settings01Icon, Folder01Icon, PlayIcon, AlarmClockIcon } from '@hugeicons/core-free-icons';
+import { CloudUploadIcon, PinIcon, Folder01Icon, PlayIcon, AlarmClockIcon } from '@hugeicons/core-free-icons';
 import { useOffline } from './composables/useOffline.js';
 import { useSettings } from './composables/useSettings.js';
 import { fetchAppStatus, useAppStatus } from '../../js/modules/appStatus.js';
 import { fetchAppInit, useAppInit } from '../../js/modules/appInit.js';
-import { canAccessControlPanelFromStatus } from '../../js/modules/rbacAccess.js';
 import {
 	addOfflineTask,
 	setOfflineEdit,
@@ -290,7 +282,6 @@ async function onLogin() {
 }
 
 function goToUserControlPanel() {
-	navOptionsOpen.value = false;
 	router.push({ name: 'userControlPanel' });
 }
 const navigation = ref(null);
@@ -333,7 +324,6 @@ const repoSyncSteps = [
 	'Pushing to remote',
 ];
 let repoSyncProgressTimer = null;
-const navOptionsOpen = ref(false);
 const shortcutsModal = ref(false);
 const shortcutsCloseRef = ref(null);
 const saveSearchModalOpen = ref(false);
@@ -841,23 +831,6 @@ async function getLists() {
 			});
 		}
 	}
-	navigation.value.addSeparator('nav-settings');
-	try {
-		const st = await fetchAppStatus();
-		if (canAccessControlPanelFromStatus(st)) {
-			navigation.value.addRouterLink('controlPanel', 'System Control Panel');
-		}
-	} catch {
-		// status unavailable — omit control panel link
-	}
-	navigation.value.addRouterLink('TaskPropertyProperties', 'TPPs');
-	navigation.value.addRouterLink('Settings', 'Settings');
-	navigation.value.addRouterLink('Diagnostics', 'Diagnostics');
-}
-
-function goToOptions() {
-	navOptionsOpen.value = true;
-	router.push('/options');
 }
 
 function openShortcutsDialog() {
@@ -980,9 +953,6 @@ watch(
 	},
 	{ immediate: true }
 );
-watch(() => route.path, (path) => {
-	if (path !== '/options') navOptionsOpen.value = false;
-});
 watch(isOnline, (online) => {
 	if (!online) {
 		searchMode.value = false;

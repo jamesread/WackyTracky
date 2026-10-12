@@ -2500,6 +2500,12 @@ components:
         accountCreatedAt:
           type: string
           title: account_created_at
+        databaseDriver:
+          type: string
+          title: database_driver
+          description: |-
+            Task backend driver from config (database.driver). Only set when the
+             caller may view system status (superuser, system.logs, or control-panel privileges).
       title: GetStatusResponse
       additionalProperties: false
     wackytracky.clientapi.v1.GetTagsRequest:

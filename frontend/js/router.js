@@ -7,7 +7,6 @@ import { UserShield01Icon } from '@hugeicons/core-free-icons';
 
 import Welcome from '../resources/vue/views/Welcome.vue';
 import ListView from '../resources/vue/views/ListView.vue';
-import NavOptions from '../resources/vue/components/NavOptions.vue';
 import Options from '../resources/vue/views/Options.vue';
 import Diagnostics from '../resources/vue/views/Diagnostics.vue';
 import TaskPropertyProperties from '../resources/vue/views/TaskPropertyProperties.vue';
@@ -75,43 +74,39 @@ const routes = [
 		}
 	},
 	{
-		name: 'NavOptions',
-		path: '/options',
-		component: NavOptions,
-		meta: {
-			title: 'Options',
-			icon: Settings01Icon,
-			description: 'Shortcuts to settings, task properties, and diagnostics.',
-		}
-	},
-	{
 		name: 'TaskPropertyProperties',
-		path: '/options/task-property-properties',
+		path: '/control-panel/task-property-properties',
 		component: TaskPropertyProperties,
 		meta: {
 			title: 'TPPs',
 			icon: Settings01Icon,
 			description: 'Configure tags and contexts (colors, order).',
+			requiresAuth: true,
+			requiresControlPanel: true,
 		}
 	},
 	{
 		name: 'Settings',
-		path: '/settings',
+		path: '/control-panel/settings',
 		component: Options,
 		meta: {
 			title: 'Settings',
 			icon: Settings01Icon,
 			description: 'Server and client settings.',
+			requiresAuth: true,
+			requiresControlPanel: true,
 		}
 	},
 	{
 		name: 'Diagnostics',
-		path: '/diagnostics',
+		path: '/control-panel/diagnostics',
 		component: Diagnostics,
 		meta: {
 			title: 'Diagnostics',
 			icon: Settings01Icon,
 			description: 'Debug and health information.',
+			requiresAuth: true,
+			requiresControlPanel: true,
 		}
 	},
 	{
@@ -217,6 +212,10 @@ const routes = [
 		meta: { title: 'Role', requiresAuth: true, requiresIam: true },
 	},
 	{ path: '/iam', redirect: { name: 'iam' } },
+	{ path: '/options', redirect: { name: 'controlPanel' } },
+	{ path: '/settings', redirect: { name: 'Settings' } },
+	{ path: '/diagnostics', redirect: { name: 'Diagnostics' } },
+	{ path: '/options/task-property-properties', redirect: { name: 'TaskPropertyProperties' } },
 	{ path: '/user-control-panel/permissions', redirect: { name: 'myPermissions' } },
 ]
 

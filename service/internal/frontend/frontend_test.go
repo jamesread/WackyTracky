@@ -21,7 +21,7 @@ func TestIsSPARoute(t *testing.T) {
 		{"/lists/abc", true},
 		{"/lists/a1b2c3d4-e5f6-4a5b-8c9d-0e1f2a3b4c5d", true},
 		{"/search", true},
-		{"/options", true},
+		{"/control-panel", true},
 		{"/api/foo", false},
 		{"/metrics", false},
 		{"/wallpapers/x", false},

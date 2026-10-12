@@ -4,6 +4,7 @@ export const CONTROL_PANEL_PERMISSIONS = [
 	'usergroups.view',
 	'rbac.view',
 	'system.settings',
+	'system.logs',
 ]
 
 export const IAM_PERMISSIONS = ['users.view', 'usergroups.view', 'rbac.view']
@@ -41,4 +42,20 @@ export function canAccessSettingsFromStatus(st) {
 	if (!st?.isLoggedIn) return false
 	if (st.rbacIsSuperuser) return true
 	return (st.rbacPermissions || []).includes('system.settings')
+}
+
+/** Matches GetStatus fields reserved for ops/admin (e.g. database_driver). */
+export const SYSTEM_STATUS_PERMISSIONS = [
+	'system.logs',
+	...CONTROL_PANEL_PERMISSIONS,
+]
+
+/**
+ * @param {{ isLoggedIn?: boolean, rbacIsSuperuser?: boolean, rbacPermissions?: readonly string[] } | null | undefined} st
+ */
+export function canViewSystemStatusFromStatus(st) {
+	if (!st?.isLoggedIn) return false
+	if (st.rbacIsSuperuser) return true
+	const perms = st.rbacPermissions || []
+	return SYSTEM_STATUS_PERMISSIONS.some((p) => perms.includes(p))
 }

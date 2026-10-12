@@ -5,6 +5,12 @@
 		subtitle="Server and client settings."
 		:padding="true"
 	>
+		<template #toolbar>
+			<router-link :to="{ name: 'controlPanel' }" class="button inline-icon neutral">
+				<HugeiconsIcon :icon="ArrowLeft01Icon" width="1em" height="1em" aria-hidden="true" />
+				<span>Control Panel</span>
+			</router-link>
+		</template>
 		<FormLayout @submit.prevent>
 			<FormField
 				label="Keyboard shortcuts"
@@ -107,7 +113,8 @@ import FormField from 'picocrank/vue/components/FormField.vue';
 import FormLayout from 'picocrank/vue/components/FormLayout.vue';
 import RadioGroup from 'picocrank/vue/components/RadioGroup.vue';
 import Section from 'picocrank/vue/components/Section.vue';
-import { Settings01Icon } from '@hugeicons/core-free-icons';
+import { HugeiconsIcon } from '@hugeicons/vue';
+import { ArrowLeft01Icon, Settings01Icon } from '@hugeicons/core-free-icons';
 import { useSettings } from '../composables/useSettings.js';
 
 const booleanOptions = [

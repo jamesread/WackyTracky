@@ -6,6 +6,10 @@
 		:padding="true"
 	>
 		<template #toolbar>
+			<router-link :to="{ name: 'controlPanel' }" class="button inline-icon neutral">
+				<HugeiconsIcon :icon="ArrowLeft01Icon" width="1em" height="1em" aria-hidden="true" />
+				<span>Control Panel</span>
+			</router-link>
 			<button
 				type="button"
 				class="inline-icon neutral"
@@ -210,7 +214,7 @@ import Section from 'picocrank/vue/components/Section.vue';
 import FormField from 'picocrank/vue/components/FormField.vue';
 import FormLayout from 'picocrank/vue/components/FormLayout.vue';
 import { HugeiconsIcon } from '@hugeicons/vue';
-import { Refresh01Icon, Settings01Icon } from '@hugeicons/core-free-icons';
+import { ArrowLeft01Icon, Refresh01Icon, Settings01Icon } from '@hugeicons/core-free-icons';
 
 const iconStrokeWidth = 2.5;
 const refreshTaskPropertyProperties = inject('refreshTaskPropertyProperties', () => Promise.resolve());

@@ -11,10 +11,21 @@ import (
 	"github.com/google/uuid"
 
 	"github.com/jamesread/armature-iam/password"
+	"github.com/jamesread/armature-iam/rbac"
 	pb "github.com/wacky-tracky/wacky-tracky-server/gen/wacky-tracky/clientapi/v1"
 	"github.com/wacky-tracky/wacky-tracky-server/internal/auth"
 	"github.com/wacky-tracky/wacky-tracky-server/internal/iamstore"
+	"github.com/wacky-tracky/wacky-tracky-server/internal/runtimeconfig"
 )
+
+// Privileges that may see operational fields on GetStatus (e.g. task DB driver).
+var systemStatusPermissions = []string{
+	rbac.PermissionSystemLogs,
+	rbac.PermissionSystemSettings,
+	rbac.PermissionUsersView,
+	rbac.PermissionUserGroupsView,
+	rbac.PermissionRbacView,
+}
 
 func (api *wackyTrackyClientService) BootstrapIAM(ctx context.Context) error {
 	if api.iamStore == nil {
@@ -71,8 +82,30 @@ func (api *wackyTrackyClientService) populateLoggedInStatus(ctx context.Context,
 	res.Username = au.User.Username
 	api.fillAccountCreatedAt(ctx, au.User.ID, res)
 	fillRBACStatus(au, res)
+	fillSystemStatus(au, res)
 	if sid := sessionIDFromHeader(req.Header()); sid != "" {
 		api.fillImpersonation(ctx, sid, res)
+	}
+}
+
+func canViewSystemStatus(au *auth.AuthenticatedUser) bool {
+	if au == nil || au.RBAC == nil {
+		return false
+	}
+	for _, p := range systemStatusPermissions {
+		if au.RBAC.Has(p) {
+			return true
+		}
+	}
+	return false
+}
+
+func fillSystemStatus(au *auth.AuthenticatedUser, res *pb.GetStatusResponse) {
+	if !canViewSystemStatus(au) {
+		return
+	}
+	if db := runtimeconfig.RuntimeConfig.Database; db != nil {
+		res.DatabaseDriver = db.Driver
 	}
 }
 

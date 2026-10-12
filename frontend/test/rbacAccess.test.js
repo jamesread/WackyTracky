@@ -4,6 +4,7 @@ import {
 	canAccessControlPanelFromStatus,
 	canAccessIamFromStatus,
 	canAccessSettingsFromStatus,
+	canViewSystemStatusFromStatus,
 	hasPermission,
 } from '../js/modules/rbacAccess.js'
 
@@ -55,14 +56,25 @@ test('settings permission unlocks the control panel', () => {
 	)
 })
 
-test('unimplemented child permissions do not unlock the control panel', () => {
+test('system.impersonate alone does not unlock the control panel', () => {
 	assert.equal(
 		canAccessControlPanelFromStatus({
 			isLoggedIn: true,
 			rbacIsSuperuser: false,
-			rbacPermissions: ['system.logs', 'system.impersonate'],
+			rbacPermissions: ['system.impersonate'],
 		}),
 		false,
+	)
+})
+
+test('system.logs unlocks the control panel for quick status', () => {
+	assert.equal(
+		canAccessControlPanelFromStatus({
+			isLoggedIn: true,
+			rbacIsSuperuser: false,
+			rbacPermissions: ['system.logs'],
+		}),
+		true,
 	)
 })
 
@@ -114,6 +126,43 @@ test('hasPermission grants superuser everything', () => {
 			{ isLoggedIn: true, rbacIsSuperuser: false, rbacPermissions: ['users.view'] },
 			'users.delete',
 		),
+		false,
+	)
+})
+
+test('system status is hidden when logged out', () => {
+	assert.equal(canViewSystemStatusFromStatus({ isLoggedIn: false, rbacIsSuperuser: true }), false)
+})
+
+test('system.logs unlocks system status', () => {
+	assert.equal(
+		canViewSystemStatusFromStatus({
+			isLoggedIn: true,
+			rbacIsSuperuser: false,
+			rbacPermissions: ['system.logs'],
+		}),
+		true,
+	)
+})
+
+test('control panel privileges unlock system status', () => {
+	assert.equal(
+		canViewSystemStatusFromStatus({
+			isLoggedIn: true,
+			rbacIsSuperuser: false,
+			rbacPermissions: ['users.view'],
+		}),
+		true,
+	)
+})
+
+test('ordinary members cannot view system status', () => {
+	assert.equal(
+		canViewSystemStatusFromStatus({
+			isLoggedIn: true,
+			rbacIsSuperuser: false,
+			rbacPermissions: ['app.access'],
+		}),
 		false,
 	)
 })

@@ -2711,8 +2711,11 @@ type GetStatusResponse struct {
 	ImpersonatorUsername string                 `protobuf:"bytes,6,opt,name=impersonator_username,json=impersonatorUsername,proto3" json:"impersonator_username,omitempty"`
 	UsesSecureCookies    bool                   `protobuf:"varint,7,opt,name=uses_secure_cookies,json=usesSecureCookies,proto3" json:"uses_secure_cookies,omitempty"`
 	AccountCreatedAt     string                 `protobuf:"bytes,8,opt,name=account_created_at,json=accountCreatedAt,proto3" json:"account_created_at,omitempty"`
-	unknownFields        protoimpl.UnknownFields
-	sizeCache            protoimpl.SizeCache
+	// Task backend driver from config (database.driver). Only set when the
+	// caller may view system status (superuser, system.logs, or control-panel privileges).
+	DatabaseDriver string `protobuf:"bytes,9,opt,name=database_driver,json=databaseDriver,proto3" json:"database_driver,omitempty"`
+	unknownFields  protoimpl.UnknownFields
+	sizeCache      protoimpl.SizeCache
 }
 
 func (x *GetStatusResponse) Reset() {
@@ -2797,6 +2800,13 @@ func (x *GetStatusResponse) GetUsesSecureCookies() bool {
 func (x *GetStatusResponse) GetAccountCreatedAt() string {
 	if x != nil {
 		return x.AccountCreatedAt
+	}
+	return ""
+}
+
+func (x *GetStatusResponse) GetDatabaseDriver() string {
+	if x != nil {
+		return x.DatabaseDriver
 	}
 	return ""
 }
@@ -5960,7 +5970,7 @@ const file_wacky_tracky_clientapi_v1_wt_proto_rawDesc = "" +
 	"\x10StandardResponse\x12\x18\n" +
 	"\asuccess\x18\x01 \x01(\bR\asuccess\x12\x18\n" +
 	"\amessage\x18\x02 \x01(\tR\amessage\"\x12\n" +
-	"\x10GetStatusRequest\"\xe6\x02\n" +
+	"\x10GetStatusRequest\"\x8f\x03\n" +
 	"\x11GetStatusResponse\x12\x1a\n" +
 	"\busername\x18\x01 \x01(\tR\busername\x12 \n" +
 	"\fis_logged_in\x18\x02 \x01(\bR\n" +
@@ -5970,7 +5980,8 @@ const file_wacky_tracky_clientapi_v1_wt_proto_rawDesc = "" +
 	"\x10is_impersonating\x18\x05 \x01(\bR\x0fisImpersonating\x123\n" +
 	"\x15impersonator_username\x18\x06 \x01(\tR\x14impersonatorUsername\x12.\n" +
 	"\x13uses_secure_cookies\x18\a \x01(\bR\x11usesSecureCookies\x12,\n" +
-	"\x12account_created_at\x18\b \x01(\tR\x10accountCreatedAt\"]\n" +
+	"\x12account_created_at\x18\b \x01(\tR\x10accountCreatedAt\x12'\n" +
+	"\x0fdatabase_driver\x18\t \x01(\tR\x0edatabaseDriver\"]\n" +
 	"#LoginWithUsernameAndPasswordRequest\x12\x1a\n" +
 	"\busername\x18\x01 \x01(\tR\busername\x12\x1a\n" +
 	"\bpassword\x18\x02 \x01(\tR\bpassword\"\x9b\x01\n" +
