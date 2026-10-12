@@ -7,9 +7,9 @@ import (
 	"os"
 	"path/filepath"
 
-	_ "github.com/mattn/go-sqlite3"
-
 	iamsqlite "github.com/jamesread/armature-iam/store/sqlite"
+	// Pure-Go SQLite so release builds with CGO_ENABLED=0 (goreleaser) can open IAM.
+	_ "modernc.org/sqlite"
 )
 
 // SQLite persists IAM data (users, sessions, API keys, RBAC) separately from task storage.
@@ -23,7 +23,8 @@ func Open(dbPath string) (*SQLite, error) {
 	if err := os.MkdirAll(filepath.Dir(dbPath), 0o755); err != nil {
 		return nil, err
 	}
-	db, err := sql.Open("sqlite3", dbPath+"?_foreign_keys=on&_busy_timeout=5000")
+	dsn := "file:" + filepath.ToSlash(dbPath) + "?_pragma=foreign_keys(1)&_pragma=busy_timeout(5000)"
+	db, err := sql.Open("sqlite", dsn)
 	if err != nil {
 		return nil, err
 	}
@@ -53,11 +54,16 @@ func applySQLitePragmas(db *sql.DB) error {
 
 // OpenMemory opens an in-memory IAM database with schema applied (for tests).
 func OpenMemory() (*SQLite, error) {
-	iam, err := iamsqlite.OpenMemory()
+	db, err := sql.Open("sqlite", "file::memory:?_pragma=foreign_keys(1)")
 	if err != nil {
 		return nil, err
 	}
-	return &SQLite{db: iam.DB(), SQLite: iam}, nil
+	db.SetMaxOpenConns(1)
+	if err := iamsqlite.ApplySchema(context.Background(), db); err != nil {
+		_ = db.Close()
+		return nil, err
+	}
+	return &SQLite{db: db, SQLite: iamsqlite.New(db)}, nil
 }
 
 // SQLDB exposes the underlying connection for migrations.
