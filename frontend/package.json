@@ -34,7 +34,7 @@
 	  "@connectrpc/connect": "^2.2.0",
 	  "@connectrpc/connect-web": "^2.2.0",
 	  "@vitejs/plugin-vue": "^6.0.10",
-	  "picocrank": "^1.35.0",
+	  "picocrank": "^1.36.1",
 	  "vue-router": "^5.4.0"
   },
   "overrides": {
