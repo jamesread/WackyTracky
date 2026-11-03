@@ -197,6 +197,11 @@ func (api *wackyTrackyClientService) Logout(ctx context.Context, req *connect.Re
 	})
 	c := auth.ClearSessionCookie()
 	res.Header().Add("Set-Cookie", c.String())
+	// Signed in by a proxy JWT (eg Cloudflare Access): ignore it from now on, or the
+	// next request would sign the user straight back in.
+	if optOut, ok := api.ssoOptOut.Cookie(req.Header()); ok {
+		res.Header().Add("Set-Cookie", optOut.String())
+	}
 	return res, nil
 }
 

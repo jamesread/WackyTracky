@@ -41,7 +41,7 @@ func StartServer() {
 
 	authLayer := auth.NewLayer(iamDB, runtimeconfig.RuntimeConfig.Auth, log.StandardLogger())
 
-	apiPath, apiHandler := api.GetNewHandler(authLayer)
+	apiPath, apiHandler := api.GetNewHandler(authLayer, auth.NewSSOOptOut(runtimeconfig.RuntimeConfig.Auth))
 	apiHandler = http.StripPrefix("/api", apiHandler)
 	apiHandler = withCors(apiHandler)
 

@@ -31,6 +31,8 @@ type wackyTrackyClientService struct {
 	dbconn   dbmdl.DB
 	iamStore iamstore.Store
 	log      *log.Logger
+	// ssoOptOut lets Logout opt a browser out of proxy JWT sign-in (eg Cloudflare Access).
+	ssoOptOut *auth.SSOOptOut
 }
 
 func GetNewClientAPI(newdb dbmdl.DB, iamStore iamstore.Store) *wackyTrackyClientService {
@@ -48,11 +50,14 @@ func GetNewClientAPI(newdb dbmdl.DB, iamStore iamstore.Store) *wackyTrackyClient
 	return api
 }
 
-func (api *wackyTrackyClientService) GetNewHandler(authLayer *auth.Layer) (string, http.Handler) {
+func (api *wackyTrackyClientService) GetNewHandler(authLayer *auth.Layer, ssoOptOut *auth.SSOOptOut) (string, http.Handler) {
 	path, handler := clientv1.NewWackyTrackyClientServiceHandler(api)
 	if authLayer != nil {
 		handler = authLayer.WrapHandler(handler)
 	}
+	// Outside the auth layer, so an opted-out browser's JWT is dropped before it is checked.
+	api.ssoOptOut = ssoOptOut
+	handler = ssoOptOut.Wrap(handler)
 	return path, handler
 }
 

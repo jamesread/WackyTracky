@@ -90,3 +90,46 @@ export WACKYTRACKY_SECURE_COOKIES=false
 Extend `auth:` for JWT, trusted headers, or mTLS via httpauthshim. Strip
 inbound identity headers at your reverse proxy unless you trust the
 source. Most self-hosted setups only need username and password.
+
+=== JWT from a reverse proxy (Cloudflare Access)
+
+WackyTracky can trust a signed JWT added by an authenticating reverse
+proxy, such as Cloudflare Access. Users who reach WackyTracky through the
+proxy are signed in automatically:
+
+[source,yaml]
+----
+auth:
+  jwt:
+    certsUrl: "https://<team>.cloudflareaccess.com/cdn-cgi/access/certs"
+    issuer: "https://<team>.cloudflareaccess.com"
+    aud: "<Access application AUD tag>"
+    claimUsername: "email"
+    header: "Cf-Access-Jwt-Assertion"
+    cookieName: "CF_Authorization"
+----
+
+* `certsUrl` verifies the token signature (`pubKeyPath` or `hmacSecret`
+can be used instead). Always set `issuer` and `aud`.
+* `claimUsername` is the claim used as the WackyTracky username.
+* `header` and `cookieName` say where the token is read from; set either
+or both.
+
+The startup log shows `httpauthshim: JWT header authentication enabled`
+(and `... cookie ...`) when it is active. Only enable this when
+WackyTracky is reachable *solely* through the proxy.
+
+The first time a JWT user visits, their account is created automatically
+(`created_by: sso-autocreated`) and added to the *Everyone* group. Grant
+further groups or roles from the IAM pages. Usernames match exactly, so an
+existing local account with the same username is used as-is.
+
+=== Signing out and switching accounts
+
+Signing out of a JWT session does not end the proxy's session. Instead
+WackyTracky sets a `wacky-tracky-sso-off` cookie in that browser and
+ignores the JWT while it is present, so the login form stays and you can
+sign in with a username and password.
+
+To go back to the JWT user, choose *Sign in with Single Sign-On* on the
+login page. This clears the cookie and signs you in from the proxy again.
