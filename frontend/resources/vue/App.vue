@@ -236,6 +236,7 @@
 import { ref, onMounted, onUnmounted, watch, nextTick, computed, provide } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import { HugeiconsIcon } from '@hugeicons/vue';
+import { Code, ConnectError } from '@connectrpc/connect';
 import Header from 'picocrank/vue/components/Header.vue';
 import Navigation from 'picocrank/vue/components/Navigation.vue';
 import LoginForm from './components/LoginForm.vue';
@@ -783,6 +784,12 @@ async function syncOfflineChanges() {
 			removeOfflineEdit(taskId);
 			synced++;
 		} catch (e) {
+			// The task was completed or deleted elsewhere while offline; retrying can never succeed.
+			if (e instanceof ConnectError && e.code === Code.NotFound) {
+				removeOfflineEdit(taskId);
+				showToast('Discarded offline edit: the task no longer exists', 'error');
+				continue;
+			}
 			showToast('Could not sync edit: ' + (e?.message || String(e)), 'error');
 		}
 	}
@@ -1237,11 +1244,6 @@ function onSavedSearchSelectClickOutside(e) {
 .save-search-btn:hover {
 	background: rgba(255, 255, 255, 0.15);
 }
-@media (display-mode: window-controls-overlay) {
-	:deep(.header-actions) {
-		padding-right: calc(100vw - env(titlebar-area-x, 0px) - env(titlebar-area-width, 100vw));
-	}
-}
 /* Match PicoCrank header action chrome (full-height, borderless) */
 .options-btn {
 	display: inline-flex;
@@ -1578,5 +1580,27 @@ function onSavedSearchSelectClickOutside(e) {
 	max-width: 28rem;
 	margin: 4rem auto;
 	padding: 0 1rem;
+}
+</style>
+
+<style>
+/*
+ * Unscoped: PicoCrank's Header renders multiple root nodes, so scoped :deep()
+ * selectors from this component never reach it.
+ */
+/* Give the header's free space to the toolbar input instead of PicoCrank's spacer. */
+header:has(.toolbar-input) > .fg1:has(+ .header-actions) {
+	flex-grow: 0;
+}
+header:has(.toolbar-input) > .header-actions,
+header:has(.toolbar-input) .header-toolbar:not(.toolbar-overflow-menu) {
+	flex-grow: 1;
+	min-width: 0;
+}
+/* Keep header actions clear of the native window controls in an installed PWA. */
+@media (display-mode: window-controls-overlay) {
+	header:has(.toolbar-input) > .header-actions {
+		padding-right: calc(100vw - env(titlebar-area-x, 0px) - env(titlebar-area-width, 100vw));
+	}
 }
 </style>
