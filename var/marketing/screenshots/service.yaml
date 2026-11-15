@@ -1,0 +1,12 @@
+# Throwaway config for marketing screenshots; paths are relative to tmp/run/service.
+database:
+  driver: todotxt
+  database: ./data/todotxt
+
+iam:
+  database: ./data/iam.sqlite
+
+auth: {}
+
+# Builds made by `make` carry no version, which would show as "unknown".
+showVersionNumber: false

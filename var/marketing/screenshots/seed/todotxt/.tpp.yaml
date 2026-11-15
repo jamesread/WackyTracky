@@ -1,0 +1,14 @@
+tags:
+  urgent:
+    css: "background: #fde2e1; color: #9b1c1c"
+  someday:
+    css: "background: #e8eefc; color: #3949ab"
+contexts:
+  work:
+    css: "background: #dbeafe; color: #1e40af"
+  meeting:
+    css: "background: #ede9fe; color: #5b21b6"
+  home:
+    css: "background: #dcfce7; color: #166534"
+  errands:
+    css: "background: #fef3c7; color: #92400e"

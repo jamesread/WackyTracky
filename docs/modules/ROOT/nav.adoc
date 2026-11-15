@@ -5,7 +5,6 @@
 * Backends
 ** xref:backends/index.adoc[Overview]
 ** xref:backends/todotxt.adoc[todo.txt]
-** xref:backends/neo4j.adoc[Neo4j]
 ** xref:backends/yamlfiles.adoc[YAML files]
 * API
 ** xref:api/index.adoc[Overview]

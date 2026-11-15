@@ -14,7 +14,7 @@
 
 </div>
 
-![List view](var/marketing/screenshots/list-work.png)
+![A WackyTracky task list](var/marketing/screenshots/list.png)
 
 ## Features & Benefits
 
@@ -23,13 +23,40 @@
 * **Portable**: The project recommends the todotxt backend, which stores data in plain text files that can be easily moved, edited, and backed up. You can also switch to a different backend if needed.
 * **Powerful**: vim key bindings, git integration, REST/gRPC API.
 
-## Additional Screenshots
+## Screenshots
 
-**Task options** — Right‑click a task to open the details panel (due date, priority, notes, move to list, mark done).
-![Task options](var/marketing/screenshots/task-options.png)
+### All your lists at a glance
 
-**TPPs** — Configure tags and contexts (labels, colors, order) in Options → TPPs.
-![Task property properties](var/marketing/screenshots/tpp.png)
+![All your lists at a glance](var/marketing/screenshots/home.png)
+
+The home page shows every list with a count of its open tasks, so you can see where the work is and jump straight in.
+
+### A focused task list
+
+![A focused task list](var/marketing/screenshots/list.png)
+
+Each list is a plain todo.txt list with priorities, tags and contexts shown as coloured chips. Type in the bar at the top to add a task without leaving the keyboard.
+
+### Task details and notes
+
+![Task details and notes](var/marketing/screenshots/task-details.png)
+
+Open any task to change its due date and priority, keep notes, or move it to another list.
+
+### Search across every list
+
+![Search across every list](var/marketing/screenshots/search.png)
+
+Search all lists at once by text, #tag or @context, and save searches you use often.
+
+### Colours and rules for tags and contexts
+
+![Colours and rules for tags and contexts](var/marketing/screenshots/tag-properties.png)
+
+Give tags and contexts their own colours, and hide tasks at certain times, such as work tasks at the weekend.
+
+Screenshots use fictional test data and are regenerated with `make screenshots`
+(see [`var/marketing/screenshots`](var/marketing/screenshots/README.md)).
 
 ## Documentation
 
@@ -73,4 +100,4 @@ This project follows these principles:
 ## Misc
 
 * **AI autonomy:** This project is developed at [Level 3 (semi-autonomous)](https://blog.jread.com/posts/ai-levels-of-autonomy-in-software-engineering/): AI implements features and tests; humans define specs and direction. Specs and architecture are written by a human with 20 years of development experience. Aggressive non-AI static analysis, code-quality checks (e.g. cyclomatic complexity limits), and tests are in place to reinforce project quality.
-* **Backend:** The service supports multiple database drivers (MySQL, Neo4j, YAML files, and [todo.txt](http://todotxt.org)) for different task systems. The **todotxt** driver is the one that by far receives the most focus and testing at the moment.
+* **Backend:** The service supports multiple database drivers (YAML files and [todo.txt](http://todotxt.org)) for different task systems. The **todotxt** driver is the one that by far receives the most focus and testing at the moment.
