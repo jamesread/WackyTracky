@@ -17,6 +17,9 @@ service/config.yaml
 **/secrets.yaml
 wt.crt
 wt.key
+# Git sync SSH keys are generated at runtime in the config dir
+**/wackytracky_git_sync
+**/wackytracky_git_sync.pub
 
 # Binaries / build
 /wacky-tracky-server
