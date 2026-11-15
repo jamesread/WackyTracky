@@ -1,6 +1,7 @@
 import * as process from 'node:process'
 import waitOn from 'wait-on'
 import { spawn } from 'node:child_process'
+import net from 'node:net'
 import fs from 'node:fs'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
@@ -16,8 +17,22 @@ export default function getRunner () {
   return new WackyTrackyTestRunner()
 }
 
+// Ask the OS for a free port so the suite never collides with another local
+// service on a well-known port such as 8080.
+function findFreePort () {
+  return new Promise((resolve, reject) => {
+    const srv = net.createServer()
+    srv.unref()
+    srv.on('error', reject)
+    srv.listen(0, '127.0.0.1', () => {
+      const { port } = srv.address()
+      srv.close(() => resolve(port))
+    })
+  })
+}
+
 class WackyTrackyTestRunner {
-  BASE_URL = 'http://localhost:8080/'
+  BASE_URL = null
   serverProcess = null
 
   baseUrl () {
@@ -56,12 +71,16 @@ class WackyTrackyTestRunner {
       throw new Error('Service binary not found at ' + binaryPath)
     }
 
-    console.log('      Starting WackyTracky server...')
+    const port = process.env.WT_TEST_PORT || await findFreePort()
+    this.BASE_URL = `http://localhost:${port}/`
+
+    console.log(`      Starting WackyTracky server on port ${port}...`)
     // Integration tests exercise task UI without a login step; auth is disabled for the suite.
     this.serverProcess = spawn(binaryPath, [], {
       cwd: serviceDir,
       env: {
         ...process.env,
+        PORT: String(port),
         WACKYTRACKY_DEV_DISABLE_AUTH: 'true',
         WACKYTRACKY_SECURE_COOKIES: 'false'
       }
