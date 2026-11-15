@@ -521,10 +521,14 @@ func (*DoneTaskResponse) Descriptor() ([]byte, []int) {
 	return file_wacky_tracky_clientapi_v1_wt_proto_rawDescGZIP(), []int{10}
 }
 
+// MoveTaskRequest moves an existing task (keeping its ID, metadata and subtasks)
+// to another list. A subtask that is moved becomes a root task in the target list.
 type MoveTaskRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	TaskId        string                 `protobuf:"bytes,1,opt,name=task_id,json=taskId,proto3" json:"task_id,omitempty"`
-	TargetListId  string                 `protobuf:"bytes,2,opt,name=target_list_id,json=targetListId,proto3" json:"target_list_id,omitempty"`
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// ID of the task to move.
+	TaskId string `protobuf:"bytes,1,opt,name=task_id,json=taskId,proto3" json:"task_id,omitempty"`
+	// ID of the list to move the task to (see GetLists).
+	TargetListId  string `protobuf:"bytes,2,opt,name=target_list_id,json=targetListId,proto3" json:"target_list_id,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -574,7 +578,9 @@ func (x *MoveTaskRequest) GetTargetListId() string {
 }
 
 type MoveTaskResponse struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// The task after it has been moved.
+	Task          *Task `protobuf:"bytes,1,opt,name=task,proto3" json:"task,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -607,6 +613,13 @@ func (x *MoveTaskResponse) ProtoReflect() protoreflect.Message {
 // Deprecated: Use MoveTaskResponse.ProtoReflect.Descriptor instead.
 func (*MoveTaskResponse) Descriptor() ([]byte, []int) {
 	return file_wacky_tracky_clientapi_v1_wt_proto_rawDescGZIP(), []int{12}
+}
+
+func (x *MoveTaskResponse) GetTask() *Task {
+	if x != nil {
+		return x.Task
+	}
+	return nil
 }
 
 // Task metadata (e.g. notes) — optional per driver
@@ -5831,8 +5844,9 @@ const file_wacky_tracky_clientapi_v1_wt_proto_rawDesc = "" +
 	"\x10DoneTaskResponse\"P\n" +
 	"\x0fMoveTaskRequest\x12\x17\n" +
 	"\atask_id\x18\x01 \x01(\tR\x06taskId\x12$\n" +
-	"\x0etarget_list_id\x18\x02 \x01(\tR\ftargetListId\"\x12\n" +
-	"\x10MoveTaskResponse\"1\n" +
+	"\x0etarget_list_id\x18\x02 \x01(\tR\ftargetListId\"F\n" +
+	"\x10MoveTaskResponse\x122\n" +
+	"\x04task\x18\x01 \x01(\v2\x1e.wackytracky.clientapi.v1.TaskR\x04task\"1\n" +
 	"\x16GetTaskMetadataRequest\x12\x17\n" +
 	"\atask_id\x18\x01 \x01(\tR\x06taskId\"\xab\x01\n" +
 	"\x17GetTaskMetadataResponse\x12U\n" +
@@ -6357,157 +6371,158 @@ var file_wacky_tracky_clientapi_v1_wt_proto_depIdxs = []int32{
 	0,   // 0: wackytracky.clientapi.v1.GetListsResponse.lists:type_name -> wackytracky.clientapi.v1.List
 	31,  // 1: wackytracky.clientapi.v1.CreateTaskResponse.task:type_name -> wackytracky.clientapi.v1.Task
 	31,  // 2: wackytracky.clientapi.v1.UpdateTaskResponse.task:type_name -> wackytracky.clientapi.v1.Task
-	120, // 3: wackytracky.clientapi.v1.GetTaskMetadataResponse.fields:type_name -> wackytracky.clientapi.v1.GetTaskMetadataResponse.FieldsEntry
-	121, // 4: wackytracky.clientapi.v1.TaskPropertyProps.props:type_name -> wackytracky.clientapi.v1.TaskPropertyProps.PropsEntry
-	122, // 5: wackytracky.clientapi.v1.GetTaskPropertyPropertiesResponse.tag_properties:type_name -> wackytracky.clientapi.v1.GetTaskPropertyPropertiesResponse.TagPropertiesEntry
-	123, // 6: wackytracky.clientapi.v1.GetTaskPropertyPropertiesResponse.context_properties:type_name -> wackytracky.clientapi.v1.GetTaskPropertyPropertiesResponse.ContextPropertiesEntry
-	26,  // 7: wackytracky.clientapi.v1.GetTagsResponse.tags:type_name -> wackytracky.clientapi.v1.Tag
-	31,  // 8: wackytracky.clientapi.v1.ListTasksResponse.tasks:type_name -> wackytracky.clientapi.v1.Task
-	124, // 9: wackytracky.clientapi.v1.ListTasksResponse.tree:type_name -> wackytracky.clientapi.v1.ListTasksResponse.TreeEntry
-	31,  // 10: wackytracky.clientapi.v1.SearchTasksResponse.tasks:type_name -> wackytracky.clientapi.v1.Task
-	49,  // 11: wackytracky.clientapi.v1.GetSavedSearchesResponse.saved_searches:type_name -> wackytracky.clientapi.v1.SavedSearch
-	49,  // 12: wackytracky.clientapi.v1.SetSavedSearchesRequest.saved_searches:type_name -> wackytracky.clientapi.v1.SavedSearch
-	54,  // 13: wackytracky.clientapi.v1.LoginWithUsernameAndPasswordResponse.standard_response:type_name -> wackytracky.clientapi.v1.StandardResponse
-	54,  // 14: wackytracky.clientapi.v1.LogoutResponse.standard_response:type_name -> wackytracky.clientapi.v1.StandardResponse
-	54,  // 15: wackytracky.clientapi.v1.ChangePasswordResponse.standard_response:type_name -> wackytracky.clientapi.v1.StandardResponse
-	98,  // 16: wackytracky.clientapi.v1.UserAccount.user_groups:type_name -> wackytracky.clientapi.v1.UserGroup
-	63,  // 17: wackytracky.clientapi.v1.GetUsersResponse.users:type_name -> wackytracky.clientapi.v1.UserAccount
-	63,  // 18: wackytracky.clientapi.v1.GetUserResponse.user:type_name -> wackytracky.clientapi.v1.UserAccount
-	98,  // 19: wackytracky.clientapi.v1.GetUserResponse.user_groups:type_name -> wackytracky.clientapi.v1.UserGroup
-	54,  // 20: wackytracky.clientapi.v1.CreateUserResponse.standard_response:type_name -> wackytracky.clientapi.v1.StandardResponse
-	63,  // 21: wackytracky.clientapi.v1.CreateUserResponse.user:type_name -> wackytracky.clientapi.v1.UserAccount
-	54,  // 22: wackytracky.clientapi.v1.DeleteUserResponse.standard_response:type_name -> wackytracky.clientapi.v1.StandardResponse
-	54,  // 23: wackytracky.clientapi.v1.ResetUserPasswordResponse.standard_response:type_name -> wackytracky.clientapi.v1.StandardResponse
-	74,  // 24: wackytracky.clientapi.v1.ListRbacPermissionsResponse.permissions:type_name -> wackytracky.clientapi.v1.RbacPermission
-	75,  // 25: wackytracky.clientapi.v1.ListRbacRolesResponse.roles:type_name -> wackytracky.clientapi.v1.RbacRole
-	75,  // 26: wackytracky.clientapi.v1.CreateRbacRoleResponse.role:type_name -> wackytracky.clientapi.v1.RbacRole
-	75,  // 27: wackytracky.clientapi.v1.GetUserRbacRolesResponse.roles:type_name -> wackytracky.clientapi.v1.RbacRole
-	54,  // 28: wackytracky.clientapi.v1.SetUserGroupRbacRolesResponse.standard_response:type_name -> wackytracky.clientapi.v1.StandardResponse
-	95,  // 29: wackytracky.clientapi.v1.GetMyPermissionsAuditResponse.permissions:type_name -> wackytracky.clientapi.v1.MyPermissionAuditRow
-	98,  // 30: wackytracky.clientapi.v1.ListUserGroupsResponse.groups:type_name -> wackytracky.clientapi.v1.UserGroup
-	98,  // 31: wackytracky.clientapi.v1.CreateUserGroupResponse.group:type_name -> wackytracky.clientapi.v1.UserGroup
-	63,  // 32: wackytracky.clientapi.v1.GetUserGroupMembersResponse.members:type_name -> wackytracky.clientapi.v1.UserAccount
-	54,  // 33: wackytracky.clientapi.v1.SetUserGroupMembersResponse.standard_response:type_name -> wackytracky.clientapi.v1.StandardResponse
-	54,  // 34: wackytracky.clientapi.v1.ImpersonateUserResponse.standard_response:type_name -> wackytracky.clientapi.v1.StandardResponse
-	54,  // 35: wackytracky.clientapi.v1.StopImpersonationResponse.standard_response:type_name -> wackytracky.clientapi.v1.StandardResponse
-	113, // 36: wackytracky.clientapi.v1.ListApiKeysResponse.keys:type_name -> wackytracky.clientapi.v1.ApiKey
-	113, // 37: wackytracky.clientapi.v1.CreateApiKeyResponse.key:type_name -> wackytracky.clientapi.v1.ApiKey
-	17,  // 38: wackytracky.clientapi.v1.GetTaskPropertyPropertiesResponse.TagPropertiesEntry.value:type_name -> wackytracky.clientapi.v1.TaskPropertyProps
-	17,  // 39: wackytracky.clientapi.v1.GetTaskPropertyPropertiesResponse.ContextPropertiesEntry.value:type_name -> wackytracky.clientapi.v1.TaskPropertyProps
-	33,  // 40: wackytracky.clientapi.v1.ListTasksResponse.TreeEntry.value:type_name -> wackytracky.clientapi.v1.TaskIdList
-	43,  // 41: wackytracky.clientapi.v1.WackyTrackyClientService.Version:input_type -> wackytracky.clientapi.v1.VersionRequest
-	41,  // 42: wackytracky.clientapi.v1.WackyTrackyClientService.Init:input_type -> wackytracky.clientapi.v1.InitRequest
-	55,  // 43: wackytracky.clientapi.v1.WackyTrackyClientService.GetStatus:input_type -> wackytracky.clientapi.v1.GetStatusRequest
-	57,  // 44: wackytracky.clientapi.v1.WackyTrackyClientService.LoginWithUsernameAndPassword:input_type -> wackytracky.clientapi.v1.LoginWithUsernameAndPasswordRequest
-	59,  // 45: wackytracky.clientapi.v1.WackyTrackyClientService.Logout:input_type -> wackytracky.clientapi.v1.LogoutRequest
-	61,  // 46: wackytracky.clientapi.v1.WackyTrackyClientService.ChangePassword:input_type -> wackytracky.clientapi.v1.ChangePasswordRequest
-	64,  // 47: wackytracky.clientapi.v1.WackyTrackyClientService.GetUsers:input_type -> wackytracky.clientapi.v1.GetUsersRequest
-	66,  // 48: wackytracky.clientapi.v1.WackyTrackyClientService.GetUser:input_type -> wackytracky.clientapi.v1.GetUserRequest
-	68,  // 49: wackytracky.clientapi.v1.WackyTrackyClientService.CreateUser:input_type -> wackytracky.clientapi.v1.CreateUserRequest
-	70,  // 50: wackytracky.clientapi.v1.WackyTrackyClientService.DeleteUser:input_type -> wackytracky.clientapi.v1.DeleteUserRequest
-	72,  // 51: wackytracky.clientapi.v1.WackyTrackyClientService.ResetUserPassword:input_type -> wackytracky.clientapi.v1.ResetUserPasswordRequest
-	76,  // 52: wackytracky.clientapi.v1.WackyTrackyClientService.ListRbacPermissions:input_type -> wackytracky.clientapi.v1.ListRbacPermissionsRequest
-	78,  // 53: wackytracky.clientapi.v1.WackyTrackyClientService.ListRbacRoles:input_type -> wackytracky.clientapi.v1.ListRbacRolesRequest
-	80,  // 54: wackytracky.clientapi.v1.WackyTrackyClientService.CreateRbacRole:input_type -> wackytracky.clientapi.v1.CreateRbacRoleRequest
-	82,  // 55: wackytracky.clientapi.v1.WackyTrackyClientService.UpdateRbacRole:input_type -> wackytracky.clientapi.v1.UpdateRbacRoleRequest
-	83,  // 56: wackytracky.clientapi.v1.WackyTrackyClientService.DeleteRbacRole:input_type -> wackytracky.clientapi.v1.DeleteRbacRoleRequest
-	85,  // 57: wackytracky.clientapi.v1.WackyTrackyClientService.GetUserRbacRoles:input_type -> wackytracky.clientapi.v1.GetUserRbacRolesRequest
-	87,  // 58: wackytracky.clientapi.v1.WackyTrackyClientService.GetUserGroupRbacRoles:input_type -> wackytracky.clientapi.v1.GetUserGroupRbacRolesRequest
-	89,  // 59: wackytracky.clientapi.v1.WackyTrackyClientService.SetUserGroupRbacRoles:input_type -> wackytracky.clientapi.v1.SetUserGroupRbacRolesRequest
-	91,  // 60: wackytracky.clientapi.v1.WackyTrackyClientService.GetRbacRoleUsers:input_type -> wackytracky.clientapi.v1.GetRbacRoleUsersRequest
-	93,  // 61: wackytracky.clientapi.v1.WackyTrackyClientService.GetRbacRoleGroups:input_type -> wackytracky.clientapi.v1.GetRbacRoleGroupsRequest
-	96,  // 62: wackytracky.clientapi.v1.WackyTrackyClientService.GetMyPermissionsAudit:input_type -> wackytracky.clientapi.v1.GetMyPermissionsAuditRequest
-	99,  // 63: wackytracky.clientapi.v1.WackyTrackyClientService.ListUserGroups:input_type -> wackytracky.clientapi.v1.ListUserGroupsRequest
-	101, // 64: wackytracky.clientapi.v1.WackyTrackyClientService.CreateUserGroup:input_type -> wackytracky.clientapi.v1.CreateUserGroupRequest
-	103, // 65: wackytracky.clientapi.v1.WackyTrackyClientService.DeleteUserGroup:input_type -> wackytracky.clientapi.v1.DeleteUserGroupRequest
-	105, // 66: wackytracky.clientapi.v1.WackyTrackyClientService.GetUserGroupMembers:input_type -> wackytracky.clientapi.v1.GetUserGroupMembersRequest
-	107, // 67: wackytracky.clientapi.v1.WackyTrackyClientService.SetUserGroupMembers:input_type -> wackytracky.clientapi.v1.SetUserGroupMembersRequest
-	109, // 68: wackytracky.clientapi.v1.WackyTrackyClientService.ImpersonateUser:input_type -> wackytracky.clientapi.v1.ImpersonateUserRequest
-	111, // 69: wackytracky.clientapi.v1.WackyTrackyClientService.StopImpersonation:input_type -> wackytracky.clientapi.v1.StopImpersonationRequest
-	114, // 70: wackytracky.clientapi.v1.WackyTrackyClientService.ListApiKeys:input_type -> wackytracky.clientapi.v1.ListApiKeysRequest
-	116, // 71: wackytracky.clientapi.v1.WackyTrackyClientService.CreateApiKey:input_type -> wackytracky.clientapi.v1.CreateApiKeyRequest
-	118, // 72: wackytracky.clientapi.v1.WackyTrackyClientService.DeleteApiKey:input_type -> wackytracky.clientapi.v1.DeleteApiKeyRequest
-	1,   // 73: wackytracky.clientapi.v1.WackyTrackyClientService.GetLists:input_type -> wackytracky.clientapi.v1.GetListsRequest
-	32,  // 74: wackytracky.clientapi.v1.WackyTrackyClientService.ListTasks:input_type -> wackytracky.clientapi.v1.ListTasksRequest
-	35,  // 75: wackytracky.clientapi.v1.WackyTrackyClientService.SearchTasks:input_type -> wackytracky.clientapi.v1.SearchTasksRequest
-	5,   // 76: wackytracky.clientapi.v1.WackyTrackyClientService.CreateTask:input_type -> wackytracky.clientapi.v1.CreateTaskRequest
-	7,   // 77: wackytracky.clientapi.v1.WackyTrackyClientService.UpdateTask:input_type -> wackytracky.clientapi.v1.UpdateTaskRequest
-	9,   // 78: wackytracky.clientapi.v1.WackyTrackyClientService.DoneTask:input_type -> wackytracky.clientapi.v1.DoneTaskRequest
-	11,  // 79: wackytracky.clientapi.v1.WackyTrackyClientService.MoveTask:input_type -> wackytracky.clientapi.v1.MoveTaskRequest
-	3,   // 80: wackytracky.clientapi.v1.WackyTrackyClientService.CreateList:input_type -> wackytracky.clientapi.v1.CreateListRequest
-	27,  // 81: wackytracky.clientapi.v1.WackyTrackyClientService.Tag:input_type -> wackytracky.clientapi.v1.TagRequest
-	37,  // 82: wackytracky.clientapi.v1.WackyTrackyClientService.UpdateList:input_type -> wackytracky.clientapi.v1.UpdateListRequest
-	39,  // 83: wackytracky.clientapi.v1.WackyTrackyClientService.DeleteList:input_type -> wackytracky.clientapi.v1.DeleteListRequest
-	29,  // 84: wackytracky.clientapi.v1.WackyTrackyClientService.GetTags:input_type -> wackytracky.clientapi.v1.GetTagsRequest
-	45,  // 85: wackytracky.clientapi.v1.WackyTrackyClientService.RepoStatus:input_type -> wackytracky.clientapi.v1.RepoStatusRequest
-	47,  // 86: wackytracky.clientapi.v1.WackyTrackyClientService.RepoSync:input_type -> wackytracky.clientapi.v1.RepoSyncRequest
-	50,  // 87: wackytracky.clientapi.v1.WackyTrackyClientService.GetSavedSearches:input_type -> wackytracky.clientapi.v1.GetSavedSearchesRequest
-	52,  // 88: wackytracky.clientapi.v1.WackyTrackyClientService.SetSavedSearches:input_type -> wackytracky.clientapi.v1.SetSavedSearchesRequest
-	13,  // 89: wackytracky.clientapi.v1.WackyTrackyClientService.GetTaskMetadata:input_type -> wackytracky.clientapi.v1.GetTaskMetadataRequest
-	15,  // 90: wackytracky.clientapi.v1.WackyTrackyClientService.SetTaskMetadata:input_type -> wackytracky.clientapi.v1.SetTaskMetadataRequest
-	18,  // 91: wackytracky.clientapi.v1.WackyTrackyClientService.GetTaskPropertyProperties:input_type -> wackytracky.clientapi.v1.GetTaskPropertyPropertiesRequest
-	20,  // 92: wackytracky.clientapi.v1.WackyTrackyClientService.SetTaskPropertyProperty:input_type -> wackytracky.clientapi.v1.SetTaskPropertyPropertyRequest
-	22,  // 93: wackytracky.clientapi.v1.WackyTrackyClientService.RuleStatus:input_type -> wackytracky.clientapi.v1.RuleStatusRequest
-	24,  // 94: wackytracky.clientapi.v1.WackyTrackyClientService.RuleTest:input_type -> wackytracky.clientapi.v1.RuleTestRequest
-	44,  // 95: wackytracky.clientapi.v1.WackyTrackyClientService.Version:output_type -> wackytracky.clientapi.v1.VersionResponse
-	42,  // 96: wackytracky.clientapi.v1.WackyTrackyClientService.Init:output_type -> wackytracky.clientapi.v1.InitResponse
-	56,  // 97: wackytracky.clientapi.v1.WackyTrackyClientService.GetStatus:output_type -> wackytracky.clientapi.v1.GetStatusResponse
-	58,  // 98: wackytracky.clientapi.v1.WackyTrackyClientService.LoginWithUsernameAndPassword:output_type -> wackytracky.clientapi.v1.LoginWithUsernameAndPasswordResponse
-	60,  // 99: wackytracky.clientapi.v1.WackyTrackyClientService.Logout:output_type -> wackytracky.clientapi.v1.LogoutResponse
-	62,  // 100: wackytracky.clientapi.v1.WackyTrackyClientService.ChangePassword:output_type -> wackytracky.clientapi.v1.ChangePasswordResponse
-	65,  // 101: wackytracky.clientapi.v1.WackyTrackyClientService.GetUsers:output_type -> wackytracky.clientapi.v1.GetUsersResponse
-	67,  // 102: wackytracky.clientapi.v1.WackyTrackyClientService.GetUser:output_type -> wackytracky.clientapi.v1.GetUserResponse
-	69,  // 103: wackytracky.clientapi.v1.WackyTrackyClientService.CreateUser:output_type -> wackytracky.clientapi.v1.CreateUserResponse
-	71,  // 104: wackytracky.clientapi.v1.WackyTrackyClientService.DeleteUser:output_type -> wackytracky.clientapi.v1.DeleteUserResponse
-	73,  // 105: wackytracky.clientapi.v1.WackyTrackyClientService.ResetUserPassword:output_type -> wackytracky.clientapi.v1.ResetUserPasswordResponse
-	77,  // 106: wackytracky.clientapi.v1.WackyTrackyClientService.ListRbacPermissions:output_type -> wackytracky.clientapi.v1.ListRbacPermissionsResponse
-	79,  // 107: wackytracky.clientapi.v1.WackyTrackyClientService.ListRbacRoles:output_type -> wackytracky.clientapi.v1.ListRbacRolesResponse
-	81,  // 108: wackytracky.clientapi.v1.WackyTrackyClientService.CreateRbacRole:output_type -> wackytracky.clientapi.v1.CreateRbacRoleResponse
-	75,  // 109: wackytracky.clientapi.v1.WackyTrackyClientService.UpdateRbacRole:output_type -> wackytracky.clientapi.v1.RbacRole
-	84,  // 110: wackytracky.clientapi.v1.WackyTrackyClientService.DeleteRbacRole:output_type -> wackytracky.clientapi.v1.DeleteRbacRoleResponse
-	86,  // 111: wackytracky.clientapi.v1.WackyTrackyClientService.GetUserRbacRoles:output_type -> wackytracky.clientapi.v1.GetUserRbacRolesResponse
-	88,  // 112: wackytracky.clientapi.v1.WackyTrackyClientService.GetUserGroupRbacRoles:output_type -> wackytracky.clientapi.v1.GetUserGroupRbacRolesResponse
-	90,  // 113: wackytracky.clientapi.v1.WackyTrackyClientService.SetUserGroupRbacRoles:output_type -> wackytracky.clientapi.v1.SetUserGroupRbacRolesResponse
-	92,  // 114: wackytracky.clientapi.v1.WackyTrackyClientService.GetRbacRoleUsers:output_type -> wackytracky.clientapi.v1.GetRbacRoleUsersResponse
-	94,  // 115: wackytracky.clientapi.v1.WackyTrackyClientService.GetRbacRoleGroups:output_type -> wackytracky.clientapi.v1.GetRbacRoleGroupsResponse
-	97,  // 116: wackytracky.clientapi.v1.WackyTrackyClientService.GetMyPermissionsAudit:output_type -> wackytracky.clientapi.v1.GetMyPermissionsAuditResponse
-	100, // 117: wackytracky.clientapi.v1.WackyTrackyClientService.ListUserGroups:output_type -> wackytracky.clientapi.v1.ListUserGroupsResponse
-	102, // 118: wackytracky.clientapi.v1.WackyTrackyClientService.CreateUserGroup:output_type -> wackytracky.clientapi.v1.CreateUserGroupResponse
-	104, // 119: wackytracky.clientapi.v1.WackyTrackyClientService.DeleteUserGroup:output_type -> wackytracky.clientapi.v1.DeleteUserGroupResponse
-	106, // 120: wackytracky.clientapi.v1.WackyTrackyClientService.GetUserGroupMembers:output_type -> wackytracky.clientapi.v1.GetUserGroupMembersResponse
-	108, // 121: wackytracky.clientapi.v1.WackyTrackyClientService.SetUserGroupMembers:output_type -> wackytracky.clientapi.v1.SetUserGroupMembersResponse
-	110, // 122: wackytracky.clientapi.v1.WackyTrackyClientService.ImpersonateUser:output_type -> wackytracky.clientapi.v1.ImpersonateUserResponse
-	112, // 123: wackytracky.clientapi.v1.WackyTrackyClientService.StopImpersonation:output_type -> wackytracky.clientapi.v1.StopImpersonationResponse
-	115, // 124: wackytracky.clientapi.v1.WackyTrackyClientService.ListApiKeys:output_type -> wackytracky.clientapi.v1.ListApiKeysResponse
-	117, // 125: wackytracky.clientapi.v1.WackyTrackyClientService.CreateApiKey:output_type -> wackytracky.clientapi.v1.CreateApiKeyResponse
-	119, // 126: wackytracky.clientapi.v1.WackyTrackyClientService.DeleteApiKey:output_type -> wackytracky.clientapi.v1.DeleteApiKeyResponse
-	2,   // 127: wackytracky.clientapi.v1.WackyTrackyClientService.GetLists:output_type -> wackytracky.clientapi.v1.GetListsResponse
-	34,  // 128: wackytracky.clientapi.v1.WackyTrackyClientService.ListTasks:output_type -> wackytracky.clientapi.v1.ListTasksResponse
-	36,  // 129: wackytracky.clientapi.v1.WackyTrackyClientService.SearchTasks:output_type -> wackytracky.clientapi.v1.SearchTasksResponse
-	6,   // 130: wackytracky.clientapi.v1.WackyTrackyClientService.CreateTask:output_type -> wackytracky.clientapi.v1.CreateTaskResponse
-	8,   // 131: wackytracky.clientapi.v1.WackyTrackyClientService.UpdateTask:output_type -> wackytracky.clientapi.v1.UpdateTaskResponse
-	10,  // 132: wackytracky.clientapi.v1.WackyTrackyClientService.DoneTask:output_type -> wackytracky.clientapi.v1.DoneTaskResponse
-	12,  // 133: wackytracky.clientapi.v1.WackyTrackyClientService.MoveTask:output_type -> wackytracky.clientapi.v1.MoveTaskResponse
-	4,   // 134: wackytracky.clientapi.v1.WackyTrackyClientService.CreateList:output_type -> wackytracky.clientapi.v1.CreateListResponse
-	28,  // 135: wackytracky.clientapi.v1.WackyTrackyClientService.Tag:output_type -> wackytracky.clientapi.v1.TagResponse
-	38,  // 136: wackytracky.clientapi.v1.WackyTrackyClientService.UpdateList:output_type -> wackytracky.clientapi.v1.UpdateListResponse
-	40,  // 137: wackytracky.clientapi.v1.WackyTrackyClientService.DeleteList:output_type -> wackytracky.clientapi.v1.DeleteListResponse
-	30,  // 138: wackytracky.clientapi.v1.WackyTrackyClientService.GetTags:output_type -> wackytracky.clientapi.v1.GetTagsResponse
-	46,  // 139: wackytracky.clientapi.v1.WackyTrackyClientService.RepoStatus:output_type -> wackytracky.clientapi.v1.RepoStatusResponse
-	48,  // 140: wackytracky.clientapi.v1.WackyTrackyClientService.RepoSync:output_type -> wackytracky.clientapi.v1.RepoSyncResponse
-	51,  // 141: wackytracky.clientapi.v1.WackyTrackyClientService.GetSavedSearches:output_type -> wackytracky.clientapi.v1.GetSavedSearchesResponse
-	53,  // 142: wackytracky.clientapi.v1.WackyTrackyClientService.SetSavedSearches:output_type -> wackytracky.clientapi.v1.SetSavedSearchesResponse
-	14,  // 143: wackytracky.clientapi.v1.WackyTrackyClientService.GetTaskMetadata:output_type -> wackytracky.clientapi.v1.GetTaskMetadataResponse
-	16,  // 144: wackytracky.clientapi.v1.WackyTrackyClientService.SetTaskMetadata:output_type -> wackytracky.clientapi.v1.SetTaskMetadataResponse
-	19,  // 145: wackytracky.clientapi.v1.WackyTrackyClientService.GetTaskPropertyProperties:output_type -> wackytracky.clientapi.v1.GetTaskPropertyPropertiesResponse
-	21,  // 146: wackytracky.clientapi.v1.WackyTrackyClientService.SetTaskPropertyProperty:output_type -> wackytracky.clientapi.v1.SetTaskPropertyPropertyResponse
-	23,  // 147: wackytracky.clientapi.v1.WackyTrackyClientService.RuleStatus:output_type -> wackytracky.clientapi.v1.RuleStatusResponse
-	25,  // 148: wackytracky.clientapi.v1.WackyTrackyClientService.RuleTest:output_type -> wackytracky.clientapi.v1.RuleTestResponse
-	95,  // [95:149] is the sub-list for method output_type
-	41,  // [41:95] is the sub-list for method input_type
-	41,  // [41:41] is the sub-list for extension type_name
-	41,  // [41:41] is the sub-list for extension extendee
-	0,   // [0:41] is the sub-list for field type_name
+	31,  // 3: wackytracky.clientapi.v1.MoveTaskResponse.task:type_name -> wackytracky.clientapi.v1.Task
+	120, // 4: wackytracky.clientapi.v1.GetTaskMetadataResponse.fields:type_name -> wackytracky.clientapi.v1.GetTaskMetadataResponse.FieldsEntry
+	121, // 5: wackytracky.clientapi.v1.TaskPropertyProps.props:type_name -> wackytracky.clientapi.v1.TaskPropertyProps.PropsEntry
+	122, // 6: wackytracky.clientapi.v1.GetTaskPropertyPropertiesResponse.tag_properties:type_name -> wackytracky.clientapi.v1.GetTaskPropertyPropertiesResponse.TagPropertiesEntry
+	123, // 7: wackytracky.clientapi.v1.GetTaskPropertyPropertiesResponse.context_properties:type_name -> wackytracky.clientapi.v1.GetTaskPropertyPropertiesResponse.ContextPropertiesEntry
+	26,  // 8: wackytracky.clientapi.v1.GetTagsResponse.tags:type_name -> wackytracky.clientapi.v1.Tag
+	31,  // 9: wackytracky.clientapi.v1.ListTasksResponse.tasks:type_name -> wackytracky.clientapi.v1.Task
+	124, // 10: wackytracky.clientapi.v1.ListTasksResponse.tree:type_name -> wackytracky.clientapi.v1.ListTasksResponse.TreeEntry
+	31,  // 11: wackytracky.clientapi.v1.SearchTasksResponse.tasks:type_name -> wackytracky.clientapi.v1.Task
+	49,  // 12: wackytracky.clientapi.v1.GetSavedSearchesResponse.saved_searches:type_name -> wackytracky.clientapi.v1.SavedSearch
+	49,  // 13: wackytracky.clientapi.v1.SetSavedSearchesRequest.saved_searches:type_name -> wackytracky.clientapi.v1.SavedSearch
+	54,  // 14: wackytracky.clientapi.v1.LoginWithUsernameAndPasswordResponse.standard_response:type_name -> wackytracky.clientapi.v1.StandardResponse
+	54,  // 15: wackytracky.clientapi.v1.LogoutResponse.standard_response:type_name -> wackytracky.clientapi.v1.StandardResponse
+	54,  // 16: wackytracky.clientapi.v1.ChangePasswordResponse.standard_response:type_name -> wackytracky.clientapi.v1.StandardResponse
+	98,  // 17: wackytracky.clientapi.v1.UserAccount.user_groups:type_name -> wackytracky.clientapi.v1.UserGroup
+	63,  // 18: wackytracky.clientapi.v1.GetUsersResponse.users:type_name -> wackytracky.clientapi.v1.UserAccount
+	63,  // 19: wackytracky.clientapi.v1.GetUserResponse.user:type_name -> wackytracky.clientapi.v1.UserAccount
+	98,  // 20: wackytracky.clientapi.v1.GetUserResponse.user_groups:type_name -> wackytracky.clientapi.v1.UserGroup
+	54,  // 21: wackytracky.clientapi.v1.CreateUserResponse.standard_response:type_name -> wackytracky.clientapi.v1.StandardResponse
+	63,  // 22: wackytracky.clientapi.v1.CreateUserResponse.user:type_name -> wackytracky.clientapi.v1.UserAccount
+	54,  // 23: wackytracky.clientapi.v1.DeleteUserResponse.standard_response:type_name -> wackytracky.clientapi.v1.StandardResponse
+	54,  // 24: wackytracky.clientapi.v1.ResetUserPasswordResponse.standard_response:type_name -> wackytracky.clientapi.v1.StandardResponse
+	74,  // 25: wackytracky.clientapi.v1.ListRbacPermissionsResponse.permissions:type_name -> wackytracky.clientapi.v1.RbacPermission
+	75,  // 26: wackytracky.clientapi.v1.ListRbacRolesResponse.roles:type_name -> wackytracky.clientapi.v1.RbacRole
+	75,  // 27: wackytracky.clientapi.v1.CreateRbacRoleResponse.role:type_name -> wackytracky.clientapi.v1.RbacRole
+	75,  // 28: wackytracky.clientapi.v1.GetUserRbacRolesResponse.roles:type_name -> wackytracky.clientapi.v1.RbacRole
+	54,  // 29: wackytracky.clientapi.v1.SetUserGroupRbacRolesResponse.standard_response:type_name -> wackytracky.clientapi.v1.StandardResponse
+	95,  // 30: wackytracky.clientapi.v1.GetMyPermissionsAuditResponse.permissions:type_name -> wackytracky.clientapi.v1.MyPermissionAuditRow
+	98,  // 31: wackytracky.clientapi.v1.ListUserGroupsResponse.groups:type_name -> wackytracky.clientapi.v1.UserGroup
+	98,  // 32: wackytracky.clientapi.v1.CreateUserGroupResponse.group:type_name -> wackytracky.clientapi.v1.UserGroup
+	63,  // 33: wackytracky.clientapi.v1.GetUserGroupMembersResponse.members:type_name -> wackytracky.clientapi.v1.UserAccount
+	54,  // 34: wackytracky.clientapi.v1.SetUserGroupMembersResponse.standard_response:type_name -> wackytracky.clientapi.v1.StandardResponse
+	54,  // 35: wackytracky.clientapi.v1.ImpersonateUserResponse.standard_response:type_name -> wackytracky.clientapi.v1.StandardResponse
+	54,  // 36: wackytracky.clientapi.v1.StopImpersonationResponse.standard_response:type_name -> wackytracky.clientapi.v1.StandardResponse
+	113, // 37: wackytracky.clientapi.v1.ListApiKeysResponse.keys:type_name -> wackytracky.clientapi.v1.ApiKey
+	113, // 38: wackytracky.clientapi.v1.CreateApiKeyResponse.key:type_name -> wackytracky.clientapi.v1.ApiKey
+	17,  // 39: wackytracky.clientapi.v1.GetTaskPropertyPropertiesResponse.TagPropertiesEntry.value:type_name -> wackytracky.clientapi.v1.TaskPropertyProps
+	17,  // 40: wackytracky.clientapi.v1.GetTaskPropertyPropertiesResponse.ContextPropertiesEntry.value:type_name -> wackytracky.clientapi.v1.TaskPropertyProps
+	33,  // 41: wackytracky.clientapi.v1.ListTasksResponse.TreeEntry.value:type_name -> wackytracky.clientapi.v1.TaskIdList
+	43,  // 42: wackytracky.clientapi.v1.WackyTrackyClientService.Version:input_type -> wackytracky.clientapi.v1.VersionRequest
+	41,  // 43: wackytracky.clientapi.v1.WackyTrackyClientService.Init:input_type -> wackytracky.clientapi.v1.InitRequest
+	55,  // 44: wackytracky.clientapi.v1.WackyTrackyClientService.GetStatus:input_type -> wackytracky.clientapi.v1.GetStatusRequest
+	57,  // 45: wackytracky.clientapi.v1.WackyTrackyClientService.LoginWithUsernameAndPassword:input_type -> wackytracky.clientapi.v1.LoginWithUsernameAndPasswordRequest
+	59,  // 46: wackytracky.clientapi.v1.WackyTrackyClientService.Logout:input_type -> wackytracky.clientapi.v1.LogoutRequest
+	61,  // 47: wackytracky.clientapi.v1.WackyTrackyClientService.ChangePassword:input_type -> wackytracky.clientapi.v1.ChangePasswordRequest
+	64,  // 48: wackytracky.clientapi.v1.WackyTrackyClientService.GetUsers:input_type -> wackytracky.clientapi.v1.GetUsersRequest
+	66,  // 49: wackytracky.clientapi.v1.WackyTrackyClientService.GetUser:input_type -> wackytracky.clientapi.v1.GetUserRequest
+	68,  // 50: wackytracky.clientapi.v1.WackyTrackyClientService.CreateUser:input_type -> wackytracky.clientapi.v1.CreateUserRequest
+	70,  // 51: wackytracky.clientapi.v1.WackyTrackyClientService.DeleteUser:input_type -> wackytracky.clientapi.v1.DeleteUserRequest
+	72,  // 52: wackytracky.clientapi.v1.WackyTrackyClientService.ResetUserPassword:input_type -> wackytracky.clientapi.v1.ResetUserPasswordRequest
+	76,  // 53: wackytracky.clientapi.v1.WackyTrackyClientService.ListRbacPermissions:input_type -> wackytracky.clientapi.v1.ListRbacPermissionsRequest
+	78,  // 54: wackytracky.clientapi.v1.WackyTrackyClientService.ListRbacRoles:input_type -> wackytracky.clientapi.v1.ListRbacRolesRequest
+	80,  // 55: wackytracky.clientapi.v1.WackyTrackyClientService.CreateRbacRole:input_type -> wackytracky.clientapi.v1.CreateRbacRoleRequest
+	82,  // 56: wackytracky.clientapi.v1.WackyTrackyClientService.UpdateRbacRole:input_type -> wackytracky.clientapi.v1.UpdateRbacRoleRequest
+	83,  // 57: wackytracky.clientapi.v1.WackyTrackyClientService.DeleteRbacRole:input_type -> wackytracky.clientapi.v1.DeleteRbacRoleRequest
+	85,  // 58: wackytracky.clientapi.v1.WackyTrackyClientService.GetUserRbacRoles:input_type -> wackytracky.clientapi.v1.GetUserRbacRolesRequest
+	87,  // 59: wackytracky.clientapi.v1.WackyTrackyClientService.GetUserGroupRbacRoles:input_type -> wackytracky.clientapi.v1.GetUserGroupRbacRolesRequest
+	89,  // 60: wackytracky.clientapi.v1.WackyTrackyClientService.SetUserGroupRbacRoles:input_type -> wackytracky.clientapi.v1.SetUserGroupRbacRolesRequest
+	91,  // 61: wackytracky.clientapi.v1.WackyTrackyClientService.GetRbacRoleUsers:input_type -> wackytracky.clientapi.v1.GetRbacRoleUsersRequest
+	93,  // 62: wackytracky.clientapi.v1.WackyTrackyClientService.GetRbacRoleGroups:input_type -> wackytracky.clientapi.v1.GetRbacRoleGroupsRequest
+	96,  // 63: wackytracky.clientapi.v1.WackyTrackyClientService.GetMyPermissionsAudit:input_type -> wackytracky.clientapi.v1.GetMyPermissionsAuditRequest
+	99,  // 64: wackytracky.clientapi.v1.WackyTrackyClientService.ListUserGroups:input_type -> wackytracky.clientapi.v1.ListUserGroupsRequest
+	101, // 65: wackytracky.clientapi.v1.WackyTrackyClientService.CreateUserGroup:input_type -> wackytracky.clientapi.v1.CreateUserGroupRequest
+	103, // 66: wackytracky.clientapi.v1.WackyTrackyClientService.DeleteUserGroup:input_type -> wackytracky.clientapi.v1.DeleteUserGroupRequest
+	105, // 67: wackytracky.clientapi.v1.WackyTrackyClientService.GetUserGroupMembers:input_type -> wackytracky.clientapi.v1.GetUserGroupMembersRequest
+	107, // 68: wackytracky.clientapi.v1.WackyTrackyClientService.SetUserGroupMembers:input_type -> wackytracky.clientapi.v1.SetUserGroupMembersRequest
+	109, // 69: wackytracky.clientapi.v1.WackyTrackyClientService.ImpersonateUser:input_type -> wackytracky.clientapi.v1.ImpersonateUserRequest
+	111, // 70: wackytracky.clientapi.v1.WackyTrackyClientService.StopImpersonation:input_type -> wackytracky.clientapi.v1.StopImpersonationRequest
+	114, // 71: wackytracky.clientapi.v1.WackyTrackyClientService.ListApiKeys:input_type -> wackytracky.clientapi.v1.ListApiKeysRequest
+	116, // 72: wackytracky.clientapi.v1.WackyTrackyClientService.CreateApiKey:input_type -> wackytracky.clientapi.v1.CreateApiKeyRequest
+	118, // 73: wackytracky.clientapi.v1.WackyTrackyClientService.DeleteApiKey:input_type -> wackytracky.clientapi.v1.DeleteApiKeyRequest
+	1,   // 74: wackytracky.clientapi.v1.WackyTrackyClientService.GetLists:input_type -> wackytracky.clientapi.v1.GetListsRequest
+	32,  // 75: wackytracky.clientapi.v1.WackyTrackyClientService.ListTasks:input_type -> wackytracky.clientapi.v1.ListTasksRequest
+	35,  // 76: wackytracky.clientapi.v1.WackyTrackyClientService.SearchTasks:input_type -> wackytracky.clientapi.v1.SearchTasksRequest
+	5,   // 77: wackytracky.clientapi.v1.WackyTrackyClientService.CreateTask:input_type -> wackytracky.clientapi.v1.CreateTaskRequest
+	7,   // 78: wackytracky.clientapi.v1.WackyTrackyClientService.UpdateTask:input_type -> wackytracky.clientapi.v1.UpdateTaskRequest
+	9,   // 79: wackytracky.clientapi.v1.WackyTrackyClientService.DoneTask:input_type -> wackytracky.clientapi.v1.DoneTaskRequest
+	11,  // 80: wackytracky.clientapi.v1.WackyTrackyClientService.MoveTask:input_type -> wackytracky.clientapi.v1.MoveTaskRequest
+	3,   // 81: wackytracky.clientapi.v1.WackyTrackyClientService.CreateList:input_type -> wackytracky.clientapi.v1.CreateListRequest
+	27,  // 82: wackytracky.clientapi.v1.WackyTrackyClientService.Tag:input_type -> wackytracky.clientapi.v1.TagRequest
+	37,  // 83: wackytracky.clientapi.v1.WackyTrackyClientService.UpdateList:input_type -> wackytracky.clientapi.v1.UpdateListRequest
+	39,  // 84: wackytracky.clientapi.v1.WackyTrackyClientService.DeleteList:input_type -> wackytracky.clientapi.v1.DeleteListRequest
+	29,  // 85: wackytracky.clientapi.v1.WackyTrackyClientService.GetTags:input_type -> wackytracky.clientapi.v1.GetTagsRequest
+	45,  // 86: wackytracky.clientapi.v1.WackyTrackyClientService.RepoStatus:input_type -> wackytracky.clientapi.v1.RepoStatusRequest
+	47,  // 87: wackytracky.clientapi.v1.WackyTrackyClientService.RepoSync:input_type -> wackytracky.clientapi.v1.RepoSyncRequest
+	50,  // 88: wackytracky.clientapi.v1.WackyTrackyClientService.GetSavedSearches:input_type -> wackytracky.clientapi.v1.GetSavedSearchesRequest
+	52,  // 89: wackytracky.clientapi.v1.WackyTrackyClientService.SetSavedSearches:input_type -> wackytracky.clientapi.v1.SetSavedSearchesRequest
+	13,  // 90: wackytracky.clientapi.v1.WackyTrackyClientService.GetTaskMetadata:input_type -> wackytracky.clientapi.v1.GetTaskMetadataRequest
+	15,  // 91: wackytracky.clientapi.v1.WackyTrackyClientService.SetTaskMetadata:input_type -> wackytracky.clientapi.v1.SetTaskMetadataRequest
+	18,  // 92: wackytracky.clientapi.v1.WackyTrackyClientService.GetTaskPropertyProperties:input_type -> wackytracky.clientapi.v1.GetTaskPropertyPropertiesRequest
+	20,  // 93: wackytracky.clientapi.v1.WackyTrackyClientService.SetTaskPropertyProperty:input_type -> wackytracky.clientapi.v1.SetTaskPropertyPropertyRequest
+	22,  // 94: wackytracky.clientapi.v1.WackyTrackyClientService.RuleStatus:input_type -> wackytracky.clientapi.v1.RuleStatusRequest
+	24,  // 95: wackytracky.clientapi.v1.WackyTrackyClientService.RuleTest:input_type -> wackytracky.clientapi.v1.RuleTestRequest
+	44,  // 96: wackytracky.clientapi.v1.WackyTrackyClientService.Version:output_type -> wackytracky.clientapi.v1.VersionResponse
+	42,  // 97: wackytracky.clientapi.v1.WackyTrackyClientService.Init:output_type -> wackytracky.clientapi.v1.InitResponse
+	56,  // 98: wackytracky.clientapi.v1.WackyTrackyClientService.GetStatus:output_type -> wackytracky.clientapi.v1.GetStatusResponse
+	58,  // 99: wackytracky.clientapi.v1.WackyTrackyClientService.LoginWithUsernameAndPassword:output_type -> wackytracky.clientapi.v1.LoginWithUsernameAndPasswordResponse
+	60,  // 100: wackytracky.clientapi.v1.WackyTrackyClientService.Logout:output_type -> wackytracky.clientapi.v1.LogoutResponse
+	62,  // 101: wackytracky.clientapi.v1.WackyTrackyClientService.ChangePassword:output_type -> wackytracky.clientapi.v1.ChangePasswordResponse
+	65,  // 102: wackytracky.clientapi.v1.WackyTrackyClientService.GetUsers:output_type -> wackytracky.clientapi.v1.GetUsersResponse
+	67,  // 103: wackytracky.clientapi.v1.WackyTrackyClientService.GetUser:output_type -> wackytracky.clientapi.v1.GetUserResponse
+	69,  // 104: wackytracky.clientapi.v1.WackyTrackyClientService.CreateUser:output_type -> wackytracky.clientapi.v1.CreateUserResponse
+	71,  // 105: wackytracky.clientapi.v1.WackyTrackyClientService.DeleteUser:output_type -> wackytracky.clientapi.v1.DeleteUserResponse
+	73,  // 106: wackytracky.clientapi.v1.WackyTrackyClientService.ResetUserPassword:output_type -> wackytracky.clientapi.v1.ResetUserPasswordResponse
+	77,  // 107: wackytracky.clientapi.v1.WackyTrackyClientService.ListRbacPermissions:output_type -> wackytracky.clientapi.v1.ListRbacPermissionsResponse
+	79,  // 108: wackytracky.clientapi.v1.WackyTrackyClientService.ListRbacRoles:output_type -> wackytracky.clientapi.v1.ListRbacRolesResponse
+	81,  // 109: wackytracky.clientapi.v1.WackyTrackyClientService.CreateRbacRole:output_type -> wackytracky.clientapi.v1.CreateRbacRoleResponse
+	75,  // 110: wackytracky.clientapi.v1.WackyTrackyClientService.UpdateRbacRole:output_type -> wackytracky.clientapi.v1.RbacRole
+	84,  // 111: wackytracky.clientapi.v1.WackyTrackyClientService.DeleteRbacRole:output_type -> wackytracky.clientapi.v1.DeleteRbacRoleResponse
+	86,  // 112: wackytracky.clientapi.v1.WackyTrackyClientService.GetUserRbacRoles:output_type -> wackytracky.clientapi.v1.GetUserRbacRolesResponse
+	88,  // 113: wackytracky.clientapi.v1.WackyTrackyClientService.GetUserGroupRbacRoles:output_type -> wackytracky.clientapi.v1.GetUserGroupRbacRolesResponse
+	90,  // 114: wackytracky.clientapi.v1.WackyTrackyClientService.SetUserGroupRbacRoles:output_type -> wackytracky.clientapi.v1.SetUserGroupRbacRolesResponse
+	92,  // 115: wackytracky.clientapi.v1.WackyTrackyClientService.GetRbacRoleUsers:output_type -> wackytracky.clientapi.v1.GetRbacRoleUsersResponse
+	94,  // 116: wackytracky.clientapi.v1.WackyTrackyClientService.GetRbacRoleGroups:output_type -> wackytracky.clientapi.v1.GetRbacRoleGroupsResponse
+	97,  // 117: wackytracky.clientapi.v1.WackyTrackyClientService.GetMyPermissionsAudit:output_type -> wackytracky.clientapi.v1.GetMyPermissionsAuditResponse
+	100, // 118: wackytracky.clientapi.v1.WackyTrackyClientService.ListUserGroups:output_type -> wackytracky.clientapi.v1.ListUserGroupsResponse
+	102, // 119: wackytracky.clientapi.v1.WackyTrackyClientService.CreateUserGroup:output_type -> wackytracky.clientapi.v1.CreateUserGroupResponse
+	104, // 120: wackytracky.clientapi.v1.WackyTrackyClientService.DeleteUserGroup:output_type -> wackytracky.clientapi.v1.DeleteUserGroupResponse
+	106, // 121: wackytracky.clientapi.v1.WackyTrackyClientService.GetUserGroupMembers:output_type -> wackytracky.clientapi.v1.GetUserGroupMembersResponse
+	108, // 122: wackytracky.clientapi.v1.WackyTrackyClientService.SetUserGroupMembers:output_type -> wackytracky.clientapi.v1.SetUserGroupMembersResponse
+	110, // 123: wackytracky.clientapi.v1.WackyTrackyClientService.ImpersonateUser:output_type -> wackytracky.clientapi.v1.ImpersonateUserResponse
+	112, // 124: wackytracky.clientapi.v1.WackyTrackyClientService.StopImpersonation:output_type -> wackytracky.clientapi.v1.StopImpersonationResponse
+	115, // 125: wackytracky.clientapi.v1.WackyTrackyClientService.ListApiKeys:output_type -> wackytracky.clientapi.v1.ListApiKeysResponse
+	117, // 126: wackytracky.clientapi.v1.WackyTrackyClientService.CreateApiKey:output_type -> wackytracky.clientapi.v1.CreateApiKeyResponse
+	119, // 127: wackytracky.clientapi.v1.WackyTrackyClientService.DeleteApiKey:output_type -> wackytracky.clientapi.v1.DeleteApiKeyResponse
+	2,   // 128: wackytracky.clientapi.v1.WackyTrackyClientService.GetLists:output_type -> wackytracky.clientapi.v1.GetListsResponse
+	34,  // 129: wackytracky.clientapi.v1.WackyTrackyClientService.ListTasks:output_type -> wackytracky.clientapi.v1.ListTasksResponse
+	36,  // 130: wackytracky.clientapi.v1.WackyTrackyClientService.SearchTasks:output_type -> wackytracky.clientapi.v1.SearchTasksResponse
+	6,   // 131: wackytracky.clientapi.v1.WackyTrackyClientService.CreateTask:output_type -> wackytracky.clientapi.v1.CreateTaskResponse
+	8,   // 132: wackytracky.clientapi.v1.WackyTrackyClientService.UpdateTask:output_type -> wackytracky.clientapi.v1.UpdateTaskResponse
+	10,  // 133: wackytracky.clientapi.v1.WackyTrackyClientService.DoneTask:output_type -> wackytracky.clientapi.v1.DoneTaskResponse
+	12,  // 134: wackytracky.clientapi.v1.WackyTrackyClientService.MoveTask:output_type -> wackytracky.clientapi.v1.MoveTaskResponse
+	4,   // 135: wackytracky.clientapi.v1.WackyTrackyClientService.CreateList:output_type -> wackytracky.clientapi.v1.CreateListResponse
+	28,  // 136: wackytracky.clientapi.v1.WackyTrackyClientService.Tag:output_type -> wackytracky.clientapi.v1.TagResponse
+	38,  // 137: wackytracky.clientapi.v1.WackyTrackyClientService.UpdateList:output_type -> wackytracky.clientapi.v1.UpdateListResponse
+	40,  // 138: wackytracky.clientapi.v1.WackyTrackyClientService.DeleteList:output_type -> wackytracky.clientapi.v1.DeleteListResponse
+	30,  // 139: wackytracky.clientapi.v1.WackyTrackyClientService.GetTags:output_type -> wackytracky.clientapi.v1.GetTagsResponse
+	46,  // 140: wackytracky.clientapi.v1.WackyTrackyClientService.RepoStatus:output_type -> wackytracky.clientapi.v1.RepoStatusResponse
+	48,  // 141: wackytracky.clientapi.v1.WackyTrackyClientService.RepoSync:output_type -> wackytracky.clientapi.v1.RepoSyncResponse
+	51,  // 142: wackytracky.clientapi.v1.WackyTrackyClientService.GetSavedSearches:output_type -> wackytracky.clientapi.v1.GetSavedSearchesResponse
+	53,  // 143: wackytracky.clientapi.v1.WackyTrackyClientService.SetSavedSearches:output_type -> wackytracky.clientapi.v1.SetSavedSearchesResponse
+	14,  // 144: wackytracky.clientapi.v1.WackyTrackyClientService.GetTaskMetadata:output_type -> wackytracky.clientapi.v1.GetTaskMetadataResponse
+	16,  // 145: wackytracky.clientapi.v1.WackyTrackyClientService.SetTaskMetadata:output_type -> wackytracky.clientapi.v1.SetTaskMetadataResponse
+	19,  // 146: wackytracky.clientapi.v1.WackyTrackyClientService.GetTaskPropertyProperties:output_type -> wackytracky.clientapi.v1.GetTaskPropertyPropertiesResponse
+	21,  // 147: wackytracky.clientapi.v1.WackyTrackyClientService.SetTaskPropertyProperty:output_type -> wackytracky.clientapi.v1.SetTaskPropertyPropertyResponse
+	23,  // 148: wackytracky.clientapi.v1.WackyTrackyClientService.RuleStatus:output_type -> wackytracky.clientapi.v1.RuleStatusResponse
+	25,  // 149: wackytracky.clientapi.v1.WackyTrackyClientService.RuleTest:output_type -> wackytracky.clientapi.v1.RuleTestResponse
+	96,  // [96:150] is the sub-list for method output_type
+	42,  // [42:96] is the sub-list for method input_type
+	42,  // [42:42] is the sub-list for extension type_name
+	42,  // [42:42] is the sub-list for extension extendee
+	0,   // [0:42] is the sub-list for field type_name
 }
 
 func init() { file_wacky_tracky_clientapi_v1_wt_proto_init() }

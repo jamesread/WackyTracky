@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
-	"strconv"
 	"strings"
 
 	"github.com/jamesread/golure/pkg/listenaddr"
@@ -33,10 +32,6 @@ type config struct {
 type databaseConfig struct {
 	Driver   string `koanf:"driver"`
 	Database string `koanf:"database"`
-	Hostname string `koanf:"hostname"`
-	Username string `koanf:"username"`
-	Password string `koanf:"password"`
-	Port     int    `koanf:"port"`
 }
 
 type iamConfig struct {
@@ -51,11 +46,7 @@ var (
 func defaultConfig() config {
 	return config{
 		Database: &databaseConfig{
-			Driver:   "nodriver",
-			Hostname: "localhost",
-			Username: "user",
-			Password: "pass",
-			Port:     7687,
+			Driver: "nodriver",
 		},
 		IAM: &iamConfig{
 			Database: "./data/iam.sqlite",
@@ -124,10 +115,6 @@ func loadConfigFile(k *koanf.Koanf) error {
 func setKoanfDefaults(k *koanf.Koanf) {
 	_ = k.Set("listenAddress", "0.0.0.0:8080")
 	_ = k.Set("database.driver", "nodriver")
-	_ = k.Set("database.hostname", "localhost")
-	_ = k.Set("database.username", "user")
-	_ = k.Set("database.password", "pass")
-	_ = k.Set("database.port", 7687)
 	_ = k.Set("iam.database", "./data/iam.sqlite")
 	_ = k.Set("wallpaperDirectory", "/opt/wallpaper/")
 	_ = k.Set("cert", "wt.crt")
@@ -167,11 +154,17 @@ func resolveConfigCandidate(c string) (string, error) {
 	if info.IsDir() {
 		return "", nil
 	}
+	return absOrOriginal(c), nil
+}
+
+// absOrOriginal falls back to the path as given; Abs only fails when the
+// working directory is unavailable, and a relative path still works then.
+func absOrOriginal(c string) string {
 	abs, err := filepath.Abs(c)
 	if err != nil {
-		return c, nil
+		return c
 	}
-	return abs, nil
+	return abs
 }
 
 func applyEnvOverrides(cfg *config) {
@@ -192,10 +185,6 @@ func ensureConfigStructs(cfg *config) {
 func applyDatabaseEnv(db *databaseConfig) {
 	setEnvString(&db.Driver, "DATABASE_DRIVER")
 	setEnvString(&db.Database, "DATABASE_DATABASE")
-	setEnvString(&db.Hostname, "DATABASE_HOSTNAME")
-	setEnvString(&db.Username, "DATABASE_USERNAME")
-	setEnvString(&db.Password, "DATABASE_PASSWORD")
-	setEnvInt(&db.Port, "DATABASE_PORT")
 }
 
 func applyIAMEnv(iam *iamConfig) {
@@ -205,16 +194,6 @@ func applyIAMEnv(iam *iamConfig) {
 func setEnvString(dst *string, envKey string) {
 	if v := strings.TrimSpace(os.Getenv(envKey)); v != "" {
 		*dst = v
-	}
-}
-
-func setEnvInt(dst *int, envKey string) {
-	v := strings.TrimSpace(os.Getenv(envKey))
-	if v == "" {
-		return
-	}
-	if n, err := strconv.Atoi(v); err == nil {
-		*dst = n
 	}
 }
 

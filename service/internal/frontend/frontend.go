@@ -24,7 +24,7 @@ func findWebUIDir() string {
 		"/usr/share/wacky-tracky/frontend/",
 	}
 
-	for i := 0; i < len(directoriesToSearch); i++ {
+	for i := range directoriesToSearch {
 		if _, err := os.Stat(directoriesToSearch[i]); err == nil {
 			return directoriesToSearch[i]
 		}

@@ -2,6 +2,7 @@ package clientapi
 
 import (
 	"context"
+	"maps"
 	"net/http"
 	"strings"
 	"testing"
@@ -19,9 +20,7 @@ import (
 func logoutSetCookies(t *testing.T, api *wackyTrackyClientService, header http.Header) []string {
 	t.Helper()
 	req := connect.NewRequest(&pb.LogoutRequest{})
-	for k, v := range header {
-		req.Header()[k] = v
-	}
+	maps.Copy(req.Header(), header)
 	res, err := api.Logout(context.Background(), req)
 	require.NoError(t, err)
 	return res.Header().Values("Set-Cookie")

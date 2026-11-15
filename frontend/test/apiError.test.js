@@ -61,3 +61,15 @@ test('handles unknown/plain errors gracefully', () => {
 	assert.equal(typeof describeApiError(new Error('boom')), 'string');
 	assert.match(describeApiError(new Error('boom')), /boom/);
 });
+
+test('shows the server message for Unimplemented errors raised by the backend', () => {
+	const err = new ConnectError('the database backend does not support saved searches', Code.Unimplemented);
+	const msg = describeApiError(err);
+	assert.match(msg, /does not support saved searches/);
+	assert.doesNotMatch(msg, /endpoint not found/i);
+});
+
+test('falls back to the endpoint-not-found hint for Unimplemented errors without a message', () => {
+	const msg = describeApiError(new ConnectError('', Code.Unimplemented));
+	assert.match(msg, /endpoint not found/i);
+});

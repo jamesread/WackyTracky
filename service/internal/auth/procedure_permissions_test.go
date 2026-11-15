@@ -27,8 +27,7 @@ func TestRequiredPermission(t *testing.T) {
 		RequiredPermission(clientv1connect.WackyTrackyClientServiceSetUserGroupMembersProcedure))
 	require.Equal(t, rbac.PermissionSystemImpersonate,
 		RequiredPermission(clientv1connect.WackyTrackyClientServiceImpersonateUserProcedure))
-	require.Equal(t, "",
-		RequiredPermission(clientv1connect.WackyTrackyClientServiceStopImpersonationProcedure))
+	require.Empty(t, RequiredPermission(clientv1connect.WackyTrackyClientServiceStopImpersonationProcedure))
 	require.Equal(t, rbac.PermissionAppAccess,
 		RequiredPermission(clientv1connect.WackyTrackyClientServiceListTasksProcedure))
 	require.Equal(t, rbac.PermissionAppAccess,

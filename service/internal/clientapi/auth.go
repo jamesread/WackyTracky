@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"net/http"
+	"slices"
 	"sort"
 	"strings"
 
@@ -92,12 +93,7 @@ func canViewSystemStatus(au *auth.AuthenticatedUser) bool {
 	if au == nil || au.RBAC == nil {
 		return false
 	}
-	for _, p := range systemStatusPermissions {
-		if au.RBAC.Has(p) {
-			return true
-		}
-	}
-	return false
+	return slices.ContainsFunc(systemStatusPermissions, au.RBAC.Has)
 }
 
 func fillSystemStatus(au *auth.AuthenticatedUser, res *pb.GetStatusResponse) {
@@ -141,10 +137,10 @@ func (api *wackyTrackyClientService) fillImpersonation(ctx context.Context, sid 
 }
 
 func sessionIDFromHeader(h http.Header) string {
-	for _, part := range strings.Split(h.Get("Cookie"), ";") {
+	for part := range strings.SplitSeq(h.Get("Cookie"), ";") {
 		part = strings.TrimSpace(part)
-		if strings.HasPrefix(part, auth.SessionCookieName()+"=") {
-			return strings.TrimPrefix(part, auth.SessionCookieName()+"=")
+		if after, ok := strings.CutPrefix(part, auth.SessionCookieName()+"="); ok {
+			return after
 		}
 	}
 	return ""
@@ -230,7 +226,7 @@ func (api *wackyTrackyClientService) verifyAndHashPasswordChange(ctx context.Con
 	if err != nil || user == nil {
 		return "", connect.NewError(connect.CodeInternal, err)
 	}
-	if err := verifyCurrentPassword(user, msg.CurrentPassword); err != nil {
+	if err = verifyCurrentPassword(user, msg.CurrentPassword); err != nil {
 		return "", err
 	}
 	hash, err := password.Hash(msg.NewPassword)

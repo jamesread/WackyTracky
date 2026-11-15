@@ -1377,6 +1377,7 @@ paths:
       tags:
         - wackytracky.clientapi.v1.WackyTrackyClientService
       summary: MoveTask
+      description: MoveTask moves a task to another list without deleting and re-creating it.
       operationId: wackytracky.clientapi.v1.WackyTrackyClientService.MoveTask
       parameters:
         - name: Connect-Protocol-Version
@@ -2863,13 +2864,24 @@ components:
         taskId:
           type: string
           title: task_id
+          description: ID of the task to move.
         targetListId:
           type: string
           title: target_list_id
+          description: ID of the list to move the task to (see GetLists).
       title: MoveTaskRequest
       additionalProperties: false
+      description: |-
+        MoveTaskRequest moves an existing task (keeping its ID, metadata and subtasks)
+         to another list. A subtask that is moved becomes a root task in the target list.
     wackytracky.clientapi.v1.MoveTaskResponse:
       type: object
+      properties:
+        task:
+          allOf:
+            - $ref: '#/components/schemas/wackytracky.clientapi.v1.Task'
+          title: task
+          description: The task after it has been moved.
       title: MoveTaskResponse
       additionalProperties: false
     wackytracky.clientapi.v1.MyPermissionAuditRow:

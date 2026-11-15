@@ -15,14 +15,12 @@ require (
 	github.com/knadh/koanf/providers/file v1.2.1
 	github.com/knadh/koanf/v2 v2.4.1
 	github.com/mark3labs/mcp-go v1.5.0
-	github.com/neo4j/neo4j-go-driver/v5 v5.28.6
 	github.com/prometheus/client_golang v1.25.0
 	github.com/rs/cors v1.11.1
 	github.com/rubenv/sql-migrate v1.8.1
 	github.com/sirupsen/logrus v1.10.2
 	github.com/spf13/cobra v1.10.2
 	github.com/stretchr/testify v1.12.1
-	golang.org/x/net v0.62.0
 	google.golang.org/protobuf v1.36.12
 	gopkg.in/yaml.v2 v2.4.0
 	modernc.org/sqlite v1.62.0

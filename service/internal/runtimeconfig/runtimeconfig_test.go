@@ -64,9 +64,9 @@ func TestResolveListenAddress_UsesPORT(t *testing.T) {
 
 func freeTCPPort(t *testing.T) string {
 	t.Helper()
-	ln, err := net.Listen("tcp", ":0")
+	ln, err := new(net.ListenConfig).Listen(t.Context(), "tcp", ":0")
 	require.NoError(t, err)
-	defer ln.Close()
+	defer func() { require.NoError(t, ln.Close()) }()
 	_, portStr, err := net.SplitHostPort(ln.Addr().String())
 	require.NoError(t, err)
 	_, err = strconv.Atoi(portStr)

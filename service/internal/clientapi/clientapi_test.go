@@ -143,3 +143,118 @@ func TestClientAPI_CreateTaskReturnsParsedMetadata(t *testing.T) {
 	assert.Equal(t, "2025-07-15", resp.Msg.Task.DueDate)
 	assert.Equal(t, "ship feature", resp.Msg.Task.Content)
 }
+
+func newTodoTxtClientAPI(t *testing.T) *wackyTrackyClientService {
+	t.Helper()
+	orig := RuntimeConfig.Database.Database
+	RuntimeConfig.Database.Database = t.TempDir()
+	t.Cleanup(func() { RuntimeConfig.Database.Database = orig })
+	return GetNewClientAPI(&todotxt.TodoTxt{}, nil)
+}
+
+func TestClientAPI_MoveTaskReturnsMovedTask(t *testing.T) {
+	api := newTodoTxtClientAPI(t)
+	ctx := context.Background()
+
+	_, err := api.CreateList(ctx, connect.NewRequest(&pb.CreateListRequest{Title: "Other"}))
+	require.NoError(t, err)
+	lists, err := api.GetLists(ctx, connect.NewRequest(&pb.GetListsRequest{}))
+	require.NoError(t, err)
+	var otherID string
+	for _, l := range lists.Msg.Lists {
+		if l.Title == "Other" {
+			otherID = l.Id
+		}
+	}
+	require.NotEmpty(t, otherID)
+
+	created, err := api.CreateTask(ctx, connect.NewRequest(&pb.CreateTaskRequest{Content: "move me", ParentListId: "inbox"}))
+	require.NoError(t, err)
+
+	resp, err := api.MoveTask(ctx, connect.NewRequest(&pb.MoveTaskRequest{TaskId: created.Msg.Task.Id, TargetListId: otherID}))
+	require.NoError(t, err)
+	require.NotNil(t, resp.Msg.Task)
+	assert.Equal(t, created.Msg.Task.Id, resp.Msg.Task.Id)
+	assert.Equal(t, otherID, resp.Msg.Task.ParentId)
+	assert.Equal(t, "move me", resp.Msg.Task.Content)
+}
+
+func TestClientAPI_MoveTaskErrorCodes(t *testing.T) {
+	api := newTodoTxtClientAPI(t)
+	ctx := context.Background()
+
+	_, err := api.MoveTask(ctx, connect.NewRequest(&pb.MoveTaskRequest{TaskId: "x"}))
+	assert.Equal(t, connect.CodeInvalidArgument, connect.CodeOf(err))
+
+	_, err = api.MoveTask(ctx, connect.NewRequest(&pb.MoveTaskRequest{TaskId: "missing", TargetListId: "inbox"}))
+	assert.Equal(t, connect.CodeNotFound, connect.CodeOf(err))
+}
+
+func TestClientAPI_MoveTaskUnimplementedForBackendWithoutMover(t *testing.T) {
+	api := GetNewClientAPI(&dummy.Dummy{}, nil)
+	_, err := api.MoveTask(context.Background(), connect.NewRequest(&pb.MoveTaskRequest{TaskId: "x", TargetListId: "y"}))
+	assert.Equal(t, connect.CodeUnimplemented, connect.CodeOf(err))
+}
+
+func TestClientAPI_MutationsReturnErrorCodes(t *testing.T) {
+	api := newTodoTxtClientAPI(t)
+	ctx := context.Background()
+
+	cases := []struct {
+		name string
+		call func() error
+		code connect.Code
+	}{
+		{"DoneTask missing id", func() error {
+			_, err := api.DoneTask(ctx, connect.NewRequest(&pb.DoneTaskRequest{}))
+			return err
+		}, connect.CodeInvalidArgument},
+		{"DoneTask unknown task", func() error {
+			_, err := api.DoneTask(ctx, connect.NewRequest(&pb.DoneTaskRequest{Id: "missing"}))
+			return err
+		}, connect.CodeNotFound},
+		{"UpdateTask unknown task", func() error {
+			_, err := api.UpdateTask(ctx, connect.NewRequest(&pb.UpdateTaskRequest{Id: "missing", Content: "x"}))
+			return err
+		}, connect.CodeNotFound},
+		{"UpdateList unknown list", func() error {
+			_, err := api.UpdateList(ctx, connect.NewRequest(&pb.UpdateListRequest{Id: "missing", Title: "x"}))
+			return err
+		}, connect.CodeNotFound},
+		{"DeleteList missing id", func() error {
+			_, err := api.DeleteList(ctx, connect.NewRequest(&pb.DeleteListRequest{}))
+			return err
+		}, connect.CodeInvalidArgument},
+		{"DeleteList inbox", func() error {
+			_, err := api.DeleteList(ctx, connect.NewRequest(&pb.DeleteListRequest{Id: "inbox"}))
+			return err
+		}, connect.CodeFailedPrecondition},
+		{"SetTaskMetadata unknown task", func() error {
+			_, err := api.SetTaskMetadata(ctx, connect.NewRequest(&pb.SetTaskMetadataRequest{TaskId: "missing", Field: "notes"}))
+			return err
+		}, connect.CodeNotFound},
+		{"SetTaskMetadata missing field", func() error {
+			_, err := api.SetTaskMetadata(ctx, connect.NewRequest(&pb.SetTaskMetadataRequest{TaskId: "t"}))
+			return err
+		}, connect.CodeInvalidArgument},
+		{"SetTaskPropertyProperty bad type", func() error {
+			_, err := api.SetTaskPropertyProperty(ctx, connect.NewRequest(&pb.SetTaskPropertyPropertyRequest{PropertyType: "colour", PropertyName: "work", Key: "k"}))
+			return err
+		}, connect.CodeInvalidArgument},
+	}
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			assert.Equal(t, tc.code, connect.CodeOf(tc.call()))
+		})
+	}
+}
+
+func TestClientAPI_DoneTaskSucceedsForExistingTask(t *testing.T) {
+	api := newTodoTxtClientAPI(t)
+	ctx := context.Background()
+	created, err := api.CreateTask(ctx, connect.NewRequest(&pb.CreateTaskRequest{Content: "x", ParentListId: "inbox"}))
+	require.NoError(t, err)
+
+	_, err = api.DoneTask(ctx, connect.NewRequest(&pb.DoneTaskRequest{Id: created.Msg.Task.Id}))
+	assert.NoError(t, err)
+}

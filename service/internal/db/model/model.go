@@ -1,5 +1,17 @@
 package db
 
+import "errors"
+
+var (
+	ErrTaskNotFound = errors.New("task not found")
+	ErrListNotFound = errors.New("list not found")
+	// ErrDefaultListNotDeletable is returned when deleting the default (inbox) list,
+	// which orphaned tasks fall back to.
+	ErrDefaultListNotDeletable = errors.New("the default list cannot be deleted")
+	ErrInvalidMetadataField    = errors.New("metadata field names may only contain letters, digits, '-' and '_'")
+	ErrInvalidPropertyType     = errors.New("property type must be \"tag\" or \"context\"")
+)
+
 type DBTag struct {
 	ID    string
 	Title string
@@ -16,12 +28,12 @@ type DBTask struct {
 	Content       string
 	ParentId      string
 	ParentType    string
-	CountSubitems int32
-	Tags          []string
-	Contexts      []string
 	WaitUntil     string
 	Priority      string
 	DueDate       string
+	Tags          []string
+	Contexts      []string
+	CountSubitems int32
 }
 
 // SavedSearch is used by backends that support saved searches (e.g. todotxt).

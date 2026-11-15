@@ -46,12 +46,19 @@ message DoneTaskRequest {
 
 message DoneTaskResponse {}
 
+// MoveTaskRequest moves an existing task (keeping its ID, metadata and subtasks)
+// to another list. A subtask that is moved becomes a root task in the target list.
 message MoveTaskRequest {
+	// ID of the task to move.
 	string task_id = 1;
+	// ID of the list to move the task to (see GetLists).
 	string target_list_id = 2;
 }
 
-message MoveTaskResponse {}
+message MoveTaskResponse {
+	// The task after it has been moved.
+	Task task = 1;
+}
 
 // Task metadata (e.g. notes) — optional per driver
 message GetTaskMetadataRequest {
@@ -563,6 +570,7 @@ service WackyTrackyClientService {
 
 	rpc DoneTask(DoneTaskRequest) returns (DoneTaskResponse) {}
 
+	// MoveTask moves a task to another list without deleting and re-creating it.
 	rpc MoveTask(MoveTaskRequest) returns (MoveTaskResponse) {}
 
 	rpc CreateList(CreateListRequest) returns (CreateListResponse) {}

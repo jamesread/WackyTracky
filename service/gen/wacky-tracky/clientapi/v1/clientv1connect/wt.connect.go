@@ -238,6 +238,7 @@ type WackyTrackyClientServiceClient interface {
 	CreateTask(context.Context, *connect.Request[v1.CreateTaskRequest]) (*connect.Response[v1.CreateTaskResponse], error)
 	UpdateTask(context.Context, *connect.Request[v1.UpdateTaskRequest]) (*connect.Response[v1.UpdateTaskResponse], error)
 	DoneTask(context.Context, *connect.Request[v1.DoneTaskRequest]) (*connect.Response[v1.DoneTaskResponse], error)
+	// MoveTask moves a task to another list without deleting and re-creating it.
 	MoveTask(context.Context, *connect.Request[v1.MoveTaskRequest]) (*connect.Response[v1.MoveTaskResponse], error)
 	CreateList(context.Context, *connect.Request[v1.CreateListRequest]) (*connect.Response[v1.CreateListResponse], error)
 	Tag(context.Context, *connect.Request[v1.TagRequest]) (*connect.Response[v1.TagResponse], error)
@@ -970,6 +971,7 @@ type WackyTrackyClientServiceHandler interface {
 	CreateTask(context.Context, *connect.Request[v1.CreateTaskRequest]) (*connect.Response[v1.CreateTaskResponse], error)
 	UpdateTask(context.Context, *connect.Request[v1.UpdateTaskRequest]) (*connect.Response[v1.UpdateTaskResponse], error)
 	DoneTask(context.Context, *connect.Request[v1.DoneTaskRequest]) (*connect.Response[v1.DoneTaskResponse], error)
+	// MoveTask moves a task to another list without deleting and re-creating it.
 	MoveTask(context.Context, *connect.Request[v1.MoveTaskRequest]) (*connect.Response[v1.MoveTaskResponse], error)
 	CreateList(context.Context, *connect.Request[v1.CreateListRequest]) (*connect.Response[v1.CreateListResponse], error)
 	Tag(context.Context, *connect.Request[v1.TagRequest]) (*connect.Response[v1.TagResponse], error)

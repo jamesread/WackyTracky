@@ -1,0 +1,80 @@
+version: "2"
+
+run:
+  timeout: 5m
+  tests: true
+
+issues:
+  max-same-issues: 0
+  max-issues-per-linter: 0
+
+linters:
+  default: none
+  enable:
+    - bidichk
+    - bodyclose
+    - copyloopvar
+    - durationcheck
+    - errcheck
+    - errorlint
+    - gocritic
+    - gocyclo
+    - gosec
+    - govet
+    - ineffassign
+    - misspell
+    - modernize
+    - nilerr
+    - noctx
+    - staticcheck
+    - testifylint
+    - thelper
+    - unconvert
+    - unparam
+    - unused
+    - usestdlibvars
+  settings:
+    gocyclo:
+      min-complexity: 5
+    gosec:
+      enable-all-rules: true
+    govet:
+      enable-all: true
+  exclusions:
+    paths:
+      - gen
+    rules:
+      - path: _test\.go
+        linters:
+          - gosec
+          - gocyclo
+      - path: _test\.go
+        text: "fieldalignment:"
+        linters:
+          - govet
+
+      # Secure comes from WACKYTRACKY_SECURE_COOKIES (on by default, off only for plain-HTTP dev);
+      # gosec only accepts a literal true.
+      - path: internal/auth/(cookies|sso_optout)\.go
+        text: "G124:"
+        linters:
+          - gosec
+
+      # SQLite row IDs/counts and clock hours/minutes cannot approach 2^31.
+      - path: internal/clientapi/(iam|auth|clientapi)\.go
+        text: "G115:"
+        linters:
+          - gosec
+
+      # Fixed binaries (git, ssh-keygen) run with argument vectors, never through a shell.
+      - path: internal/(gitssh/gitssh|gitsync/gitsync|clientapi/clientapi)\.go
+        text: "G204:"
+        linters:
+          - gosec
+
+      # Reads are under the operator-configured data dir; task IDs are sanitised and
+      # metadata field names are validated before any path is built.
+      - path: internal/db/(todotxt/todotxt|yamlfiles/yamlfiles)\.go
+        text: "G304:"
+        linters:
+          - gosec

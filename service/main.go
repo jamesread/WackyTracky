@@ -1,6 +1,9 @@
 package main
 
 import (
+	"context"
+	"os"
+
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"github.com/wacky-tracky/wacky-tracky-server/internal/buildinfo"
@@ -55,9 +58,11 @@ func main() {
 	if err := runtimeconfig.Load(); err != nil {
 		log.Fatalf("Config error: %v", err)
 	}
-	gitssh.SetupAndLog()
+	gitssh.SetupAndLog(context.Background())
 
 	root.AddCommand(mcpCmd)
 
-	root.Execute()
+	if err := root.Execute(); err != nil {
+		os.Exit(1)
+	}
 }

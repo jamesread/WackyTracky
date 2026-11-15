@@ -276,7 +276,7 @@ func (api *wackyTrackyClientService) createUserAccount(ctx context.Context, user
 		api.log.WithError(err).Error("create user account")
 		return nil, mapStoreError(err)
 	}
-	if err := api.finalizeCreatedUser(ctx, id); err != nil {
+	if err = api.finalizeCreatedUser(ctx, id); err != nil {
 		return nil, err
 	}
 	user, err := api.iamStore.GetUserByID(ctx, id)
@@ -637,7 +637,7 @@ func (api *wackyTrackyClientService) ImpersonateUser(ctx context.Context, req *c
 		return nil, err
 	}
 	targetID := int(req.Msg.UserId)
-	if err := api.validateImpersonationTarget(ctx, targetID); err != nil {
+	if err = api.validateImpersonationTarget(ctx, targetID); err != nil {
 		return nil, err
 	}
 	impersonatorID, err := api.impersonatorUserID(ctx, req.Header(), au)

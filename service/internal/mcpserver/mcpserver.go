@@ -28,6 +28,7 @@ type ClientService interface {
 	CreateTask(context.Context, *connect.Request[pb.CreateTaskRequest]) (*connect.Response[pb.CreateTaskResponse], error)
 	UpdateTask(context.Context, *connect.Request[pb.UpdateTaskRequest]) (*connect.Response[pb.UpdateTaskResponse], error)
 	DoneTask(context.Context, *connect.Request[pb.DoneTaskRequest]) (*connect.Response[pb.DoneTaskResponse], error)
+	MoveTask(context.Context, *connect.Request[pb.MoveTaskRequest]) (*connect.Response[pb.MoveTaskResponse], error)
 	CreateList(context.Context, *connect.Request[pb.CreateListRequest]) (*connect.Response[pb.CreateListResponse], error)
 }
 
@@ -93,6 +94,12 @@ func (s *Server) registerTools(srv *server.MCPServer) {
 		mcp.WithDescription("Mark a task as done."),
 		mcp.WithString("id", mcp.Required(), mcp.Description("The task ID to complete.")),
 	), s.handleCompleteTask)
+
+	srv.AddTool(mcp.NewTool("move_task",
+		mcp.WithDescription("Move a task, with its subtasks, to another list. The task keeps its ID and metadata. A subtask that is moved becomes a top-level task in the target list."),
+		mcp.WithString("id", mcp.Required(), mcp.Description("The task ID to move.")),
+		mcp.WithString("list_id", mcp.Required(), mcp.Description("The ID of the list to move the task to, from list_lists.")),
+	), s.handleMoveTask)
 
 	srv.AddTool(mcp.NewTool("create_list",
 		mcp.WithDescription("Create a new task list."),
@@ -183,6 +190,22 @@ func (s *Server) handleCompleteTask(ctx context.Context, req mcp.CallToolRequest
 		return mcp.NewToolResultErrorFromErr("complete_task failed", err), nil
 	}
 	return mcp.NewToolResultText("Task " + id + " marked done."), nil
+}
+
+func (s *Server) handleMoveTask(ctx context.Context, req mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+	id, err := req.RequireString("id")
+	if err != nil {
+		return mcp.NewToolResultErrorFromErr("invalid arguments", err), nil
+	}
+	listID, err := req.RequireString("list_id")
+	if err != nil {
+		return mcp.NewToolResultErrorFromErr("invalid arguments", err), nil
+	}
+	resp, err := s.svc.MoveTask(ctx, connect.NewRequest(&pb.MoveTaskRequest{TaskId: id, TargetListId: listID}))
+	if err != nil {
+		return mcp.NewToolResultErrorFromErr("move_task failed", err), nil
+	}
+	return toolJSON(resp.Msg)
 }
 
 func (s *Server) handleCreateList(ctx context.Context, req mcp.CallToolRequest) (*mcp.CallToolResult, error) {

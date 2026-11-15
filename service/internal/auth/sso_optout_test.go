@@ -19,6 +19,7 @@ import (
 const (
 	testJWTSecret = "test-hmac-secret"
 	testJWTHeader = "Cf-Access-Jwt-Assertion"
+	testJWTEmail  = "alice@example.com"
 	testJWTCookie = "CF_Authorization"
 	testJWTIssuer = "https://team.cloudflareaccess.com"
 	testJWTAud    = "test-aud"
@@ -50,10 +51,10 @@ func signTestJWT(t *testing.T, email string) string {
 	return s
 }
 
-func newJWTRequest(t *testing.T, email string) *http.Request {
+func newJWTRequest(t *testing.T) *http.Request {
 	t.Helper()
 	req := httptest.NewRequestWithContext(context.Background(), "POST", clientv1connect.WackyTrackyClientServiceGetStatusProcedure, nil)
-	tok := signTestJWT(t, email)
+	tok := signTestJWT(t, testJWTEmail)
 	req.Header.Set(testJWTHeader, tok)
 	req.AddCookie(&http.Cookie{Name: testJWTCookie, Value: tok})
 	return req
@@ -72,13 +73,13 @@ func TestJWTAutoCreatesUser(t *testing.T) {
 	layer, st := newJWTLayer(t)
 	ctx := context.Background()
 
-	info, err := layer.Handle(ctx, newJWTRequest(t, "alice@example.com"))
+	info, err := layer.Handle(ctx, newJWTRequest(t))
 	require.NoError(t, err)
 	au, ok := info.(*AuthenticatedUser)
 	require.True(t, ok, "JWT request should be authenticated")
-	assert.Equal(t, "alice@example.com", au.User.Username)
+	assert.Equal(t, testJWTEmail, au.User.Username)
 
-	user, err := st.GetUserByUsername(ctx, "alice@example.com")
+	user, err := st.GetUserByUsername(ctx, testJWTEmail)
 	require.NoError(t, err)
 	require.NotNil(t, user)
 	assert.Equal(t, iamstoretypes.UserCreatedBySSO, user.CreatedBy)
@@ -87,7 +88,7 @@ func TestJWTAutoCreatesUser(t *testing.T) {
 func TestStripJWTIfOptedOut(t *testing.T) {
 	s := NewSSOOptOut(testJWTAuthYAML())
 
-	req := newJWTRequest(t, "alice@example.com")
+	req := newJWTRequest(t)
 	assert.Same(t, req, s.StripJWTIfOptedOut(req), "no opt-out cookie: request unchanged")
 
 	req.AddCookie(&http.Cookie{Name: SSOOptOutCookieName, Value: "1"})
@@ -106,7 +107,7 @@ func TestStripJWTIfOptedOut(t *testing.T) {
 func TestSSOOptOut_NotConfigured(t *testing.T) {
 	var nilOptOut *SSOOptOut
 	for _, s := range []*SSOOptOut{nilOptOut, NewSSOOptOut(nil), NewSSOOptOut(map[string]any{})} {
-		req := newJWTRequest(t, "alice@example.com")
+		req := newJWTRequest(t)
 		req.AddCookie(&http.Cookie{Name: SSOOptOutCookieName, Value: "1"})
 		assert.Same(t, req, s.StripJWTIfOptedOut(req))
 		_, ok := s.Cookie(req.Header)
@@ -125,13 +126,13 @@ func TestSSOOptOut_IgnoresJWTEndToEnd(t *testing.T) {
 		gotUser = UserFromContext(r.Context())
 	})))
 
-	handler.ServeHTTP(httptest.NewRecorder(), newJWTRequest(t, "alice@example.com"))
+	handler.ServeHTTP(httptest.NewRecorder(), newJWTRequest(t))
 	require.True(t, called)
 	require.NotNil(t, gotUser, "without the opt-out cookie the JWT signs in")
-	assert.Equal(t, "alice@example.com", gotUser.User.Username)
+	assert.Equal(t, testJWTEmail, gotUser.User.Username)
 
 	called, gotUser = false, nil
-	req := newJWTRequest(t, "alice@example.com")
+	req := newJWTRequest(t)
 	req.AddCookie(&http.Cookie{Name: SSOOptOutCookieName, Value: "1"})
 	handler.ServeHTTP(httptest.NewRecorder(), req)
 	require.True(t, called, "GetStatus is allowed unauthenticated")
@@ -141,7 +142,7 @@ func TestSSOOptOut_IgnoresJWTEndToEnd(t *testing.T) {
 func TestSSOOptOutCookie(t *testing.T) {
 	s := NewSSOOptOut(testJWTAuthYAML())
 
-	c, ok := s.Cookie(newJWTRequest(t, "alice@example.com").Header)
+	c, ok := s.Cookie(newJWTRequest(t).Header)
 	require.True(t, ok)
 	assert.Equal(t, SSOOptOutCookieName, c.Name)
 	assert.Equal(t, "/", c.Path)

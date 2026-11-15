@@ -48,7 +48,7 @@ func TestSPAFallback_ServesIndexHTMLForClientRoute(t *testing.T) {
 	fs := http.FileServer(http.Dir(dir))
 	handler := spaFallback(dir, fs)
 
-	req := httptest.NewRequest(http.MethodGet, "http://test/lists/foo-id", nil)
+	req := httptest.NewRequestWithContext(t.Context(), http.MethodGet, "http://test/lists/foo-id", nil)
 	rec := httptest.NewRecorder()
 	handler.ServeHTTP(rec, req)
 
@@ -65,7 +65,7 @@ func TestSPAFallback_ServesFileWhenExists(t *testing.T) {
 	fs := http.FileServer(http.Dir(dir))
 	handler := spaFallback(dir, fs)
 
-	req := httptest.NewRequest(http.MethodGet, "http://test/lists/some-file", nil)
+	req := httptest.NewRequestWithContext(t.Context(), http.MethodGet, "http://test/lists/some-file", nil)
 	rec := httptest.NewRecorder()
 	handler.ServeHTTP(rec, req)
 
@@ -88,7 +88,7 @@ func TestNoStoreServiceWorkerAssets_SetsCacheControl(t *testing.T) {
 	})
 	handler := noStoreServiceWorkerAssets(next)
 
-	req := httptest.NewRequest(http.MethodGet, "http://test/pwa-sw.js", nil)
+	req := httptest.NewRequestWithContext(t.Context(), http.MethodGet, "http://test/pwa-sw.js", nil)
 	rec := httptest.NewRecorder()
 	handler.ServeHTTP(rec, req)
 

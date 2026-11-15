@@ -1,6 +1,7 @@
 package gitssh
 
 import (
+	"context"
 	"fmt"
 	"os"
 	"os/exec"
@@ -36,17 +37,17 @@ func ResolveConfigDir() string {
 	return "."
 }
 
-func Setup(configDir string) (SetupResult, error) {
+func Setup(ctx context.Context, configDir string) (SetupResult, error) {
 	privateKey := filepath.Join(configDir, keyBaseName)
 	publicKey := privateKey + ".pub"
-	existing, err := ensureKeyPair(privateKey)
+	existing, err := ensureKeyPair(ctx, privateKey)
 	if err != nil {
 		return SetupResult{}, err
 	}
-	if err := linkKeysToSSHDir(privateKey, publicKey); err != nil {
+	if err = linkKeysToSSHDir(privateKey, publicKey); err != nil {
 		return SetupResult{}, err
 	}
-	fingerprint, err := keyFingerprint(publicKey)
+	fingerprint, err := keyFingerprint(ctx, publicKey)
 	if err != nil {
 		return SetupResult{}, err
 	}
@@ -58,12 +59,12 @@ func Setup(configDir string) (SetupResult, error) {
 	}, nil
 }
 
-func SetupAndLog() {
-	if err := ensureGitIdentity(); err != nil {
+func SetupAndLog(ctx context.Context) {
+	if err := ensureGitIdentity(ctx); err != nil {
 		log.Warnf("Git identity setup failed: %v", err)
 	}
 	dir := ResolveConfigDir()
-	res, err := Setup(dir)
+	res, err := Setup(ctx, dir)
 	if err != nil {
 		log.Warnf("Git SSH key setup failed: %v", err)
 		return
@@ -95,11 +96,11 @@ func ConfigureGitCommand(cmd *exec.Cmd) {
 	)
 }
 
-func ensureKeyPair(privateKey string) (bool, error) {
+func ensureKeyPair(ctx context.Context, privateKey string) (bool, error) {
 	if _, err := os.Stat(privateKey); err == nil {
 		return true, nil
 	}
-	cmd := exec.Command("ssh-keygen", "-t", "ed25519", "-f", privateKey, "-N", "", "-C", keyComment)
+	cmd := exec.CommandContext(ctx, "ssh-keygen", "-t", "ed25519", "-f", privateKey, "-N", "", "-C", keyComment)
 	if out, err := cmd.CombinedOutput(); err != nil {
 		return false, fmt.Errorf("ssh-keygen: %s: %w", strings.TrimSpace(string(out)), err)
 	}
@@ -178,8 +179,8 @@ func sameSymlink(linkPath, target string) bool {
 	return got == want || current == target
 }
 
-func keyFingerprint(publicKey string) (string, error) {
-	out, err := exec.Command("ssh-keygen", "-lf", publicKey).CombinedOutput()
+func keyFingerprint(ctx context.Context, publicKey string) (string, error) {
+	out, err := exec.CommandContext(ctx, "ssh-keygen", "-lf", publicKey).CombinedOutput()
 	if err != nil {
 		return "", fmt.Errorf("ssh-keygen -lf: %s: %w", strings.TrimSpace(string(out)), err)
 	}
@@ -194,14 +195,14 @@ func shellEscape(value string) string {
 	return "'" + strings.ReplaceAll(value, "'", "'\\''") + "'"
 }
 
-func ensureGitIdentity() error {
+func ensureGitIdentity(ctx context.Context) error {
 	if !isContainerHome() {
 		return nil
 	}
-	if err := setGlobalGitConfig("user.name", gitUserName); err != nil {
+	if err := setGlobalGitConfig(ctx, "user.name", gitUserName); err != nil {
 		return err
 	}
-	return setGlobalGitConfig("user.email", gitUserEmail)
+	return setGlobalGitConfig(ctx, "user.email", gitUserEmail)
 }
 
 func isContainerHome() bool {
@@ -212,8 +213,8 @@ func isContainerHome() bool {
 	return home == containerHome
 }
 
-func setGlobalGitConfig(key, value string) error {
-	cmd := exec.Command("git", "config", "--global", key, value)
+func setGlobalGitConfig(ctx context.Context, key, value string) error {
+	cmd := exec.CommandContext(ctx, "git", "config", "--global", key, value)
 	if out, err := cmd.CombinedOutput(); err != nil {
 		return fmt.Errorf("git config --global %s: %s: %w", key, strings.TrimSpace(string(out)), err)
 	}

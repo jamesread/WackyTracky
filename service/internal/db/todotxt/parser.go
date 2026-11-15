@@ -9,15 +9,15 @@ import (
 
 // Task represents a parsed todo.txt task (in-memory).
 type Task struct {
-	Completed      bool
 	CompletionDate *time.Time
 	CreationDate   *time.Time
-	Priority       string // (A)..(Z) or empty
-	Description    string // body text
+	Metadata       map[string]string
+	Priority       string
+	Description    string
 	Projects       []string
 	Contexts       []string
-	Tags           []string // #hashtag parsed as tag (e.g. #bar -> "bar")
-	Metadata       map[string]string
+	Tags           []string
+	Completed      bool
 }
 
 // parseCompletedPrefix parses "x " and optional completion + creation dates; returns updated task and remaining rest.

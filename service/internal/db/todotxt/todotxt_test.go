@@ -163,7 +163,7 @@ func TestTodoTxt_UpdateTaskAndDoneTask(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	if err := d.UpdateTask(id, "updated content"); err != nil {
+	if err = d.UpdateTask(id, "updated content"); err != nil {
 		t.Fatal(err)
 	}
 	task, err := d.GetTask(id)
@@ -210,15 +210,94 @@ func TestTodoTxt_MoveTask(t *testing.T) {
 	inboxBefore, _ := d.GetTasks("inbox")
 	otherBefore, _ := d.GetTasks(otherListID)
 	require.Len(t, inboxBefore, 1)
-	require.Len(t, otherBefore, 0)
+	require.Empty(t, otherBefore)
 
 	require.NoError(t, d.MoveTask(id, otherListID))
 
 	inboxAfter, _ := d.GetTasks("inbox")
 	otherAfter, _ := d.GetTasks(otherListID)
-	require.Len(t, inboxAfter, 0, "task should no longer be in inbox")
+	require.Empty(t, inboxAfter, "task should no longer be in inbox")
 	require.Len(t, otherAfter, 1, "task should appear in Other list")
 	assert.Equal(t, "move me", otherAfter[0].Content)
+}
+
+func connectTodoTxtWithOtherList(t *testing.T) (*TodoTxt, string) {
+	t.Helper()
+	_, cleanup := setTodotxtDir(t)
+	t.Cleanup(cleanup)
+	d := &TodoTxt{}
+	require.NoError(t, d.Connect())
+	require.NoError(t, d.CreateList("Other"))
+	lists, err := d.GetLists()
+	require.NoError(t, err)
+	for _, l := range lists {
+		if l.Title == "Other" {
+			return d, l.ID
+		}
+	}
+	t.Fatal("expected Other list")
+	return nil, ""
+}
+
+func TestTodoTxt_MoveTaskKeepsIDAndMovesSubtasks(t *testing.T) {
+	d, otherListID := connectTodoTxtWithOtherList(t)
+
+	parentID, err := d.CreateTask("parent", "inbox", "")
+	require.NoError(t, err)
+	childID, err := d.CreateTask("child", "inbox", parentID)
+	require.NoError(t, err)
+	grandchildID, err := d.CreateTask("grandchild", "inbox", childID)
+	require.NoError(t, err)
+
+	require.NoError(t, d.MoveTask(parentID, otherListID))
+
+	moved, err := d.GetTask(parentID)
+	require.NoError(t, err)
+	require.NotNil(t, moved)
+	assert.Equal(t, otherListID, moved.ParentId)
+
+	children, err := d.GetSubtasks(parentID)
+	require.NoError(t, err)
+	require.Len(t, children, 1)
+	assert.Equal(t, childID, children[0].ID)
+
+	for _, task := range d.tasks {
+		if id := task.Metadata["id"]; id == childID || id == grandchildID {
+			assert.Equal(t, otherListID, task.Metadata["listid"], "descendant %s should follow its root", id)
+		}
+	}
+}
+
+func TestTodoTxt_MoveSubtaskBecomesRootInTargetList(t *testing.T) {
+	d, otherListID := connectTodoTxtWithOtherList(t)
+
+	parentID, err := d.CreateTask("parent", "inbox", "")
+	require.NoError(t, err)
+	childID, err := d.CreateTask("child", "inbox", parentID)
+	require.NoError(t, err)
+
+	require.NoError(t, d.MoveTask(childID, otherListID))
+
+	roots, _ := d.GetTasks(otherListID)
+	require.Len(t, roots, 1)
+	assert.Equal(t, childID, roots[0].ID)
+	assert.Equal(t, "list", roots[0].ParentType)
+
+	remaining, _ := d.GetSubtasks(parentID)
+	assert.Empty(t, remaining)
+}
+
+func TestTodoTxt_MoveTaskErrors(t *testing.T) {
+	d, otherListID := connectTodoTxtWithOtherList(t)
+
+	id, err := d.CreateTask("task", "inbox", "")
+	require.NoError(t, err)
+
+	require.ErrorIs(t, d.MoveTask("missing", otherListID), db.ErrTaskNotFound)
+	require.ErrorIs(t, d.MoveTask(id, "missing-list"), db.ErrListNotFound)
+
+	require.NoError(t, d.DoneTask(id))
+	require.ErrorIs(t, d.MoveTask(id, otherListID), db.ErrTaskNotFound, "completed tasks cannot be moved")
 }
 
 func TestTodoTxt_GetSetTaskPropertyProperties(t *testing.T) {
@@ -446,4 +525,51 @@ func TestParseSearchQuery(t *testing.T) {
 	inc, exc = parseSearchQuery("-only")
 	assert.Empty(t, inc)
 	assert.Equal(t, []string{"only"}, exc)
+}
+
+func TestTodoTxt_MutationsReturnNotFoundErrors(t *testing.T) {
+	d, _ := connectTodoTxtWithOtherList(t)
+
+	require.ErrorIs(t, d.UpdateTask("missing", "x"), db.ErrTaskNotFound)
+	require.ErrorIs(t, d.DoneTask("missing"), db.ErrTaskNotFound)
+	require.ErrorIs(t, d.SetTaskMetadata("missing", "notes", "x"), db.ErrTaskNotFound)
+	require.ErrorIs(t, d.SetTaskMetadata("missing", "priority", "A"), db.ErrTaskNotFound)
+	require.ErrorIs(t, d.UpdateList("missing", "x"), db.ErrListNotFound)
+	require.ErrorIs(t, d.DeleteList("missing"), db.ErrListNotFound)
+}
+
+func TestTodoTxt_DeleteDefaultListIsRefused(t *testing.T) {
+	d, _ := connectTodoTxtWithOtherList(t)
+
+	require.ErrorIs(t, d.DeleteList("inbox"), db.ErrDefaultListNotDeletable)
+}
+
+func TestTodoTxt_SetTaskPropertyPropertyRejectsUnknownType(t *testing.T) {
+	d, _ := connectTodoTxtWithOtherList(t)
+
+	require.ErrorIs(t, d.SetTaskPropertyProperty("colour", "work", "k", "v"), db.ErrInvalidPropertyType)
+	require.NoError(t, d.SetTaskPropertyProperty("tag", "work", "k", "v"))
+}
+
+func TestTodoTxt_SetTaskMetadataOnExistingTask(t *testing.T) {
+	d, _ := connectTodoTxtWithOtherList(t)
+	id, err := d.CreateTask("task", "inbox", "")
+	require.NoError(t, err)
+
+	require.NoError(t, d.SetTaskMetadata(id, "notes", "hello"))
+	fields, err := d.GetTaskMetadata(id)
+	require.NoError(t, err)
+	assert.Equal(t, "hello", fields["notes"])
+}
+
+func TestTodoTxt_SetTaskMetadataRejectsPathTraversalInField(t *testing.T) {
+	d, _ := connectTodoTxtWithOtherList(t)
+	id, err := d.CreateTask("task", "inbox", "")
+	require.NoError(t, err)
+
+	for _, field := range []string{"../../escape", "a/b", "", "."} {
+		require.ErrorIs(t, d.SetTaskMetadata(id, field, "x"), db.ErrInvalidMetadataField, "field %q", field)
+	}
+	_, statErr := os.Stat(filepath.Join(d.dir, "..", "escape.txt"))
+	assert.True(t, os.IsNotExist(statErr), "no file may be written outside the metadata dir")
 }

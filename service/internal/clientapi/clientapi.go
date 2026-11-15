@@ -2,6 +2,8 @@ package clientapi
 
 import (
 	"context"
+	"errors"
+	"maps"
 	"net/http"
 	"os/exec"
 	"time"
@@ -117,9 +119,7 @@ func (api *wackyTrackyClientService) appendSubtrees(tasks []*pb.Task, tree map[s
 		return nil, nil, err
 	}
 	tasks = append(tasks, subTasks...)
-	for k, v := range subTree {
-		tree[k] = v
-	}
+	maps.Copy(tree, subTree)
 	return tasks, subTree, nil
 }
 
@@ -286,17 +286,86 @@ func (api *wackyTrackyClientService) ListTasks(ctx context.Context, req *connect
 }
 
 func (api *wackyTrackyClientService) DoneTask(ctx context.Context, req *connect.Request[pb.DoneTaskRequest]) (*connect.Response[pb.DoneTaskResponse], error) {
-	if upd, ok := api.dbconn.(dbmdl.Updatable); ok && req.Msg.Id != "" {
-		_ = upd.DoneTask(req.Msg.Id)
+	upd, err := api.updatableFor(req.Msg.Id)
+	if err != nil {
+		return nil, err
+	}
+	if err := upd.DoneTask(req.Msg.Id); err != nil {
+		return nil, toConnectError(err)
 	}
 	return connect.NewResponse(&pb.DoneTaskResponse{}), nil
 }
 
 func (api *wackyTrackyClientService) MoveTask(ctx context.Context, req *connect.Request[pb.MoveTaskRequest]) (*connect.Response[pb.MoveTaskResponse], error) {
-	if mover, ok := api.dbconn.(dbmdl.TaskMover); ok && req.Msg.TaskId != "" && req.Msg.TargetListId != "" {
-		_ = mover.MoveTask(req.Msg.TaskId, req.Msg.TargetListId)
+	mover, err := api.taskMoverFor(req.Msg)
+	if err != nil {
+		return nil, err
 	}
-	return connect.NewResponse(&pb.MoveTaskResponse{}), nil
+	if err := mover.MoveTask(req.Msg.TaskId, req.Msg.TargetListId); err != nil {
+		return nil, toConnectError(err)
+	}
+	return connect.NewResponse(&pb.MoveTaskResponse{Task: api.getTaskAsPb(req.Msg.TaskId)}), nil
+}
+
+func (api *wackyTrackyClientService) taskMoverFor(req *pb.MoveTaskRequest) (dbmdl.TaskMover, error) {
+	mover, ok := api.dbconn.(dbmdl.TaskMover)
+	if !ok {
+		return nil, unimplemented("moving tasks")
+	}
+	if req.TaskId == "" || req.TargetListId == "" {
+		return nil, invalidArgument("task_id and target_list_id are required")
+	}
+	return mover, nil
+}
+
+func (api *wackyTrackyClientService) updatableFor(taskId string) (dbmdl.Updatable, error) {
+	upd, ok := api.dbconn.(dbmdl.Updatable)
+	if !ok {
+		return nil, unimplemented("updating tasks")
+	}
+	if taskId == "" {
+		return nil, invalidArgument("id is required")
+	}
+	return upd, nil
+}
+
+var errorCodes = map[error]connect.Code{
+	dbmdl.ErrTaskNotFound:            connect.CodeNotFound,
+	dbmdl.ErrListNotFound:            connect.CodeNotFound,
+	dbmdl.ErrDefaultListNotDeletable: connect.CodeFailedPrecondition,
+	dbmdl.ErrInvalidPropertyType:     connect.CodeInvalidArgument,
+	dbmdl.ErrInvalidMetadataField:    connect.CodeInvalidArgument,
+}
+
+// toConnectError maps backend sentinel errors to Connect codes; anything else
+// is returned as-is and surfaces to clients as CodeUnknown.
+func toConnectError(err error) error {
+	for sentinel, code := range errorCodes {
+		if errors.Is(err, sentinel) {
+			return connect.NewError(code, err)
+		}
+	}
+	return err
+}
+
+func invalidArgument(msg string) error {
+	return connect.NewError(connect.CodeInvalidArgument, errors.New(msg))
+}
+
+func unimplemented(feature string) error {
+	return connect.NewError(connect.CodeUnimplemented, errors.New("the database backend does not support "+feature))
+}
+
+func (api *wackyTrackyClientService) getTaskAsPb(id string) *pb.Task {
+	return api.getTaskOrFallback(id, &pb.Task{Id: id})
+}
+
+func (api *wackyTrackyClientService) getTaskOrFallback(id string, fallback *pb.Task) *pb.Task {
+	task, err := api.dbconn.GetTask(id)
+	if err != nil || task == nil {
+		return fallback
+	}
+	return dbTaskToPb(task)
 }
 
 func (api *wackyTrackyClientService) CreateTask(ctx context.Context, req *connect.Request[pb.CreateTaskRequest]) (*connect.Response[pb.CreateTaskResponse], error) {
@@ -304,13 +373,9 @@ func (api *wackyTrackyClientService) CreateTask(ctx context.Context, req *connec
 	if err != nil {
 		return nil, err
 	}
-	task, err := api.dbconn.GetTask(id)
-	if err != nil || task == nil {
-		return connect.NewResponse(&pb.CreateTaskResponse{
-			Task: &pb.Task{Id: id, Content: req.Msg.Content},
-		}), nil
-	}
-	return connect.NewResponse(&pb.CreateTaskResponse{Task: dbTaskToPb(task)}), nil
+	// The task is already saved; if reading it back fails, echo what was sent rather than fail the create.
+	task := api.getTaskOrFallback(id, &pb.Task{Id: id, Content: req.Msg.Content})
+	return connect.NewResponse(&pb.CreateTaskResponse{Task: task}), nil
 }
 
 func (api *wackyTrackyClientService) CreateList(ctx context.Context, req *connect.Request[pb.CreateListRequest]) (*connect.Response[pb.CreateListResponse], error) {
@@ -321,7 +386,10 @@ func (api *wackyTrackyClientService) CreateList(ctx context.Context, req *connec
 }
 
 func (api *wackyTrackyClientService) GetLists(ctx context.Context, req *connect.Request[pb.GetListsRequest]) (*connect.Response[pb.GetListsResponse], error) {
-	lists, _ := api.dbconn.GetLists()
+	lists, err := api.dbconn.GetLists()
+	if err != nil {
+		return nil, err
+	}
 
 	res := &pb.GetListsResponse{}
 
@@ -347,7 +415,10 @@ func (api *wackyTrackyClientService) Version(ctx context.Context, req *connect.R
 }
 
 func (api *wackyTrackyClientService) GetTags(ctx context.Context, req *connect.Request[pb.GetTagsRequest]) (*connect.Response[pb.GetTagsResponse], error) {
-	tags, _ := api.dbconn.GetTags()
+	tags, err := api.dbconn.GetTags()
+	if err != nil {
+		return nil, err
+	}
 
 	res := &pb.GetTagsResponse{}
 
@@ -369,41 +440,57 @@ func (api *wackyTrackyClientService) Tag(ctx context.Context, req *connect.Reque
 }
 
 func (api *wackyTrackyClientService) UpdateList(ctx context.Context, req *connect.Request[pb.UpdateListRequest]) (*connect.Response[pb.UpdateListResponse], error) {
-	if req.Msg.Id != "" {
-		_ = api.dbconn.UpdateList(req.Msg.Id, req.Msg.Title)
+	if req.Msg.Id == "" {
+		return nil, invalidArgument("id is required")
+	}
+	if err := api.dbconn.UpdateList(req.Msg.Id, req.Msg.Title); err != nil {
+		return nil, toConnectError(err)
 	}
 	return connect.NewResponse(&pb.UpdateListResponse{}), nil
 }
 
 func (api *wackyTrackyClientService) DeleteList(ctx context.Context, req *connect.Request[pb.DeleteListRequest]) (*connect.Response[pb.DeleteListResponse], error) {
-	if req.Msg.Id != "" {
-		_ = api.dbconn.DeleteList(req.Msg.Id)
+	if req.Msg.Id == "" {
+		return nil, invalidArgument("id is required")
+	}
+	if err := api.dbconn.DeleteList(req.Msg.Id); err != nil {
+		return nil, toConnectError(err)
 	}
 	return connect.NewResponse(&pb.DeleteListResponse{}), nil
 }
 
 func (api *wackyTrackyClientService) SearchTasks(ctx context.Context, req *connect.Request[pb.SearchTasksRequest]) (*connect.Response[pb.SearchTasksResponse], error) {
-	var tasks []*pb.Task
-	if s, ok := api.dbconn.(dbmdl.Searchable); ok && req.Msg.Query != "" {
-		items, err := s.SearchTasks(req.Msg.Query)
-		if err == nil {
-			for i := range items {
-				tasks = append(tasks, dbTaskToPb(&items[i]))
-			}
-		}
+	s, ok := api.dbconn.(dbmdl.Searchable)
+	if !ok {
+		return nil, unimplemented("searching tasks")
 	}
-	return connect.NewResponse(&pb.SearchTasksResponse{Tasks: tasks}), nil
+	if req.Msg.Query == "" {
+		return connect.NewResponse(&pb.SearchTasksResponse{}), nil
+	}
+	items, err := s.SearchTasks(req.Msg.Query)
+	if err != nil {
+		return nil, err
+	}
+	return connect.NewResponse(&pb.SearchTasksResponse{Tasks: dbTasksToPb(items)}), nil
+}
+
+func dbTasksToPb(items []dbmdl.DBTask) []*pb.Task {
+	tasks := make([]*pb.Task, 0, len(items))
+	for i := range items {
+		tasks = append(tasks, dbTaskToPb(&items[i]))
+	}
+	return tasks
 }
 
 func (api *wackyTrackyClientService) UpdateTask(ctx context.Context, req *connect.Request[pb.UpdateTaskRequest]) (*connect.Response[pb.UpdateTaskResponse], error) {
-	var task *pb.Task
-	if upd, ok := api.dbconn.(dbmdl.Updatable); ok && req.Msg.Id != "" {
-		_ = upd.UpdateTask(req.Msg.Id, req.Msg.Content)
-		if t, _ := api.dbconn.GetTask(req.Msg.Id); t != nil {
-			task = dbTaskToPb(t)
-		}
+	upd, err := api.updatableFor(req.Msg.Id)
+	if err != nil {
+		return nil, err
 	}
-	return connect.NewResponse(&pb.UpdateTaskResponse{Task: task}), nil
+	if err := upd.UpdateTask(req.Msg.Id, req.Msg.Content); err != nil {
+		return nil, toConnectError(err)
+	}
+	return connect.NewResponse(&pb.UpdateTaskResponse{Task: api.getTaskAsPb(req.Msg.Id)}), nil
 }
 
 func (api *wackyTrackyClientService) RepoStatus(ctx context.Context, req *connect.Request[pb.RepoStatusRequest]) (*connect.Response[pb.RepoStatusResponse], error) {
@@ -438,42 +525,71 @@ func (api *wackyTrackyClientService) RepoSync(ctx context.Context, req *connect.
 }
 
 func (api *wackyTrackyClientService) GetSavedSearches(ctx context.Context, req *connect.Request[pb.GetSavedSearchesRequest]) (*connect.Response[pb.GetSavedSearchesResponse], error) {
+	s, ok := api.dbconn.(dbmdl.SavedSearchesStore)
+	if !ok {
+		return connect.NewResponse(&pb.GetSavedSearchesResponse{}), nil
+	}
+	searches, err := s.GetSavedSearches()
+	if err != nil {
+		return nil, err
+	}
 	var list []*pb.SavedSearch
-	if s, ok := api.dbconn.(dbmdl.SavedSearchesStore); ok {
-		searches, err := s.GetSavedSearches()
-		if err == nil {
-			for i := range searches {
-				list = append(list, &pb.SavedSearch{Id: searches[i].ID, Name: searches[i].Title, Query: searches[i].Query})
-			}
-		}
+	for i := range searches {
+		list = append(list, &pb.SavedSearch{Id: searches[i].ID, Name: searches[i].Title, Query: searches[i].Query})
 	}
 	return connect.NewResponse(&pb.GetSavedSearchesResponse{SavedSearches: list}), nil
 }
 
 func (api *wackyTrackyClientService) SetSavedSearches(ctx context.Context, req *connect.Request[pb.SetSavedSearchesRequest]) (*connect.Response[pb.SetSavedSearchesResponse], error) {
-	if s, ok := api.dbconn.(dbmdl.SavedSearchesStore); ok && req.Msg.SavedSearches != nil {
-		searches := make([]dbmdl.SavedSearch, len(req.Msg.SavedSearches))
-		for i, p := range req.Msg.SavedSearches {
-			searches[i] = dbmdl.SavedSearch{ID: p.Id, Title: p.Name, Query: p.Query}
-		}
-		_ = s.SetSavedSearches(searches)
+	s, ok := api.dbconn.(dbmdl.SavedSearchesStore)
+	if !ok {
+		return nil, unimplemented("saved searches")
+	}
+	searches := make([]dbmdl.SavedSearch, len(req.Msg.SavedSearches))
+	for i, p := range req.Msg.SavedSearches {
+		searches[i] = dbmdl.SavedSearch{ID: p.Id, Title: p.Name, Query: p.Query}
+	}
+	if err := s.SetSavedSearches(searches); err != nil {
+		return nil, err
 	}
 	return connect.NewResponse(&pb.SetSavedSearchesResponse{}), nil
 }
 
 func (api *wackyTrackyClientService) GetTaskMetadata(ctx context.Context, req *connect.Request[pb.GetTaskMetadataRequest]) (*connect.Response[pb.GetTaskMetadataResponse], error) {
-	var fields map[string]string
-	if s, ok := api.dbconn.(dbmdl.TaskMetadataStore); ok && req.Msg.TaskId != "" {
-		fields, _ = s.GetTaskMetadata(req.Msg.TaskId)
+	s, ok := api.dbconn.(dbmdl.TaskMetadataStore)
+	if !ok {
+		return connect.NewResponse(&pb.GetTaskMetadataResponse{}), nil
+	}
+	if req.Msg.TaskId == "" {
+		return nil, invalidArgument("task_id is required")
+	}
+	fields, err := s.GetTaskMetadata(req.Msg.TaskId)
+	if err != nil {
+		return nil, toConnectError(err)
 	}
 	return connect.NewResponse(&pb.GetTaskMetadataResponse{Fields: fields}), nil
 }
 
 func (api *wackyTrackyClientService) SetTaskMetadata(ctx context.Context, req *connect.Request[pb.SetTaskMetadataRequest]) (*connect.Response[pb.SetTaskMetadataResponse], error) {
-	if s, ok := api.dbconn.(dbmdl.TaskMetadataStore); ok && req.Msg.TaskId != "" && req.Msg.Field != "" {
-		_ = s.SetTaskMetadata(req.Msg.TaskId, req.Msg.Field, req.Msg.Value)
+	s, err := api.taskMetadataStoreFor(req.Msg)
+	if err != nil {
+		return nil, err
+	}
+	if err := s.SetTaskMetadata(req.Msg.TaskId, req.Msg.Field, req.Msg.Value); err != nil {
+		return nil, toConnectError(err)
 	}
 	return connect.NewResponse(&pb.SetTaskMetadataResponse{}), nil
+}
+
+func (api *wackyTrackyClientService) taskMetadataStoreFor(req *pb.SetTaskMetadataRequest) (dbmdl.TaskMetadataStore, error) {
+	s, ok := api.dbconn.(dbmdl.TaskMetadataStore)
+	if !ok {
+		return nil, unimplemented("task metadata")
+	}
+	if req.TaskId == "" || req.Field == "" {
+		return nil, invalidArgument("task_id and field are required")
+	}
+	return s, nil
 }
 
 func mapToTaskPropertyProps(m map[string]string) *pb.TaskPropertyProps {
@@ -481,9 +597,7 @@ func mapToTaskPropertyProps(m map[string]string) *pb.TaskPropertyProps {
 		return nil
 	}
 	props := make(map[string]string, len(m))
-	for k, v := range m {
-		props[k] = v
-	}
+	maps.Copy(props, m)
 	return &pb.TaskPropertyProps{Props: props}
 }
 
@@ -509,10 +623,25 @@ func (api *wackyTrackyClientService) GetTaskPropertyProperties(ctx context.Conte
 }
 
 func (api *wackyTrackyClientService) SetTaskPropertyProperty(ctx context.Context, req *connect.Request[pb.SetTaskPropertyPropertyRequest]) (*connect.Response[pb.SetTaskPropertyPropertyResponse], error) {
-	if s, ok := api.dbconn.(dbmdl.TaskPropertyPropertiesStore); ok && req.Msg.PropertyType != "" && req.Msg.PropertyName != "" && req.Msg.Key != "" {
-		_ = s.SetTaskPropertyProperty(req.Msg.PropertyType, req.Msg.PropertyName, req.Msg.Key, req.Msg.Value)
+	s, err := api.taskPropertyStoreFor(req.Msg)
+	if err != nil {
+		return nil, err
+	}
+	if err := s.SetTaskPropertyProperty(req.Msg.PropertyType, req.Msg.PropertyName, req.Msg.Key, req.Msg.Value); err != nil {
+		return nil, toConnectError(err)
 	}
 	return connect.NewResponse(&pb.SetTaskPropertyPropertyResponse{}), nil
+}
+
+func (api *wackyTrackyClientService) taskPropertyStoreFor(req *pb.SetTaskPropertyPropertyRequest) (dbmdl.TaskPropertyPropertiesStore, error) {
+	s, ok := api.dbconn.(dbmdl.TaskPropertyPropertiesStore)
+	if !ok {
+		return nil, unimplemented("tag and context properties")
+	}
+	if req.PropertyName == "" || req.Key == "" {
+		return nil, invalidArgument("property_name and key are required")
+	}
+	return s, nil
 }
 
 func (api *wackyTrackyClientService) RuleStatus(ctx context.Context, req *connect.Request[pb.RuleStatusRequest]) (*connect.Response[pb.RuleStatusResponse], error) {
@@ -526,30 +655,24 @@ func (api *wackyTrackyClientService) RuleStatus(ctx context.Context, req *connec
 }
 
 func (api *wackyTrackyClientService) RuleTest(ctx context.Context, req *connect.Request[pb.RuleTestRequest]) (*connect.Response[pb.RuleTestResponse], error) {
-	exprStr := req.Msg.Expression
+	return connect.NewResponse(testRuleExpression(req.Msg.Expression, time.Now())), nil
+}
+
+// testRuleExpression reports compile and evaluation problems in the response,
+// because a broken expression is the answer the caller asked for, not an RPC failure.
+func testRuleExpression(exprStr string, now time.Time) *pb.RuleTestResponse {
 	if exprStr == "" {
-		return connect.NewResponse(&pb.RuleTestResponse{Compiles: false, CompileError: "expression is empty"}), nil
+		return &pb.RuleTestResponse{Compiles: false, CompileError: "expression is empty"}
 	}
 	program, err := ruleeval.Compile(exprStr)
 	if err != nil {
-		return connect.NewResponse(&pb.RuleTestResponse{
-			Compiles:     false,
-			CompileError: err.Error(),
-		}), nil
+		return &pb.RuleTestResponse{Compiles: false, CompileError: err.Error()}
 	}
-	env := ruleeval.NewRuleEnv(time.Now())
-	result, err := ruleeval.Run(program, env)
+	result, err := ruleeval.Run(program, ruleeval.NewRuleEnv(now))
 	if err != nil {
-		return connect.NewResponse(&pb.RuleTestResponse{
-			Compiles:  true,
-			Result:    false,
-			EvalError: err.Error(),
-		}), nil
+		return &pb.RuleTestResponse{Compiles: true, Result: false, EvalError: err.Error()}
 	}
-	return connect.NewResponse(&pb.RuleTestResponse{
-		Compiles: true,
-		Result:   result,
-	}), nil
+	return &pb.RuleTestResponse{Compiles: true, Result: result}
 }
 
 func (api *wackyTrackyClientService) Init(ctx context.Context, req *connect.Request[pb.InitRequest]) (*connect.Response[pb.InitResponse], error) {

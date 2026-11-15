@@ -20,7 +20,7 @@ type SQLite struct {
 
 // Open opens (or creates) a SQLite database at dbPath.
 func Open(dbPath string) (*SQLite, error) {
-	if err := os.MkdirAll(filepath.Dir(dbPath), 0o755); err != nil {
+	if err := os.MkdirAll(filepath.Dir(dbPath), 0o750); err != nil {
 		return nil, err
 	}
 	dsn := "file:" + filepath.ToSlash(dbPath) + "?_pragma=foreign_keys(1)&_pragma=busy_timeout(5000)"
@@ -29,7 +29,7 @@ func Open(dbPath string) (*SQLite, error) {
 		return nil, err
 	}
 	configureSQLitePool(db)
-	if err := applySQLitePragmas(db); err != nil {
+	if err := applySQLitePragmas(context.Background(), db); err != nil {
 		_ = db.Close()
 		return nil, err
 	}
@@ -42,14 +42,14 @@ func configureSQLitePool(db *sql.DB) {
 	db.SetConnMaxLifetime(-1)
 }
 
-func applySQLitePragmas(db *sql.DB) error {
-	if _, err := db.Exec(`PRAGMA journal_mode=WAL`); err != nil {
+func applySQLitePragmas(ctx context.Context, db *sql.DB) error {
+	if _, err := db.ExecContext(ctx, `PRAGMA journal_mode=WAL`); err != nil {
 		return err
 	}
-	if _, err := db.Exec(`PRAGMA synchronous=NORMAL`); err != nil {
+	if _, err := db.ExecContext(ctx, `PRAGMA synchronous=NORMAL`); err != nil {
 		return err
 	}
-	return db.Ping()
+	return db.PingContext(ctx)
 }
 
 // OpenMemory opens an in-memory IAM database with schema applied (for tests).

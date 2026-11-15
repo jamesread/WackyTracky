@@ -2,10 +2,9 @@ package httpserver
 
 import (
 	"context"
+	"fmt"
 	"net/http"
-
-	"golang.org/x/net/http2"
-	"golang.org/x/net/http2/h2c"
+	"time"
 
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	cors "github.com/rs/cors"
@@ -23,49 +22,70 @@ import (
 )
 
 func StartServer() {
-	mux := http.NewServeMux()
+	if err := runServer(); err != nil {
+		log.Fatalf("%v", err)
+	}
+}
 
+func runServer() error {
 	iamDB, err := openAndMigrateIAM()
 	if err != nil {
-		log.Fatalf("IAM database: %v", err)
+		return fmt.Errorf("IAM database: %w", err)
 	}
-	defer iamDB.Close()
+	defer func() {
+		if cerr := iamDB.Close(); cerr != nil {
+			log.WithError(cerr).Warn("Closing IAM database")
+		}
+	}()
 
-	taskDB := db.GetNewDatabaseConnection()
-	api := clientapi.GetNewClientAPI(taskDB, iamDB)
-
-	ctx := context.Background()
-	if err := api.BootstrapIAM(ctx); err != nil {
-		log.Fatalf("IAM bootstrap: %v", err)
+	api := clientapi.GetNewClientAPI(db.GetNewDatabaseConnection(), iamDB)
+	if err := api.BootstrapIAM(context.Background()); err != nil {
+		return fmt.Errorf("IAM bootstrap: %w", err)
 	}
 
 	authLayer := auth.NewLayer(iamDB, runtimeconfig.RuntimeConfig.Auth, log.StandardLogger())
-
 	apiPath, apiHandler := api.GetNewHandler(authLayer, auth.NewSSOOptOut(runtimeconfig.RuntimeConfig.Auth))
-	apiHandler = http.StripPrefix("/api", apiHandler)
-	apiHandler = withCors(apiHandler)
+	mux := newServeMux(api, authLayer, apiPath, apiHandler)
 
-	mux.HandleFunc("/api"+apiPath, func(w http.ResponseWriter, r *http.Request) {
-		apiHandler.ServeHTTP(w, r)
-	})
+	endpoint := runtimeconfig.RuntimeConfig.ListenAddress
+	log.WithField("endpoint", endpoint).Info("Starting HTTP server")
+	log.WithField("url", endpoint+"/api"+apiPath).Info("API available")
+	log.WithField("iam_db", runtimeconfig.IAMDatabasePath()).Info("IAM database ready")
+
+	if err := newHTTPServer(endpoint, mux).ListenAndServe(); err != nil {
+		return fmt.Errorf("failed to start server: %w", err)
+	}
+	return nil
+}
+
+func newServeMux(api mcpserver.ClientService, authLayer *auth.Layer, apiPath string, apiHandler http.Handler) *http.ServeMux {
+	apiHandler = withCors(http.StripPrefix("/api", apiHandler))
+
+	mux := http.NewServeMux()
+	mux.Handle("/api"+apiPath, apiHandler)
 	mux.Handle("/openapi", apidocs.OpenAPIHandler())
 	mux.Handle("/llms.txt", apidocs.LLMsTxtHandler())
 	mux.Handle("/mcp", authLayer.WrapMCPHandler(mcpserver.New(api).HTTPHandler()))
 	mux.Handle("/", http.StripPrefix("/", frontend.GetNewHandler()))
 	mux.Handle("/metrics", promhttp.Handler())
 	mux.Handle("/wallpapers", getWallpapersHandler())
+	return mux
+}
 
-	endpoint := runtimeconfig.RuntimeConfig.ListenAddress
+// newHTTPServer serves HTTP/1.1 and unencrypted HTTP/2 (h2c), which Connect
+// clients and gRPC tooling use without TLS. No write timeout is set because
+// MCP streams and git sync requests can legitimately run for a long time.
+func newHTTPServer(endpoint string, handler http.Handler) *http.Server {
+	protocols := new(http.Protocols)
+	protocols.SetHTTP1(true)
+	protocols.SetUnencryptedHTTP2(true)
 
-	log.WithField("endpoint", endpoint).Info("Starting HTTP server")
-	log.WithField("url", endpoint+"/api"+apiPath).Info("API available")
-	log.WithField("iam_db", runtimeconfig.IAMDatabasePath()).Info("IAM database ready")
-
-	if err := http.ListenAndServe(
-		endpoint,
-		h2c.NewHandler(mux, &http2.Server{}),
-	); err != nil {
-		log.Fatalf("Failed to start server: %v", err)
+	return &http.Server{
+		Addr:              endpoint,
+		Handler:           handler,
+		Protocols:         protocols,
+		ReadHeaderTimeout: 10 * time.Second,
+		IdleTimeout:       2 * time.Minute,
 	}
 }
 

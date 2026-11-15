@@ -20,7 +20,7 @@ var (
 	filenameLists = "lists.yaml"
 )
 
-func save(filename string, structure interface{}) {
+func save(filename string, structure any) {
 	log.WithFields(log.Fields{
 		"filename": filename,
 	}).Infof("YamlFiles save")
@@ -31,14 +31,14 @@ func save(filename string, structure interface{}) {
 		log.Fatalf("%v", err)
 	}
 
-	err = os.WriteFile(filename, data, 0644)
+	err = os.WriteFile(filename, data, 0o600)
 
 	if err != nil {
 		log.Fatalf("%v", err)
 	}
 }
 
-func load(filename string, structure interface{}) {
+func load(filename string, structure any) {
 	yfile, err := os.ReadFile(filename)
 
 	if err != nil {

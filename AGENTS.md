@@ -63,6 +63,7 @@ The stdio server uses the same backend and configuration as the HTTP server (`co
 | `create_task` | `content` (required), `list_id`, `parent_task_id` | Create a todo.txt-style task |
 | `update_task` | `id`, `content` (required) | Replace a task's content |
 | `complete_task` | `id` (required) | Mark a task done |
+| `move_task` | `id`, `list_id` (required) | Move a task (and its subtasks) to another list, keeping its ID |
 | `create_list` | `title` (required) | Create a new list |
 
 Tools return JSON (camelCase fields) matching the Connect API responses.
@@ -78,7 +79,7 @@ Tools return JSON (camelCase fields) matching the Connect API responses.
 - Use comments to explain edge cases or design decisions only. Don't use them to describe what the code is doing.
 - Use the languages' standard style guides for formatting and naming conventions.
 - Make function and method names descriptive of their behavior.
-- Cyclomic complexity should be kept to 4 or less.
+- Cyclomatic complexity should be kept to 5 or less.
 
 # TDD
 

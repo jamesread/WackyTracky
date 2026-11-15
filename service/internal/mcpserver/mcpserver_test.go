@@ -18,7 +18,9 @@ type fakeService struct {
 	lastCreateTask *pb.CreateTaskRequest
 	lastListTasks  *pb.ListTasksRequest
 	lastDoneTask   *pb.DoneTaskRequest
+	lastMoveTask   *pb.MoveTaskRequest
 	createTaskErr  error
+	moveTaskErr    error
 }
 
 func (f *fakeService) GetLists(_ context.Context, _ *connect.Request[pb.GetListsRequest]) (*connect.Response[pb.GetListsResponse], error) {
@@ -55,6 +57,14 @@ func (f *fakeService) UpdateTask(_ context.Context, req *connect.Request[pb.Upda
 func (f *fakeService) DoneTask(_ context.Context, req *connect.Request[pb.DoneTaskRequest]) (*connect.Response[pb.DoneTaskResponse], error) {
 	f.lastDoneTask = req.Msg
 	return connect.NewResponse(&pb.DoneTaskResponse{}), nil
+}
+
+func (f *fakeService) MoveTask(_ context.Context, req *connect.Request[pb.MoveTaskRequest]) (*connect.Response[pb.MoveTaskResponse], error) {
+	f.lastMoveTask = req.Msg
+	if f.moveTaskErr != nil {
+		return nil, f.moveTaskErr
+	}
+	return connect.NewResponse(&pb.MoveTaskResponse{Task: &pb.Task{Id: req.Msg.TaskId, ParentId: req.Msg.TargetListId}}), nil
 }
 
 func (f *fakeService) CreateList(_ context.Context, _ *connect.Request[pb.CreateListRequest]) (*connect.Response[pb.CreateListResponse], error) {
@@ -149,4 +159,31 @@ func TestHandleSearchTasks(t *testing.T) {
 	require.NoError(t, err)
 	assert.False(t, res.IsError)
 	assert.Contains(t, resultText(t, res), "#work")
+}
+
+func TestHandleMoveTaskPassesArguments(t *testing.T) {
+	f := &fakeService{}
+	res, err := New(f).handleMoveTask(context.Background(), callWith(map[string]any{"id": "t1", "list_id": "list-2"}))
+	require.NoError(t, err)
+	assert.False(t, res.IsError)
+	require.NotNil(t, f.lastMoveTask)
+	assert.Equal(t, "t1", f.lastMoveTask.TaskId)
+	assert.Equal(t, "list-2", f.lastMoveTask.TargetListId)
+	assert.Contains(t, resultText(t, res), "list-2")
+}
+
+func TestHandleMoveTaskRequiresIDAndListID(t *testing.T) {
+	for _, args := range []map[string]any{nil, {"id": "t1"}, {"list_id": "list-2"}} {
+		res, err := New(&fakeService{}).handleMoveTask(context.Background(), callWith(args))
+		require.NoError(t, err)
+		assert.True(t, res.IsError, "args %v should be an error result", args)
+	}
+}
+
+func TestHandleMoveTaskSurfacesServiceError(t *testing.T) {
+	f := &fakeService{moveTaskErr: errors.New("list not found")}
+	res, err := New(f).handleMoveTask(context.Background(), callWith(map[string]any{"id": "t1", "list_id": "nope"}))
+	require.NoError(t, err)
+	assert.True(t, res.IsError)
+	assert.Contains(t, resultText(t, res), "list not found")
 }

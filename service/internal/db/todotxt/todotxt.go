@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"encoding/json"
 	"fmt"
+	"maps"
 	"os"
 	"path/filepath"
 	"strings"
@@ -14,7 +15,7 @@ import (
 	"github.com/google/uuid"
 	log "github.com/sirupsen/logrus"
 	db "github.com/wacky-tracky/wacky-tracky-server/internal/db/model"
-	. "github.com/wacky-tracky/wacky-tracky-server/internal/runtimeconfig"
+	"github.com/wacky-tracky/wacky-tracky-server/internal/runtimeconfig"
 	"gopkg.in/yaml.v2"
 )
 
@@ -29,23 +30,23 @@ const (
 // TodoTxt implements db.DB using todo.txt format files.
 // See http://todotxt.org and https://github.com/todotxt/todo.txt
 type TodoTxt struct {
-	mu                sync.RWMutex
-	todoPath          string
-	donePath          string
+	tagProperties     map[string]map[string]string
+	reloadDebounce    chan struct{}
+	watcher           *fsnotify.Watcher
+	contextProperties map[string]map[string]string
 	listsPath         string
-	tppPath           string
 	dir               string
+	tppPath           string
+	defaultListID     string
+	donePath          string
+	todoPath          string
 	tasks             []*Task
 	lists             []db.DBList
-	tagProperties     map[string]map[string]string
-	contextProperties map[string]map[string]string
-	defaultListID     string
-	watcher           *fsnotify.Watcher
-	reloadDebounce    chan struct{}
+	mu                sync.RWMutex
 }
 
 func (d *TodoTxt) connectInitPaths() error {
-	d.dir = RuntimeConfig.Database.Database
+	d.dir = runtimeconfig.RuntimeConfig.Database.Database
 	if d.dir == "" {
 		d.dir = "."
 	}
@@ -54,7 +55,7 @@ func (d *TodoTxt) connectInitPaths() error {
 	d.listsPath = filepath.Join(d.dir, listsFilename)
 	d.tppPath = filepath.Join(d.dir, tppFilename)
 	d.defaultListID = defaultListID
-	if err := os.MkdirAll(d.dir, 0755); err != nil {
+	if err := os.MkdirAll(d.dir, 0o750); err != nil {
 		return fmt.Errorf("todotxt: create dir: %w", err)
 	}
 	return nil
@@ -195,12 +196,17 @@ func parseTodoLineToTask(line string) (*Task, bool) {
 	return t, false
 }
 
+// closeQuietly closes a file that was only read from; a close error cannot lose data.
+func closeQuietly(f *os.File) {
+	_ = f.Close()
+}
+
 func readTasksFromPath(path string) ([]*Task, error) {
 	f, err := os.Open(path)
 	if err != nil {
 		return nil, err
 	}
-	defer f.Close()
+	defer closeQuietly(f)
 	var out []*Task
 	sc := bufio.NewScanner(f)
 	for sc.Scan() {
@@ -265,7 +271,7 @@ func (d *TodoTxt) loadLists() error {
 		}
 		return err
 	}
-	defer f.Close()
+	defer closeQuietly(f)
 	sc := bufio.NewScanner(f)
 	for sc.Scan() {
 		id, title, skip := parseListLine(sc.Text())
@@ -287,10 +293,10 @@ func (d *TodoTxt) saveTasks() error {
 			incomplete = append(incomplete, line)
 		}
 	}
-	if err := os.WriteFile(d.todoPath, []byte(strings.Join(incomplete, "\n")+"\n"), 0644); err != nil {
+	if err := os.WriteFile(d.todoPath, []byte(strings.Join(incomplete, "\n")+"\n"), 0o600); err != nil {
 		return err
 	}
-	return os.WriteFile(d.donePath, []byte(strings.Join(complete, "\n")+"\n"), 0644)
+	return os.WriteFile(d.donePath, []byte(strings.Join(complete, "\n")+"\n"), 0o600)
 }
 
 func (d *TodoTxt) saveLists() error {
@@ -301,7 +307,7 @@ func (d *TodoTxt) saveLists() error {
 		}
 		lines = append(lines, l.ID+"\t"+l.Title)
 	}
-	return os.WriteFile(d.listsPath, []byte(strings.Join(lines, "\n")+"\n"), 0644)
+	return os.WriteFile(d.listsPath, []byte(strings.Join(lines, "\n")+"\n"), 0o600)
 }
 
 type tppYaml struct {
@@ -345,7 +351,7 @@ func (d *TodoTxt) saveTpp() error {
 	if err != nil {
 		return err
 	}
-	return os.WriteFile(d.tppPath, b, 0644)
+	return os.WriteFile(d.tppPath, b, 0o600)
 }
 
 func taskParentTypeAndID(t *Task) (parentType, parentID string) {
@@ -382,10 +388,6 @@ func taskToDB(t *Task, subcount int32, waitUntil, dueDate string) db.DBTask {
 	id := t.Metadata["id"]
 	if id == "" {
 		id = uuid.New().String()
-	}
-	listID := t.Metadata["listid"]
-	if listID == "" {
-		listID = defaultListID
 	}
 	parentType, parentID := taskParentTypeAndID(t)
 	content := t.Description
@@ -611,16 +613,17 @@ func (d *TodoTxt) UpdateList(id string, title string) error {
 			return d.saveLists()
 		}
 	}
-	return nil
+	return db.ErrListNotFound
 }
 
-func (d *TodoTxt) removeListByID(id string) {
+func (d *TodoTxt) removeListByID(id string) bool {
 	for i, l := range d.lists {
 		if l.ID == id {
 			d.lists = append(d.lists[:i], d.lists[i+1:]...)
-			return
+			return true
 		}
 	}
+	return false
 }
 
 func (d *TodoTxt) reassignTasksToDefaultList(listId string) {
@@ -633,11 +636,13 @@ func (d *TodoTxt) reassignTasksToDefaultList(listId string) {
 
 func (d *TodoTxt) DeleteList(id string) error {
 	if id == defaultListID {
-		return nil
+		return db.ErrDefaultListNotDeletable
 	}
 	d.mu.Lock()
 	defer d.mu.Unlock()
-	d.removeListByID(id)
+	if !d.removeListByID(id) {
+		return db.ErrListNotFound
+	}
 	d.reassignTasksToDefaultList(id)
 	if err := d.saveLists(); err != nil {
 		return err
@@ -713,7 +718,7 @@ func parseSearchQuery(query string) (include, exclude []string) {
 	if query == "" {
 		return nil, nil
 	}
-	for _, w := range strings.Fields(query) {
+	for w := range strings.FieldsSeq(query) {
 		term, isExclude := parseOneSearchTerm(w)
 		if term == "" {
 			continue
@@ -796,7 +801,7 @@ func (d *TodoTxt) UpdateTask(id string, content string) error {
 		applyContentToTask(t, content)
 		return d.saveTasks()
 	}
-	return nil
+	return db.ErrTaskNotFound
 }
 
 // DoneTask marks a task as completed (moves it to done.txt) and persists.
@@ -811,28 +816,65 @@ func (d *TodoTxt) DoneTask(id string) error {
 			return d.saveTasks()
 		}
 	}
-	return nil
+	return db.ErrTaskNotFound
 }
 
-// MoveTask implements db.TaskMover: move a task to another list (root tasks: change listid; subtasks: make root in target list).
+// MoveTask implements db.TaskMover: move a task, with its subtasks, to another list.
+// A subtask that is moved becomes a root task in the target list.
 func (d *TodoTxt) MoveTask(taskId string, targetListId string) error {
 	if targetListId == "" {
 		targetListId = defaultListID
 	}
 	d.mu.Lock()
 	defer d.mu.Unlock()
+	if !d.hasList(targetListId) {
+		return db.ErrListNotFound
+	}
+	t := d.findOpenTask(taskId)
+	if t == nil {
+		return db.ErrTaskNotFound
+	}
+	delete(t.Metadata, "parent")
+	d.setListForTaskTree(t, targetListId)
+	return d.saveTasks()
+}
+
+func (d *TodoTxt) hasList(listId string) bool {
+	for _, l := range d.lists {
+		if l.ID == listId {
+			return true
+		}
+	}
+	return false
+}
+
+func (d *TodoTxt) hasTask(taskId string) bool {
 	for _, t := range d.tasks {
-		if t.Metadata["id"] != taskId {
-			continue
+		if t.Metadata["id"] == taskId {
+			return true
 		}
-		if t.Completed {
-			return nil
+	}
+	return false
+}
+
+func (d *TodoTxt) findOpenTask(taskId string) *Task {
+	for _, t := range d.tasks {
+		if t.Metadata["id"] == taskId && !t.Completed {
+			return t
 		}
-		t.Metadata["listid"] = targetListId
-		t.Metadata["parent"] = ""
-		return d.saveTasks()
 	}
 	return nil
+}
+
+// setListForTaskTree keeps descendants' listid in step with their root, because
+// list counts and search results read listid directly rather than walking parents.
+func (d *TodoTxt) setListForTaskTree(root *Task, listId string) {
+	root.Metadata["listid"] = listId
+	for _, t := range d.tasks {
+		if t.Metadata["parent"] == root.Metadata["id"] {
+			d.setListForTaskTree(t, listId)
+		}
+	}
 }
 
 // savedSearchWire reads searches.txt; accepts both old keys (ID, Title, Query) and new (id, name, query).
@@ -843,7 +885,7 @@ type savedSearchWire struct {
 }
 
 func (w *savedSearchWire) UnmarshalJSON(data []byte) error {
-	var raw map[string]interface{}
+	var raw map[string]any
 	if err := json.Unmarshal(data, &raw); err != nil {
 		return err
 	}
@@ -897,7 +939,7 @@ func (d *TodoTxt) SetSavedSearches(searches []db.SavedSearch) error {
 	if err != nil {
 		return err
 	}
-	return os.WriteFile(path, b, 0644)
+	return os.WriteFile(path, b, 0o600)
 }
 
 const metadataDirName = "metadata"
@@ -925,6 +967,10 @@ func sanitizeTaskIDForPath(taskId string) string {
 		}
 		return '_'
 	}, taskId)
+}
+
+func isSafeMetadataField(field string) bool {
+	return field != "" && strings.IndexFunc(field, func(r rune) bool { return !isAlnumOrDashUnderscore(r) }) == -1
 }
 
 // metadataPath returns the path for a task's metadata field file: metadata/<taskid>/<field>.txt
@@ -987,9 +1033,7 @@ func (d *TodoTxt) GetTaskMetadata(taskId string) (map[string]string, error) {
 	if err != nil {
 		return nil, err
 	}
-	for k, v := range fileMeta {
-		out[k] = v
-	}
+	maps.Copy(out, fileMeta)
 	return out, nil
 }
 
@@ -1010,21 +1054,28 @@ func (d *TodoTxt) setPriorityInTaskLine(taskId, value string) error {
 		}
 		return d.saveTasks()
 	}
-	return nil
+	return db.ErrTaskNotFound
 }
 
 // SetTaskMetadata implements db.TaskMetadataStore: for "priority" write into task line as priority:X; else metadata/<taskid>/<field>.txt
 func (d *TodoTxt) SetTaskMetadata(taskId, field, value string) error {
+	// field becomes part of a file path, so it must not be able to escape the metadata dir.
+	if !isSafeMetadataField(field) {
+		return db.ErrInvalidMetadataField
+	}
 	d.mu.Lock()
 	defer d.mu.Unlock()
 	if field == "priority" {
 		return d.setPriorityInTaskLine(taskId, value)
 	}
+	if !d.hasTask(taskId) {
+		return db.ErrTaskNotFound
+	}
 	p := d.metadataPath(taskId, field)
-	if err := os.MkdirAll(filepath.Dir(p), 0755); err != nil {
+	if err := os.MkdirAll(filepath.Dir(p), 0o750); err != nil {
 		return err
 	}
-	return os.WriteFile(p, []byte(value), 0644)
+	return os.WriteFile(p, []byte(value), 0o600)
 }
 
 func copyTpp(m map[string]map[string]string) map[string]map[string]string {
@@ -1034,9 +1085,7 @@ func copyTpp(m map[string]map[string]string) map[string]map[string]string {
 	out := make(map[string]map[string]string, len(m))
 	for k, v := range m {
 		inner := make(map[string]string, len(v))
-		for k2, v2 := range v {
-			inner[k2] = v2
-		}
+		maps.Copy(inner, v)
 		out[k] = inner
 	}
 	return out
@@ -1097,7 +1146,7 @@ func (d *TodoTxt) SetTaskPropertyProperty(propertyType, propertyName, key, value
 	case "context":
 		d.setContextProperty(propertyName, key, value)
 	default:
-		return nil
+		return db.ErrInvalidPropertyType
 	}
 	return d.saveTpp()
 }

@@ -12,7 +12,7 @@ import (
 
 func TestOpenAPIHandler(t *testing.T) {
 	rec := httptest.NewRecorder()
-	req := httptest.NewRequest(http.MethodGet, "/openapi", nil)
+	req := httptest.NewRequestWithContext(t.Context(), http.MethodGet, "/openapi", nil)
 	OpenAPIHandler().ServeHTTP(rec, req)
 
 	require.Equal(t, http.StatusOK, rec.Code)
@@ -22,7 +22,7 @@ func TestOpenAPIHandler(t *testing.T) {
 
 func TestLLMsTxtHandler(t *testing.T) {
 	rec := httptest.NewRecorder()
-	req := httptest.NewRequest(http.MethodGet, "/llms.txt", nil)
+	req := httptest.NewRequestWithContext(t.Context(), http.MethodGet, "/llms.txt", nil)
 	LLMsTxtHandler().ServeHTTP(rec, req)
 
 	require.Equal(t, http.StatusOK, rec.Code)
@@ -35,7 +35,7 @@ func TestLLMsTxtHandler(t *testing.T) {
 func TestHandlersRejectPost(t *testing.T) {
 	for _, h := range []http.Handler{OpenAPIHandler(), LLMsTxtHandler()} {
 		rec := httptest.NewRecorder()
-		req := httptest.NewRequest(http.MethodPost, "/", nil)
+		req := httptest.NewRequestWithContext(t.Context(), http.MethodPost, "/", nil)
 		h.ServeHTTP(rec, req)
 		assert.Equal(t, http.StatusMethodNotAllowed, rec.Code)
 	}

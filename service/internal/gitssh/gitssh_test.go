@@ -25,7 +25,7 @@ func TestSetup_GeneratesKeyAndSymlinks(t *testing.T) {
 	homeDir := t.TempDir()
 	t.Setenv("HOME", homeDir)
 
-	res, err := Setup(configDir)
+	res, err := Setup(t.Context(), configDir)
 	require.NoError(t, err)
 
 	assert.FileExists(t, res.PrivateKeyPath)
@@ -52,14 +52,14 @@ func TestSetup_Idempotent(t *testing.T) {
 	homeDir := t.TempDir()
 	t.Setenv("HOME", homeDir)
 
-	first, err := Setup(configDir)
+	first, err := Setup(t.Context(), configDir)
 	require.NoError(t, err)
 	assert.False(t, first.ExistingKey)
 
 	privateBefore, err := os.ReadFile(first.PrivateKeyPath)
 	require.NoError(t, err)
 
-	second, err := Setup(configDir)
+	second, err := Setup(t.Context(), configDir)
 	require.NoError(t, err)
 	assert.True(t, second.ExistingKey)
 
@@ -93,10 +93,10 @@ func TestConfigureGitCommand_UsesSymlinkedKey(t *testing.T) {
 	homeDir := t.TempDir()
 	t.Setenv("HOME", homeDir)
 
-	_, err := Setup(configDir)
+	_, err := Setup(t.Context(), configDir)
 	require.NoError(t, err)
 
-	cmd := exec.Command("git", "version")
+	cmd := exec.CommandContext(t.Context(), "git", "version")
 	ConfigureGitCommand(cmd)
 	require.NotNil(t, cmd.Env)
 
@@ -128,7 +128,7 @@ func TestEnsureGitIdentity_SkipsOutsideContainer(t *testing.T) {
 	homeDir := t.TempDir()
 	t.Setenv("HOME", homeDir)
 
-	require.NoError(t, ensureGitIdentity())
+	require.NoError(t, ensureGitIdentity(t.Context()))
 	_, err := os.Stat(filepath.Join(homeDir, ".gitconfig"))
 	assert.True(t, os.IsNotExist(err))
 }
@@ -141,14 +141,14 @@ func TestSetGlobalGitConfig(t *testing.T) {
 	homeDir := t.TempDir()
 	t.Setenv("HOME", homeDir)
 
-	require.NoError(t, setGlobalGitConfig("user.name", gitUserName))
-	require.NoError(t, setGlobalGitConfig("user.email", gitUserEmail))
+	require.NoError(t, setGlobalGitConfig(t.Context(), "user.name", gitUserName))
+	require.NoError(t, setGlobalGitConfig(t.Context(), "user.email", gitUserEmail))
 
-	name, err := exec.Command("git", "config", "--global", "--get", "user.name").Output()
+	name, err := exec.CommandContext(t.Context(), "git", "config", "--global", "--get", "user.name").Output()
 	require.NoError(t, err)
 	assert.Equal(t, gitUserName, strings.TrimSpace(string(name)))
 
-	email, err := exec.Command("git", "config", "--global", "--get", "user.email").Output()
+	email, err := exec.CommandContext(t.Context(), "git", "config", "--global", "--get", "user.email").Output()
 	require.NoError(t, err)
 	assert.Equal(t, gitUserEmail, strings.TrimSpace(string(email)))
 }

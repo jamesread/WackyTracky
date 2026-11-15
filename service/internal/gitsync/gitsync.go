@@ -2,10 +2,12 @@ package gitsync
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"os"
 	"os/exec"
 	"path/filepath"
+	"slices"
 	"strconv"
 	"strings"
 
@@ -13,9 +15,9 @@ import (
 )
 
 type Result struct {
-	Success bool
 	Message string
 	Steps   []string
+	Success bool
 }
 
 type gitRunner struct {
@@ -38,7 +40,7 @@ func (r *gitRunner) run(ctx context.Context, args ...string) (string, error) {
 
 func Sync(ctx context.Context, dir, serverName string) Result {
 	res := Result{Steps: []string{}}
-	runner, msg := prepareRunner(dir)
+	runner, msg := prepareRunner(ctx, dir)
 	if msg != "" {
 		return fail(res, msg)
 	}
@@ -53,13 +55,13 @@ func Sync(ctx context.Context, dir, serverName string) Result {
 	return finalizeSync(ctx, runner, res, serverName)
 }
 
-func prepareRunner(dir string) (*gitRunner, string) {
+func prepareRunner(ctx context.Context, dir string) (*gitRunner, string) {
 	if strings.TrimSpace(dir) == "" {
 		return nil, "No todotxt directory configured"
 	}
-	gitDir, err := resolveGitDir(dir)
+	gitDir, err := resolveGitDir(ctx, dir)
 	if err != nil {
-		return nil, err.Error()
+		return nil, "Not a git repository"
 	}
 	if msg := checkInProgress(gitDir); msg != "" {
 		return nil, msg
@@ -139,10 +141,12 @@ func commitMessage(serverName string) string {
 	return "wt sync: " + name
 }
 
-func resolveGitDir(dir string) (string, error) {
-	out, err := exec.Command("git", "-C", dir, "rev-parse", "--git-dir").CombinedOutput()
+var errNotGitRepository = errors.New("not a git repository")
+
+func resolveGitDir(ctx context.Context, dir string) (string, error) {
+	out, err := exec.CommandContext(ctx, "git", "-C", dir, "rev-parse", "--git-dir").CombinedOutput()
 	if err != nil {
-		return "", fmt.Errorf("Not a git repository")
+		return "", errNotGitRepository
 	}
 	gitDir := strings.TrimSpace(string(out))
 	if !filepath.IsAbs(gitDir) {
@@ -186,10 +190,8 @@ func checkPorcelainConflicts(ctx context.Context, runner *gitRunner) string {
 	if err != nil {
 		return "Could not inspect repository status: " + err.Error()
 	}
-	for _, line := range strings.Split(status, "\n") {
-		if porcelainLineConflicted(line) {
-			return "Unresolved merge conflicts; resolve before syncing"
-		}
+	if slices.ContainsFunc(strings.Split(status, "\n"), porcelainLineConflicted) {
+		return "Unresolved merge conflicts; resolve before syncing"
 	}
 	return ""
 }
@@ -233,7 +235,8 @@ func hasStagedChanges(ctx context.Context, runner *gitRunner) (bool, error) {
 	if err == nil {
 		return false, nil
 	}
-	if exitErr, ok := err.(*exec.ExitError); ok && exitErr.ExitCode() == 1 {
+	exitErr := &exec.ExitError{}
+	if errors.As(err, &exitErr) {
 		return true, nil
 	}
 	return false, err

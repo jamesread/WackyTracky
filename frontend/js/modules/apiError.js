@@ -39,6 +39,14 @@ function looksLikeNonApiResponse(message) {
 	return /unexpected token|in JSON|not valid JSON|unexpected end of|<!doctype|<html/i.test(message ?? '');
 }
 
+// A missing endpoint arrives as HTTP 404 (handled above), so an Unimplemented
+// error carrying a message came from the backend itself, e.g. a database
+// backend that does not support the operation. Its message is more useful
+// than the generic hint.
+function isBackendExplanation(connectError, rawMessage) {
+	return connectError.code === Code.Unimplemented && Boolean(rawMessage);
+}
+
 function apiErrorDetail(err) {
 	if (err == null) {
 		return 'Unknown error.';
@@ -62,7 +70,7 @@ function apiErrorDetail(err) {
 		return 'The server returned an unexpected response (likely an HTML login or error page from a proxy, not the API). You may need to sign in again.';
 	}
 
-	if (connectError && CODE_HINTS[connectError.code]) {
+	if (connectError && CODE_HINTS[connectError.code] && !isBackendExplanation(connectError, rawMessage)) {
 		return CODE_HINTS[connectError.code];
 	}
 

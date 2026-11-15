@@ -56,7 +56,7 @@ func TestSync_CommitAndPush(t *testing.T) {
 	assert.True(t, res.Success, res.Message)
 	assert.Equal(t, "Changes pushed to remote", res.Message)
 
-	out, err := exec.Command("git", "-C", remote, "log", "-1", "--format=%s").CombinedOutput()
+	out, err := exec.CommandContext(t.Context(), "git", "-C", remote, "log", "-1", "--format=%s").CombinedOutput()
 	require.NoError(t, err)
 	assert.Equal(t, "wt sync: homelab", strings.TrimSpace(string(out)))
 }
@@ -149,14 +149,14 @@ func initRepoWithConflict(t *testing.T) string {
 	require.NoError(t, os.WriteFile(filepath.Join(dir, "todo.txt"), []byte("main branch\n"), 0o644))
 	runGit(t, dir, "add", "todo.txt")
 	runGit(t, dir, "commit", "-m", "main")
-	err := exec.Command("git", "-C", dir, "merge", "other").Run()
+	err := exec.CommandContext(t.Context(), "git", "-C", dir, "merge", "other").Run()
 	require.Error(t, err)
 	return dir
 }
 
 func runGit(t *testing.T, dir string, args ...string) {
 	t.Helper()
-	cmd := exec.Command("git", append([]string{"-C", dir}, args...)...)
+	cmd := exec.CommandContext(t.Context(), "git", append([]string{"-C", dir}, args...)...)
 	out, err := cmd.CombinedOutput()
 	require.NoError(t, err, string(out))
 }
