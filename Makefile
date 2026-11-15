@@ -26,6 +26,7 @@ lint: codestyle
 
 codestyle:
 	$(MAKE) -wC service codestyle
+	$(MAKE) -wC frontend lint
 
 go-tools:
 	go install "github.com/bufbuild/buf/cmd/buf"
@@ -36,8 +37,8 @@ go-tools:
 certs:
 	openssl req -x509 -newkey rsa:4096 -nodes -keyout wt.key -out wt.crt -days 365
 
-# Marketing screenshots (server must be running on http://localhost:8080; optional REPO_COMMON)
-marketing-screenshots:
-	python3 var/marketing/scripts/take-marketing-screenshots.py
+# Regenerates README/docs screenshots against a throwaway server with fictional data.
+screenshots:
+	$(MAKE) -wC var/marketing/screenshots
 
-.PHONY: default service frontend generate docs integration-tests test lint codestyle go-tools certs marketing-screenshots
+.PHONY: default service frontend generate docs integration-tests test lint codestyle go-tools certs screenshots

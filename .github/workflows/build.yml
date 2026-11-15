@@ -60,6 +60,12 @@ jobs:
       - name: Unit tests
         run: make -wC service test
 
+      - name: Frontend tests
+        run: make -wC frontend test
+
+      - name: Frontend lint
+        run: make -wC frontend lint
+
       - name: Install goreleaser
         uses: goreleaser/goreleaser-action@v6
         with:

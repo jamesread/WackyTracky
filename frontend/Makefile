@@ -13,4 +13,7 @@ dev:
 test:
 	npm test
 
-.PHONY: default build ci dev test
+lint:
+	npm run lint
+
+.PHONY: default build ci dev test lint

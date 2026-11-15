@@ -477,7 +477,7 @@
 			walk(props.listId, 0);
 			allItems.value = flat;
 			updateItems();
-		} catch (e) {
+		} catch {
 			loadListTasksFromCache();
 		}
 	}
@@ -498,7 +498,6 @@
 		hiddenTagNames.value = cached.hiddenTagNames || [];
 		hiddenContextNames.value = cached.hiddenContextNames || [];
 		const idToTask = new Map((cached.tasks || []).map((t) => [t.id, { ...t }]));
-		const inboxId = cached.listId;
 		for (const ot of offlineTasks) {
 			const isRootInList = ot.parentType === 'list' && (ot.parentId === props.listId || ot.parentId === INBOX_LIST_ID);
 			const isSubtask = ot.parentType === 'task' && ot.parentId;
