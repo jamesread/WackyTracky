@@ -6,7 +6,11 @@ package mcpserver
 
 import (
 	"context"
+	"encoding/json"
+	"errors"
 	"net/http"
+	"slices"
+	"time"
 
 	"connectrpc.com/connect"
 	"github.com/mark3labs/mcp-go/mcp"
@@ -30,7 +34,13 @@ type ClientService interface {
 	DoneTask(context.Context, *connect.Request[pb.DoneTaskRequest]) (*connect.Response[pb.DoneTaskResponse], error)
 	MoveTask(context.Context, *connect.Request[pb.MoveTaskRequest]) (*connect.Response[pb.MoveTaskResponse], error)
 	CreateList(context.Context, *connect.Request[pb.CreateListRequest]) (*connect.Response[pb.CreateListResponse], error)
+	SetTaskMetadata(context.Context, *connect.Request[pb.SetTaskMetadataRequest]) (*connect.Response[pb.SetTaskMetadataResponse], error)
 }
+
+// taskMetadataFields are the per-task metadata fields the web UI reads and writes.
+var taskMetadataFields = []string{"notes", "wait", "due", "priority"}
+
+var errInvalidSnoozeUntil = errors.New("until must be an ISO date (YYYY-MM-DD) or RFC 3339 date-time (e.g. 2026-11-25T09:00:00Z)")
 
 // Server wires the WackyTracky client API to an MCP server.
 type Server struct {
@@ -100,6 +110,19 @@ func (s *Server) registerTools(srv *server.MCPServer) {
 		mcp.WithString("id", mcp.Required(), mcp.Description("The task ID to move.")),
 		mcp.WithString("list_id", mcp.Required(), mcp.Description("The ID of the list to move the task to, from list_lists.")),
 	), s.handleMoveTask)
+
+	srv.AddTool(mcp.NewTool("snooze_task",
+		mcp.WithDescription("Snooze a task: hide it from the task list until a given time, after which it reappears. Omit until (or pass an empty string) to un-snooze. Returns the stored time as waitUntil."),
+		mcp.WithString("id", mcp.Required(), mcp.Description("The task ID to snooze.")),
+		mcp.WithString("until", mcp.Description("When the task should reappear: an ISO date (YYYY-MM-DD, treated as midnight UTC) or an RFC 3339 date-time (e.g. 2026-11-25T09:00:00Z). Empty or omitted clears the snooze.")),
+	), s.handleSnoozeTask)
+
+	srv.AddTool(mcp.NewTool("update_task_metadata",
+		mcp.WithDescription("Set one metadata field on a task without touching its content: notes (free text), wait (snooze until, ISO date-time; prefer snooze_task), due (ISO date YYYY-MM-DD), or priority (a single letter A-Z, A highest). An empty value clears the field."),
+		mcp.WithString("id", mcp.Required(), mcp.Description("The task ID.")),
+		mcp.WithString("field", mcp.Required(), mcp.Enum(taskMetadataFields...), mcp.Description("The metadata field to set.")),
+		mcp.WithString("value", mcp.Description("The new value. Empty or omitted clears the field.")),
+	), s.handleUpdateTaskMetadata)
 
 	srv.AddTool(mcp.NewTool("create_list",
 		mcp.WithDescription("Create a new task list."),
@@ -217,4 +240,71 @@ func (s *Server) handleCreateList(ctx context.Context, req mcp.CallToolRequest) 
 		return mcp.NewToolResultErrorFromErr("create_list failed", err), nil
 	}
 	return mcp.NewToolResultText("List " + title + " created."), nil
+}
+
+// normalizeSnoozeUntil stores times as RFC 3339 UTC, matching what the web UI writes.
+func normalizeSnoozeUntil(until string) (string, error) {
+	if until == "" {
+		return "", nil
+	}
+	if t, err := time.Parse(time.RFC3339, until); err == nil {
+		return t.UTC().Format(time.RFC3339), nil
+	}
+	if t, err := time.Parse(time.DateOnly, until); err == nil {
+		return t.UTC().Format(time.RFC3339), nil
+	}
+	return "", errInvalidSnoozeUntil
+}
+
+func snoozeResult(id, until string) *mcp.CallToolResult {
+	if until == "" {
+		return mcp.NewToolResultText("Task " + id + " is no longer snoozed.")
+	}
+	b, err := json.Marshal(map[string]string{"id": id, "waitUntil": until})
+	if err != nil {
+		return mcp.NewToolResultErrorFromErr("failed to encode result", err)
+	}
+	return mcp.NewToolResultText(string(b))
+}
+
+func (s *Server) handleSnoozeTask(ctx context.Context, req mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+	id, err := req.RequireString("id")
+	if err != nil {
+		return mcp.NewToolResultErrorFromErr("invalid arguments", err), nil
+	}
+	until, err := normalizeSnoozeUntil(req.GetString("until", ""))
+	if err != nil {
+		return mcp.NewToolResultErrorFromErr("invalid arguments", err), nil
+	}
+	if _, err := s.svc.SetTaskMetadata(ctx, connect.NewRequest(&pb.SetTaskMetadataRequest{TaskId: id, Field: "wait", Value: until})); err != nil {
+		return mcp.NewToolResultErrorFromErr("snooze_task failed", err), nil
+	}
+	return snoozeResult(id, until), nil
+}
+
+func requireTaskMetadataField(req mcp.CallToolRequest) (string, error) {
+	field, err := req.RequireString("field")
+	if err != nil {
+		return "", err
+	}
+	if !slices.Contains(taskMetadataFields, field) {
+		return "", errors.New("field must be one of: notes, wait, due, priority")
+	}
+	return field, nil
+}
+
+func (s *Server) handleUpdateTaskMetadata(ctx context.Context, req mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+	id, err := req.RequireString("id")
+	if err != nil {
+		return mcp.NewToolResultErrorFromErr("invalid arguments", err), nil
+	}
+	field, err := requireTaskMetadataField(req)
+	if err != nil {
+		return mcp.NewToolResultErrorFromErr("invalid arguments", err), nil
+	}
+	value := req.GetString("value", "")
+	if _, err := s.svc.SetTaskMetadata(ctx, connect.NewRequest(&pb.SetTaskMetadataRequest{TaskId: id, Field: field, Value: value})); err != nil {
+		return mcp.NewToolResultErrorFromErr("update_task_metadata failed", err), nil
+	}
+	return mcp.NewToolResultText("Task " + id + " " + field + " updated."), nil
 }

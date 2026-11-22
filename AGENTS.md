@@ -64,9 +64,13 @@ The stdio server uses the same backend and configuration as the HTTP server (`co
 | `update_task` | `id`, `content` (required) | Replace a task's content |
 | `complete_task` | `id` (required) | Mark a task done |
 | `move_task` | `id`, `list_id` (required) | Move a task (and its subtasks) to another list, keeping its ID |
+| `snooze_task` | `id` (required), `until` | Hide a task until `until` (`YYYY-MM-DD` or RFC 3339 date-time, stored as UTC); omit `until` to un-snooze |
+| `update_task_metadata` | `id`, `field` (required), `value` | Set `notes`, `wait`, `due` (`YYYY-MM-DD`) or `priority` (`A`–`Z`) without touching content; empty `value` clears |
 | `create_list` | `title` (required) | Create a new list |
 
 Tools return JSON (camelCase fields) matching the Connect API responses.
+
+`update_task` replaces the whole line, including `@contexts` and `#tags`, and `content` in task responses omits them (they are in `contexts` / `tags`). To snooze, set a due date or change priority, use `snooze_task` or `update_task_metadata` instead of editing content.
 
 ---
 
