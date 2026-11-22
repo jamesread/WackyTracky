@@ -150,6 +150,12 @@ const (
 	// WackyTrackyClientServiceMoveTaskProcedure is the fully-qualified name of the
 	// WackyTrackyClientService's MoveTask RPC.
 	WackyTrackyClientServiceMoveTaskProcedure = "/wackytracky.clientapi.v1.WackyTrackyClientService/MoveTask"
+	// WackyTrackyClientServiceDeleteTaskProcedure is the fully-qualified name of the
+	// WackyTrackyClientService's DeleteTask RPC.
+	WackyTrackyClientServiceDeleteTaskProcedure = "/wackytracky.clientapi.v1.WackyTrackyClientService/DeleteTask"
+	// WackyTrackyClientServiceListCompletedTasksProcedure is the fully-qualified name of the
+	// WackyTrackyClientService's ListCompletedTasks RPC.
+	WackyTrackyClientServiceListCompletedTasksProcedure = "/wackytracky.clientapi.v1.WackyTrackyClientService/ListCompletedTasks"
 	// WackyTrackyClientServiceCreateListProcedure is the fully-qualified name of the
 	// WackyTrackyClientService's CreateList RPC.
 	WackyTrackyClientServiceCreateListProcedure = "/wackytracky.clientapi.v1.WackyTrackyClientService/CreateList"
@@ -240,6 +246,10 @@ type WackyTrackyClientServiceClient interface {
 	DoneTask(context.Context, *connect.Request[v1.DoneTaskRequest]) (*connect.Response[v1.DoneTaskResponse], error)
 	// MoveTask moves a task to another list without deleting and re-creating it.
 	MoveTask(context.Context, *connect.Request[v1.MoveTaskRequest]) (*connect.Response[v1.MoveTaskResponse], error)
+	// DeleteTask permanently removes a task and its subtasks.
+	DeleteTask(context.Context, *connect.Request[v1.DeleteTaskRequest]) (*connect.Response[v1.DeleteTaskResponse], error)
+	// ListCompletedTasks lists done tasks, optionally since a date or in one list.
+	ListCompletedTasks(context.Context, *connect.Request[v1.ListCompletedTasksRequest]) (*connect.Response[v1.ListCompletedTasksResponse], error)
 	CreateList(context.Context, *connect.Request[v1.CreateListRequest]) (*connect.Response[v1.CreateListResponse], error)
 	Tag(context.Context, *connect.Request[v1.TagRequest]) (*connect.Response[v1.TagResponse], error)
 	UpdateList(context.Context, *connect.Request[v1.UpdateListRequest]) (*connect.Response[v1.UpdateListResponse], error)
@@ -503,6 +513,18 @@ func NewWackyTrackyClientServiceClient(httpClient connect.HTTPClient, baseURL st
 			connect.WithSchema(wackyTrackyClientServiceMethods.ByName("MoveTask")),
 			connect.WithClientOptions(opts...),
 		),
+		deleteTask: connect.NewClient[v1.DeleteTaskRequest, v1.DeleteTaskResponse](
+			httpClient,
+			baseURL+WackyTrackyClientServiceDeleteTaskProcedure,
+			connect.WithSchema(wackyTrackyClientServiceMethods.ByName("DeleteTask")),
+			connect.WithClientOptions(opts...),
+		),
+		listCompletedTasks: connect.NewClient[v1.ListCompletedTasksRequest, v1.ListCompletedTasksResponse](
+			httpClient,
+			baseURL+WackyTrackyClientServiceListCompletedTasksProcedure,
+			connect.WithSchema(wackyTrackyClientServiceMethods.ByName("ListCompletedTasks")),
+			connect.WithClientOptions(opts...),
+		),
 		createList: connect.NewClient[v1.CreateListRequest, v1.CreateListResponse](
 			httpClient,
 			baseURL+WackyTrackyClientServiceCreateListProcedure,
@@ -637,6 +659,8 @@ type wackyTrackyClientServiceClient struct {
 	updateTask                   *connect.Client[v1.UpdateTaskRequest, v1.UpdateTaskResponse]
 	doneTask                     *connect.Client[v1.DoneTaskRequest, v1.DoneTaskResponse]
 	moveTask                     *connect.Client[v1.MoveTaskRequest, v1.MoveTaskResponse]
+	deleteTask                   *connect.Client[v1.DeleteTaskRequest, v1.DeleteTaskResponse]
+	listCompletedTasks           *connect.Client[v1.ListCompletedTasksRequest, v1.ListCompletedTasksResponse]
 	createList                   *connect.Client[v1.CreateListRequest, v1.CreateListResponse]
 	tag                          *connect.Client[v1.TagRequest, v1.TagResponse]
 	updateList                   *connect.Client[v1.UpdateListRequest, v1.UpdateListResponse]
@@ -853,6 +877,16 @@ func (c *wackyTrackyClientServiceClient) MoveTask(ctx context.Context, req *conn
 	return c.moveTask.CallUnary(ctx, req)
 }
 
+// DeleteTask calls wackytracky.clientapi.v1.WackyTrackyClientService.DeleteTask.
+func (c *wackyTrackyClientServiceClient) DeleteTask(ctx context.Context, req *connect.Request[v1.DeleteTaskRequest]) (*connect.Response[v1.DeleteTaskResponse], error) {
+	return c.deleteTask.CallUnary(ctx, req)
+}
+
+// ListCompletedTasks calls wackytracky.clientapi.v1.WackyTrackyClientService.ListCompletedTasks.
+func (c *wackyTrackyClientServiceClient) ListCompletedTasks(ctx context.Context, req *connect.Request[v1.ListCompletedTasksRequest]) (*connect.Response[v1.ListCompletedTasksResponse], error) {
+	return c.listCompletedTasks.CallUnary(ctx, req)
+}
+
 // CreateList calls wackytracky.clientapi.v1.WackyTrackyClientService.CreateList.
 func (c *wackyTrackyClientServiceClient) CreateList(ctx context.Context, req *connect.Request[v1.CreateListRequest]) (*connect.Response[v1.CreateListResponse], error) {
 	return c.createList.CallUnary(ctx, req)
@@ -973,6 +1007,10 @@ type WackyTrackyClientServiceHandler interface {
 	DoneTask(context.Context, *connect.Request[v1.DoneTaskRequest]) (*connect.Response[v1.DoneTaskResponse], error)
 	// MoveTask moves a task to another list without deleting and re-creating it.
 	MoveTask(context.Context, *connect.Request[v1.MoveTaskRequest]) (*connect.Response[v1.MoveTaskResponse], error)
+	// DeleteTask permanently removes a task and its subtasks.
+	DeleteTask(context.Context, *connect.Request[v1.DeleteTaskRequest]) (*connect.Response[v1.DeleteTaskResponse], error)
+	// ListCompletedTasks lists done tasks, optionally since a date or in one list.
+	ListCompletedTasks(context.Context, *connect.Request[v1.ListCompletedTasksRequest]) (*connect.Response[v1.ListCompletedTasksResponse], error)
 	CreateList(context.Context, *connect.Request[v1.CreateListRequest]) (*connect.Response[v1.CreateListResponse], error)
 	Tag(context.Context, *connect.Request[v1.TagRequest]) (*connect.Response[v1.TagResponse], error)
 	UpdateList(context.Context, *connect.Request[v1.UpdateListRequest]) (*connect.Response[v1.UpdateListResponse], error)
@@ -1231,6 +1269,18 @@ func NewWackyTrackyClientServiceHandler(svc WackyTrackyClientServiceHandler, opt
 		connect.WithSchema(wackyTrackyClientServiceMethods.ByName("MoveTask")),
 		connect.WithHandlerOptions(opts...),
 	)
+	wackyTrackyClientServiceDeleteTaskHandler := connect.NewUnaryHandler(
+		WackyTrackyClientServiceDeleteTaskProcedure,
+		svc.DeleteTask,
+		connect.WithSchema(wackyTrackyClientServiceMethods.ByName("DeleteTask")),
+		connect.WithHandlerOptions(opts...),
+	)
+	wackyTrackyClientServiceListCompletedTasksHandler := connect.NewUnaryHandler(
+		WackyTrackyClientServiceListCompletedTasksProcedure,
+		svc.ListCompletedTasks,
+		connect.WithSchema(wackyTrackyClientServiceMethods.ByName("ListCompletedTasks")),
+		connect.WithHandlerOptions(opts...),
+	)
 	wackyTrackyClientServiceCreateListHandler := connect.NewUnaryHandler(
 		WackyTrackyClientServiceCreateListProcedure,
 		svc.CreateList,
@@ -1401,6 +1451,10 @@ func NewWackyTrackyClientServiceHandler(svc WackyTrackyClientServiceHandler, opt
 			wackyTrackyClientServiceDoneTaskHandler.ServeHTTP(w, r)
 		case WackyTrackyClientServiceMoveTaskProcedure:
 			wackyTrackyClientServiceMoveTaskHandler.ServeHTTP(w, r)
+		case WackyTrackyClientServiceDeleteTaskProcedure:
+			wackyTrackyClientServiceDeleteTaskHandler.ServeHTTP(w, r)
+		case WackyTrackyClientServiceListCompletedTasksProcedure:
+			wackyTrackyClientServiceListCompletedTasksHandler.ServeHTTP(w, r)
 		case WackyTrackyClientServiceCreateListProcedure:
 			wackyTrackyClientServiceCreateListHandler.ServeHTTP(w, r)
 		case WackyTrackyClientServiceTagProcedure:
@@ -1594,6 +1648,14 @@ func (UnimplementedWackyTrackyClientServiceHandler) DoneTask(context.Context, *c
 
 func (UnimplementedWackyTrackyClientServiceHandler) MoveTask(context.Context, *connect.Request[v1.MoveTaskRequest]) (*connect.Response[v1.MoveTaskResponse], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("wackytracky.clientapi.v1.WackyTrackyClientService.MoveTask is not implemented"))
+}
+
+func (UnimplementedWackyTrackyClientServiceHandler) DeleteTask(context.Context, *connect.Request[v1.DeleteTaskRequest]) (*connect.Response[v1.DeleteTaskResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("wackytracky.clientapi.v1.WackyTrackyClientService.DeleteTask is not implemented"))
+}
+
+func (UnimplementedWackyTrackyClientServiceHandler) ListCompletedTasks(context.Context, *connect.Request[v1.ListCompletedTasksRequest]) (*connect.Response[v1.ListCompletedTasksResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("wackytracky.clientapi.v1.WackyTrackyClientService.ListCompletedTasks is not implemented"))
 }
 
 func (UnimplementedWackyTrackyClientServiceHandler) CreateList(context.Context, *connect.Request[v1.CreateListRequest]) (*connect.Response[v1.CreateListResponse], error) {

@@ -3,6 +3,7 @@ package clientapi
 import (
 	"context"
 	"testing"
+	"time"
 
 	"connectrpc.com/connect"
 	"github.com/stretchr/testify/assert"
@@ -257,4 +258,95 @@ func TestClientAPI_DoneTaskSucceedsForExistingTask(t *testing.T) {
 
 	_, err = api.DoneTask(ctx, connect.NewRequest(&pb.DoneTaskRequest{Id: created.Msg.Task.Id}))
 	assert.NoError(t, err)
+}
+
+func createTestTask(t *testing.T, api *wackyTrackyClientService, content, parentTaskID string) string {
+	t.Helper()
+	resp, err := api.CreateTask(context.Background(), connect.NewRequest(&pb.CreateTaskRequest{Content: content, ParentListId: "inbox", ParentTaskId: parentTaskID}))
+	require.NoError(t, err)
+	return resp.Msg.Task.Id
+}
+
+func TestClientAPI_MoveTaskToParentTask(t *testing.T) {
+	api := newTodoTxtClientAPI(t)
+	parentID := createTestTask(t, api, "parent", "")
+	taskID := createTestTask(t, api, "task", "")
+
+	resp, err := api.MoveTask(context.Background(), connect.NewRequest(&pb.MoveTaskRequest{TaskId: taskID, TargetParentTaskId: parentID}))
+	require.NoError(t, err)
+	assert.Equal(t, "task", resp.Msg.Task.ParentType)
+	assert.Equal(t, parentID, resp.Msg.Task.ParentId)
+}
+
+func TestClientAPI_MoveTaskTargetValidation(t *testing.T) {
+	api := newTodoTxtClientAPI(t)
+	ctx := context.Background()
+	taskID := createTestTask(t, api, "task", "")
+
+	_, err := api.MoveTask(ctx, connect.NewRequest(&pb.MoveTaskRequest{TaskId: taskID, TargetListId: "inbox", TargetParentTaskId: taskID}))
+	assert.Equal(t, connect.CodeInvalidArgument, connect.CodeOf(err), "both targets")
+
+	_, err = api.MoveTask(ctx, connect.NewRequest(&pb.MoveTaskRequest{TaskId: taskID, TargetParentTaskId: taskID}))
+	assert.Equal(t, connect.CodeInvalidArgument, connect.CodeOf(err), "under itself")
+
+	_, err = api.MoveTask(ctx, connect.NewRequest(&pb.MoveTaskRequest{TaskId: taskID, TargetParentTaskId: "missing"}))
+	assert.Equal(t, connect.CodeNotFound, connect.CodeOf(err))
+}
+
+func TestClientAPI_DeleteTask(t *testing.T) {
+	api := newTodoTxtClientAPI(t)
+	ctx := context.Background()
+	taskID := createTestTask(t, api, "delete me", "")
+
+	_, err := api.DeleteTask(ctx, connect.NewRequest(&pb.DeleteTaskRequest{Id: taskID}))
+	require.NoError(t, err)
+
+	_, err = api.DeleteTask(ctx, connect.NewRequest(&pb.DeleteTaskRequest{Id: taskID}))
+	assert.Equal(t, connect.CodeNotFound, connect.CodeOf(err))
+	_, err = api.DeleteTask(ctx, connect.NewRequest(&pb.DeleteTaskRequest{}))
+	assert.Equal(t, connect.CodeInvalidArgument, connect.CodeOf(err))
+	_, err = GetNewClientAPI(&dummy.Dummy{}, nil).DeleteTask(ctx, connect.NewRequest(&pb.DeleteTaskRequest{Id: "x"}))
+	assert.Equal(t, connect.CodeUnimplemented, connect.CodeOf(err))
+}
+
+func TestClientAPI_ListCompletedTasks(t *testing.T) {
+	api := newTodoTxtClientAPI(t)
+	ctx := context.Background()
+	doneID := createTestTask(t, api, "finished", "")
+	createTestTask(t, api, "still open", "")
+	_, err := api.DoneTask(ctx, connect.NewRequest(&pb.DoneTaskRequest{Id: doneID}))
+	require.NoError(t, err)
+	today := time.Now().UTC().Format(time.DateOnly)
+
+	for _, since := range []string{"", today, today + "T00:00:00Z"} {
+		resp, err := api.ListCompletedTasks(ctx, connect.NewRequest(&pb.ListCompletedTasksRequest{Since: since}))
+		require.NoError(t, err, "since %q", since)
+		require.Len(t, resp.Msg.Tasks, 1, "since %q", since)
+		assert.Equal(t, doneID, resp.Msg.Tasks[0].Id)
+		assert.True(t, resp.Msg.Tasks[0].Completed)
+		assert.Equal(t, today, resp.Msg.Tasks[0].CompletedAt)
+	}
+
+	resp, err := api.ListCompletedTasks(ctx, connect.NewRequest(&pb.ListCompletedTasksRequest{Since: "2999-01-01"}))
+	require.NoError(t, err)
+	assert.Empty(t, resp.Msg.Tasks)
+
+	_, err = api.ListCompletedTasks(ctx, connect.NewRequest(&pb.ListCompletedTasksRequest{Since: "yesterday"}))
+	assert.Equal(t, connect.CodeInvalidArgument, connect.CodeOf(err))
+	_, err = GetNewClientAPI(&dummy.Dummy{}, nil).ListCompletedTasks(ctx, connect.NewRequest(&pb.ListCompletedTasksRequest{}))
+	assert.Equal(t, connect.CodeUnimplemented, connect.CodeOf(err))
+}
+
+func TestClientAPI_TasksIncludeNotes(t *testing.T) {
+	api := newTodoTxtClientAPI(t)
+	ctx := context.Background()
+	taskID := createTestTask(t, api, "with notes", "")
+	_, err := api.SetTaskMetadata(ctx, connect.NewRequest(&pb.SetTaskMetadataRequest{TaskId: taskID, Field: "notes", Value: "remember this"}))
+	require.NoError(t, err)
+
+	list, err := api.ListTasks(ctx, connect.NewRequest(&pb.ListTasksRequest{ParentId: "inbox", ParentType: "list"}))
+	require.NoError(t, err)
+	require.Len(t, list.Msg.Tasks, 1)
+	assert.Equal(t, "remember this", list.Msg.Tasks[0].Notes)
+	assert.False(t, list.Msg.Tasks[0].Completed)
 }

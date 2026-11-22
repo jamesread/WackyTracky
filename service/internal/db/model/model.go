@@ -1,6 +1,9 @@
 package db
 
-import "errors"
+import (
+	"errors"
+	"time"
+)
 
 var (
 	ErrTaskNotFound = errors.New("task not found")
@@ -10,6 +13,7 @@ var (
 	ErrDefaultListNotDeletable = errors.New("the default list cannot be deleted")
 	ErrInvalidMetadataField    = errors.New("metadata field names may only contain letters, digits, '-' and '_'")
 	ErrInvalidPropertyType     = errors.New("property type must be \"tag\" or \"context\"")
+	ErrInvalidMove             = errors.New("a task cannot be moved under itself or one of its own subtasks")
 )
 
 type DBTag struct {
@@ -31,6 +35,9 @@ type DBTask struct {
 	WaitUntil     string
 	Priority      string
 	DueDate       string
+	Notes         string
+	Completed     bool
+	CompletedAt   string
 	Tags          []string
 	Contexts      []string
 	CountSubitems int32
@@ -67,6 +74,22 @@ type Updatable interface {
 // TaskMover is optionally implemented by backends that support moving a task to another list.
 type TaskMover interface {
 	MoveTask(taskId string, targetListId string) error
+}
+
+// TaskReparenter is optionally implemented by backends that can make a task a subtask of another.
+type TaskReparenter interface {
+	ReparentTask(taskId string, parentTaskId string) error
+}
+
+// TaskDeleter is optionally implemented by backends that can permanently delete a task and its subtasks.
+type TaskDeleter interface {
+	DeleteTask(id string) error
+}
+
+// CompletedTaskLister is optionally implemented by backends that keep completed tasks.
+// A zero since lists all of them; an empty listId lists every list.
+type CompletedTaskLister interface {
+	GetCompletedTasks(since time.Time, listId string) ([]DBTask, error)
 }
 
 // Searchable is optionally implemented by backends that support task search.

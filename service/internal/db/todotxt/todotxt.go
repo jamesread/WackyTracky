@@ -7,6 +7,7 @@ import (
 	"maps"
 	"os"
 	"path/filepath"
+	"slices"
 	"strconv"
 	"strings"
 	"sync"
@@ -394,7 +395,21 @@ func taskPriority(t *Task) string {
 	return ""
 }
 
-func taskToDB(t *Task, subcount int32, waitUntil, dueDate string) db.DBTask {
+// fileMetadata holds the per-task fields read from metadata files (or inline as a fallback).
+type fileMetadata struct {
+	waitUntil string
+	dueDate   string
+	notes     string
+}
+
+func completionDateString(t *Task) string {
+	if t.CompletionDate == nil {
+		return ""
+	}
+	return t.CompletionDate.Format(time.DateOnly)
+}
+
+func taskToDB(t *Task, subcount int32, meta fileMetadata) db.DBTask {
 	id := t.Metadata["id"]
 	if id == "" {
 		id = uuid.New().String()
@@ -417,9 +432,12 @@ func taskToDB(t *Task, subcount int32, waitUntil, dueDate string) db.DBTask {
 		CountSubitems: subcount,
 		Tags:          tags,
 		Contexts:      contexts,
-		WaitUntil:     strings.TrimSpace(waitUntil),
+		WaitUntil:     strings.TrimSpace(meta.waitUntil),
 		Priority:      taskPriority(t),
-		DueDate:       strings.TrimSpace(dueDate),
+		DueDate:       strings.TrimSpace(meta.dueDate),
+		Notes:         meta.notes,
+		Completed:     t.Completed,
+		CompletedAt:   completionDateString(t),
 	}
 }
 
@@ -432,7 +450,11 @@ func (d *TodoTxt) resolveTaskMetadataField(t *Task, field string) string {
 
 func (d *TodoTxt) dbTaskFromTask(t *Task) db.DBTask {
 	id := t.Metadata["id"]
-	return taskToDB(t, countSubtasks(d.tasks, id), d.resolveTaskMetadataField(t, "wait"), d.resolveTaskMetadataField(t, "due"))
+	return taskToDB(t, countSubtasks(d.tasks, id), fileMetadata{
+		waitUntil: d.resolveTaskMetadataField(t, "wait"),
+		dueDate:   d.resolveTaskMetadataField(t, "due"),
+		notes:     d.resolveTaskMetadataField(t, "notes"),
+	})
 }
 
 func countSubtasks(tasks []*Task, taskID string) int32 {
@@ -847,6 +869,112 @@ func (d *TodoTxt) MoveTask(taskId string, targetListId string) error {
 	delete(t.Metadata, "parent")
 	d.setListForTaskTree(t, targetListId)
 	return d.saveTasks()
+}
+
+// ReparentTask implements db.TaskReparenter: make a task (with its subtasks) a
+// subtask of another open task, joining that task's list.
+func (d *TodoTxt) ReparentTask(taskId string, parentTaskId string) error {
+	d.mu.Lock()
+	defer d.mu.Unlock()
+	t := d.findOpenTask(taskId)
+	parent := d.findOpenTask(parentTaskId)
+	if t == nil || parent == nil {
+		return db.ErrTaskNotFound
+	}
+	if d.isSelfOrDescendant(parent, taskId) {
+		return db.ErrInvalidMove
+	}
+	t.Metadata["parent"] = parentTaskId
+	d.ensureParentHasProject(parentTaskId)
+	d.setListForTaskTree(t, listIDOf(parent))
+	return d.saveTasks()
+}
+
+func listIDOf(t *Task) string {
+	if lid := t.Metadata["listid"]; lid != "" {
+		return lid
+	}
+	return defaultListID
+}
+
+// isSelfOrDescendant walks up from candidate; the seen set guards against
+// parent cycles already present in a hand-edited todo.txt.
+func (d *TodoTxt) isSelfOrDescendant(candidate *Task, ancestorId string) bool {
+	seen := make(map[string]bool)
+	for cur := candidate; cur != nil && !seen[cur.Metadata["id"]]; cur = findTaskByID(d.tasks, cur.Metadata["parent"]) {
+		if cur.Metadata["id"] == ancestorId {
+			return true
+		}
+		seen[cur.Metadata["id"]] = true
+	}
+	return false
+}
+
+// DeleteTask implements db.TaskDeleter: permanently remove a task, its subtasks
+// (open or done) and their metadata files.
+func (d *TodoTxt) DeleteTask(id string) error {
+	d.mu.Lock()
+	defer d.mu.Unlock()
+	if !d.hasTask(id) {
+		return db.ErrTaskNotFound
+	}
+	doomed := d.collectTaskTreeIDs(id)
+	d.tasks = slices.DeleteFunc(d.tasks, func(t *Task) bool { return doomed[t.Metadata["id"]] })
+	if err := d.saveTasks(); err != nil {
+		return err
+	}
+	return d.removeMetadataDirs(doomed)
+}
+
+func (d *TodoTxt) collectTaskTreeIDs(rootId string) map[string]bool {
+	ids := map[string]bool{rootId: true}
+	queue := []string{rootId}
+	for len(queue) > 0 {
+		parentId := queue[0]
+		queue = queue[1:]
+		for _, t := range d.tasks {
+			if id := t.Metadata["id"]; t.Metadata["parent"] == parentId && !ids[id] {
+				ids[id] = true
+				queue = append(queue, id)
+			}
+		}
+	}
+	return ids
+}
+
+func (d *TodoTxt) removeMetadataDirs(taskIds map[string]bool) error {
+	for id := range taskIds {
+		if err := os.RemoveAll(filepath.Join(d.dir, metadataDirName, sanitizeTaskIDForPath(id))); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+// GetCompletedTasks implements db.CompletedTaskLister. todo.txt records completion
+// per day, so since is compared by date and same-day tasks keep file order.
+func (d *TodoTxt) GetCompletedTasks(since time.Time, listId string) ([]db.DBTask, error) {
+	d.mu.RLock()
+	defer d.mu.RUnlock()
+	sinceDay := ""
+	if !since.IsZero() {
+		sinceDay = since.UTC().Format(time.DateOnly)
+	}
+	var out []db.DBTask
+	for _, t := range d.tasks {
+		if isCompletedMatch(t, sinceDay, listId) {
+			out = append(out, d.dbTaskFromTask(t))
+		}
+	}
+	slices.SortStableFunc(out, func(a, b db.DBTask) int { return strings.Compare(b.CompletedAt, a.CompletedAt) })
+	return out, nil
+}
+
+func isCompletedMatch(t *Task, sinceDay string, listId string) bool {
+	if !t.Completed || (listId != "" && listIDOf(t) != listId) {
+		return false
+	}
+	return completionDateString(t) >= sinceDay
 }
 
 func (d *TodoTxt) hasList(listId string) bool {

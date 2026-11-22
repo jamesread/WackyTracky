@@ -522,15 +522,19 @@ func (*DoneTaskResponse) Descriptor() ([]byte, []int) {
 }
 
 // MoveTaskRequest moves an existing task (keeping its ID, metadata and subtasks)
-// to another list. A subtask that is moved becomes a root task in the target list.
+// to another list, or under another task. Set exactly one target. A subtask that
+// is moved to a list becomes a root task in that list.
 type MoveTaskRequest struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// ID of the task to move.
 	TaskId string `protobuf:"bytes,1,opt,name=task_id,json=taskId,proto3" json:"task_id,omitempty"`
 	// ID of the list to move the task to (see GetLists).
-	TargetListId  string `protobuf:"bytes,2,opt,name=target_list_id,json=targetListId,proto3" json:"target_list_id,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	TargetListId string `protobuf:"bytes,2,opt,name=target_list_id,json=targetListId,proto3" json:"target_list_id,omitempty"`
+	// ID of the task to make this task a subtask of. The moved task joins that
+	// task's list. It cannot be the task itself or one of its own subtasks.
+	TargetParentTaskId string `protobuf:"bytes,3,opt,name=target_parent_task_id,json=targetParentTaskId,proto3" json:"target_parent_task_id,omitempty"`
+	unknownFields      protoimpl.UnknownFields
+	sizeCache          protoimpl.SizeCache
 }
 
 func (x *MoveTaskRequest) Reset() {
@@ -573,6 +577,13 @@ func (x *MoveTaskRequest) GetTaskId() string {
 func (x *MoveTaskRequest) GetTargetListId() string {
 	if x != nil {
 		return x.TargetListId
+	}
+	return ""
+}
+
+func (x *MoveTaskRequest) GetTargetParentTaskId() string {
+	if x != nil {
+		return x.TargetParentTaskId
 	}
 	return ""
 }
@@ -622,6 +633,189 @@ func (x *MoveTaskResponse) GetTask() *Task {
 	return nil
 }
 
+// DeleteTaskRequest permanently removes a task, its subtasks and their metadata.
+// Unlike DoneTask, nothing is kept in the completed history.
+type DeleteTaskRequest struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// ID of the task to delete (open or completed).
+	Id            string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *DeleteTaskRequest) Reset() {
+	*x = DeleteTaskRequest{}
+	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[13]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DeleteTaskRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DeleteTaskRequest) ProtoMessage() {}
+
+func (x *DeleteTaskRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[13]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DeleteTaskRequest.ProtoReflect.Descriptor instead.
+func (*DeleteTaskRequest) Descriptor() ([]byte, []int) {
+	return file_wacky_tracky_clientapi_v1_wt_proto_rawDescGZIP(), []int{13}
+}
+
+func (x *DeleteTaskRequest) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+type DeleteTaskResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *DeleteTaskResponse) Reset() {
+	*x = DeleteTaskResponse{}
+	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[14]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DeleteTaskResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DeleteTaskResponse) ProtoMessage() {}
+
+func (x *DeleteTaskResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[14]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DeleteTaskResponse.ProtoReflect.Descriptor instead.
+func (*DeleteTaskResponse) Descriptor() ([]byte, []int) {
+	return file_wacky_tracky_clientapi_v1_wt_proto_rawDescGZIP(), []int{14}
+}
+
+// ListCompletedTasksRequest lists completed tasks, most recently completed first.
+type ListCompletedTasksRequest struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// Optional; only tasks completed on or after this date. ISO date (YYYY-MM-DD)
+	// or RFC 3339 date-time; completion is recorded per day.
+	Since string `protobuf:"bytes,1,opt,name=since,proto3" json:"since,omitempty"`
+	// Optional; only tasks in this list.
+	ListId        string `protobuf:"bytes,2,opt,name=list_id,json=listId,proto3" json:"list_id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ListCompletedTasksRequest) Reset() {
+	*x = ListCompletedTasksRequest{}
+	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[15]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ListCompletedTasksRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ListCompletedTasksRequest) ProtoMessage() {}
+
+func (x *ListCompletedTasksRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[15]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ListCompletedTasksRequest.ProtoReflect.Descriptor instead.
+func (*ListCompletedTasksRequest) Descriptor() ([]byte, []int) {
+	return file_wacky_tracky_clientapi_v1_wt_proto_rawDescGZIP(), []int{15}
+}
+
+func (x *ListCompletedTasksRequest) GetSince() string {
+	if x != nil {
+		return x.Since
+	}
+	return ""
+}
+
+func (x *ListCompletedTasksRequest) GetListId() string {
+	if x != nil {
+		return x.ListId
+	}
+	return ""
+}
+
+type ListCompletedTasksResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Tasks         []*Task                `protobuf:"bytes,1,rep,name=tasks,proto3" json:"tasks,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ListCompletedTasksResponse) Reset() {
+	*x = ListCompletedTasksResponse{}
+	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[16]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ListCompletedTasksResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ListCompletedTasksResponse) ProtoMessage() {}
+
+func (x *ListCompletedTasksResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[16]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ListCompletedTasksResponse.ProtoReflect.Descriptor instead.
+func (*ListCompletedTasksResponse) Descriptor() ([]byte, []int) {
+	return file_wacky_tracky_clientapi_v1_wt_proto_rawDescGZIP(), []int{16}
+}
+
+func (x *ListCompletedTasksResponse) GetTasks() []*Task {
+	if x != nil {
+		return x.Tasks
+	}
+	return nil
+}
+
 // Task metadata (e.g. notes) — optional per driver
 type GetTaskMetadataRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
@@ -632,7 +826,7 @@ type GetTaskMetadataRequest struct {
 
 func (x *GetTaskMetadataRequest) Reset() {
 	*x = GetTaskMetadataRequest{}
-	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[13]
+	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[17]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -644,7 +838,7 @@ func (x *GetTaskMetadataRequest) String() string {
 func (*GetTaskMetadataRequest) ProtoMessage() {}
 
 func (x *GetTaskMetadataRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[13]
+	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[17]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -657,7 +851,7 @@ func (x *GetTaskMetadataRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetTaskMetadataRequest.ProtoReflect.Descriptor instead.
 func (*GetTaskMetadataRequest) Descriptor() ([]byte, []int) {
-	return file_wacky_tracky_clientapi_v1_wt_proto_rawDescGZIP(), []int{13}
+	return file_wacky_tracky_clientapi_v1_wt_proto_rawDescGZIP(), []int{17}
 }
 
 func (x *GetTaskMetadataRequest) GetTaskId() string {
@@ -676,7 +870,7 @@ type GetTaskMetadataResponse struct {
 
 func (x *GetTaskMetadataResponse) Reset() {
 	*x = GetTaskMetadataResponse{}
-	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[14]
+	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[18]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -688,7 +882,7 @@ func (x *GetTaskMetadataResponse) String() string {
 func (*GetTaskMetadataResponse) ProtoMessage() {}
 
 func (x *GetTaskMetadataResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[14]
+	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[18]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -701,7 +895,7 @@ func (x *GetTaskMetadataResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetTaskMetadataResponse.ProtoReflect.Descriptor instead.
 func (*GetTaskMetadataResponse) Descriptor() ([]byte, []int) {
-	return file_wacky_tracky_clientapi_v1_wt_proto_rawDescGZIP(), []int{14}
+	return file_wacky_tracky_clientapi_v1_wt_proto_rawDescGZIP(), []int{18}
 }
 
 func (x *GetTaskMetadataResponse) GetFields() map[string]string {
@@ -722,7 +916,7 @@ type SetTaskMetadataRequest struct {
 
 func (x *SetTaskMetadataRequest) Reset() {
 	*x = SetTaskMetadataRequest{}
-	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[15]
+	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[19]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -734,7 +928,7 @@ func (x *SetTaskMetadataRequest) String() string {
 func (*SetTaskMetadataRequest) ProtoMessage() {}
 
 func (x *SetTaskMetadataRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[15]
+	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[19]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -747,7 +941,7 @@ func (x *SetTaskMetadataRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SetTaskMetadataRequest.ProtoReflect.Descriptor instead.
 func (*SetTaskMetadataRequest) Descriptor() ([]byte, []int) {
-	return file_wacky_tracky_clientapi_v1_wt_proto_rawDescGZIP(), []int{15}
+	return file_wacky_tracky_clientapi_v1_wt_proto_rawDescGZIP(), []int{19}
 }
 
 func (x *SetTaskMetadataRequest) GetTaskId() string {
@@ -779,7 +973,7 @@ type SetTaskMetadataResponse struct {
 
 func (x *SetTaskMetadataResponse) Reset() {
 	*x = SetTaskMetadataResponse{}
-	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[16]
+	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[20]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -791,7 +985,7 @@ func (x *SetTaskMetadataResponse) String() string {
 func (*SetTaskMetadataResponse) ProtoMessage() {}
 
 func (x *SetTaskMetadataResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[16]
+	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[20]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -804,7 +998,7 @@ func (x *SetTaskMetadataResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SetTaskMetadataResponse.ProtoReflect.Descriptor instead.
 func (*SetTaskMetadataResponse) Descriptor() ([]byte, []int) {
-	return file_wacky_tracky_clientapi_v1_wt_proto_rawDescGZIP(), []int{16}
+	return file_wacky_tracky_clientapi_v1_wt_proto_rawDescGZIP(), []int{20}
 }
 
 // TaskPropertyProperties: optional key/value settings per task property (e.g. tag #work, context @home).
@@ -818,7 +1012,7 @@ type TaskPropertyProps struct {
 
 func (x *TaskPropertyProps) Reset() {
 	*x = TaskPropertyProps{}
-	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[17]
+	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[21]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -830,7 +1024,7 @@ func (x *TaskPropertyProps) String() string {
 func (*TaskPropertyProps) ProtoMessage() {}
 
 func (x *TaskPropertyProps) ProtoReflect() protoreflect.Message {
-	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[17]
+	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[21]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -843,7 +1037,7 @@ func (x *TaskPropertyProps) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use TaskPropertyProps.ProtoReflect.Descriptor instead.
 func (*TaskPropertyProps) Descriptor() ([]byte, []int) {
-	return file_wacky_tracky_clientapi_v1_wt_proto_rawDescGZIP(), []int{17}
+	return file_wacky_tracky_clientapi_v1_wt_proto_rawDescGZIP(), []int{21}
 }
 
 func (x *TaskPropertyProps) GetProps() map[string]string {
@@ -861,7 +1055,7 @@ type GetTaskPropertyPropertiesRequest struct {
 
 func (x *GetTaskPropertyPropertiesRequest) Reset() {
 	*x = GetTaskPropertyPropertiesRequest{}
-	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[18]
+	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[22]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -873,7 +1067,7 @@ func (x *GetTaskPropertyPropertiesRequest) String() string {
 func (*GetTaskPropertyPropertiesRequest) ProtoMessage() {}
 
 func (x *GetTaskPropertyPropertiesRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[18]
+	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[22]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -886,7 +1080,7 @@ func (x *GetTaskPropertyPropertiesRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetTaskPropertyPropertiesRequest.ProtoReflect.Descriptor instead.
 func (*GetTaskPropertyPropertiesRequest) Descriptor() ([]byte, []int) {
-	return file_wacky_tracky_clientapi_v1_wt_proto_rawDescGZIP(), []int{18}
+	return file_wacky_tracky_clientapi_v1_wt_proto_rawDescGZIP(), []int{22}
 }
 
 type GetTaskPropertyPropertiesResponse struct {
@@ -899,7 +1093,7 @@ type GetTaskPropertyPropertiesResponse struct {
 
 func (x *GetTaskPropertyPropertiesResponse) Reset() {
 	*x = GetTaskPropertyPropertiesResponse{}
-	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[19]
+	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[23]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -911,7 +1105,7 @@ func (x *GetTaskPropertyPropertiesResponse) String() string {
 func (*GetTaskPropertyPropertiesResponse) ProtoMessage() {}
 
 func (x *GetTaskPropertyPropertiesResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[19]
+	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[23]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -924,7 +1118,7 @@ func (x *GetTaskPropertyPropertiesResponse) ProtoReflect() protoreflect.Message 
 
 // Deprecated: Use GetTaskPropertyPropertiesResponse.ProtoReflect.Descriptor instead.
 func (*GetTaskPropertyPropertiesResponse) Descriptor() ([]byte, []int) {
-	return file_wacky_tracky_clientapi_v1_wt_proto_rawDescGZIP(), []int{19}
+	return file_wacky_tracky_clientapi_v1_wt_proto_rawDescGZIP(), []int{23}
 }
 
 func (x *GetTaskPropertyPropertiesResponse) GetTagProperties() map[string]*TaskPropertyProps {
@@ -953,7 +1147,7 @@ type SetTaskPropertyPropertyRequest struct {
 
 func (x *SetTaskPropertyPropertyRequest) Reset() {
 	*x = SetTaskPropertyPropertyRequest{}
-	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[20]
+	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[24]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -965,7 +1159,7 @@ func (x *SetTaskPropertyPropertyRequest) String() string {
 func (*SetTaskPropertyPropertyRequest) ProtoMessage() {}
 
 func (x *SetTaskPropertyPropertyRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[20]
+	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[24]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -978,7 +1172,7 @@ func (x *SetTaskPropertyPropertyRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SetTaskPropertyPropertyRequest.ProtoReflect.Descriptor instead.
 func (*SetTaskPropertyPropertyRequest) Descriptor() ([]byte, []int) {
-	return file_wacky_tracky_clientapi_v1_wt_proto_rawDescGZIP(), []int{20}
+	return file_wacky_tracky_clientapi_v1_wt_proto_rawDescGZIP(), []int{24}
 }
 
 func (x *SetTaskPropertyPropertyRequest) GetPropertyType() string {
@@ -1017,7 +1211,7 @@ type SetTaskPropertyPropertyResponse struct {
 
 func (x *SetTaskPropertyPropertyResponse) Reset() {
 	*x = SetTaskPropertyPropertyResponse{}
-	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[21]
+	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[25]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1029,7 +1223,7 @@ func (x *SetTaskPropertyPropertyResponse) String() string {
 func (*SetTaskPropertyPropertyResponse) ProtoMessage() {}
 
 func (x *SetTaskPropertyPropertyResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[21]
+	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[25]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1042,7 +1236,7 @@ func (x *SetTaskPropertyPropertyResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SetTaskPropertyPropertyResponse.ProtoReflect.Descriptor instead.
 func (*SetTaskPropertyPropertyResponse) Descriptor() ([]byte, []int) {
-	return file_wacky_tracky_clientapi_v1_wt_proto_rawDescGZIP(), []int{21}
+	return file_wacky_tracky_clientapi_v1_wt_proto_rawDescGZIP(), []int{25}
 }
 
 // RuleStatus returns current date/time components for hide-at-times rule builder (D=day short name, H=hour, M=minute).
@@ -1054,7 +1248,7 @@ type RuleStatusRequest struct {
 
 func (x *RuleStatusRequest) Reset() {
 	*x = RuleStatusRequest{}
-	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[22]
+	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[26]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1066,7 +1260,7 @@ func (x *RuleStatusRequest) String() string {
 func (*RuleStatusRequest) ProtoMessage() {}
 
 func (x *RuleStatusRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[22]
+	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[26]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1079,7 +1273,7 @@ func (x *RuleStatusRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use RuleStatusRequest.ProtoReflect.Descriptor instead.
 func (*RuleStatusRequest) Descriptor() ([]byte, []int) {
-	return file_wacky_tracky_clientapi_v1_wt_proto_rawDescGZIP(), []int{22}
+	return file_wacky_tracky_clientapi_v1_wt_proto_rawDescGZIP(), []int{26}
 }
 
 type RuleStatusResponse struct {
@@ -1093,7 +1287,7 @@ type RuleStatusResponse struct {
 
 func (x *RuleStatusResponse) Reset() {
 	*x = RuleStatusResponse{}
-	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[23]
+	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[27]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1105,7 +1299,7 @@ func (x *RuleStatusResponse) String() string {
 func (*RuleStatusResponse) ProtoMessage() {}
 
 func (x *RuleStatusResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[23]
+	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[27]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1118,7 +1312,7 @@ func (x *RuleStatusResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use RuleStatusResponse.ProtoReflect.Descriptor instead.
 func (*RuleStatusResponse) Descriptor() ([]byte, []int) {
-	return file_wacky_tracky_clientapi_v1_wt_proto_rawDescGZIP(), []int{23}
+	return file_wacky_tracky_clientapi_v1_wt_proto_rawDescGZIP(), []int{27}
 }
 
 func (x *RuleStatusResponse) GetD() string {
@@ -1152,7 +1346,7 @@ type RuleTestRequest struct {
 
 func (x *RuleTestRequest) Reset() {
 	*x = RuleTestRequest{}
-	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[24]
+	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[28]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1164,7 +1358,7 @@ func (x *RuleTestRequest) String() string {
 func (*RuleTestRequest) ProtoMessage() {}
 
 func (x *RuleTestRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[24]
+	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[28]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1177,7 +1371,7 @@ func (x *RuleTestRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use RuleTestRequest.ProtoReflect.Descriptor instead.
 func (*RuleTestRequest) Descriptor() ([]byte, []int) {
-	return file_wacky_tracky_clientapi_v1_wt_proto_rawDescGZIP(), []int{24}
+	return file_wacky_tracky_clientapi_v1_wt_proto_rawDescGZIP(), []int{28}
 }
 
 func (x *RuleTestRequest) GetExpression() string {
@@ -1199,7 +1393,7 @@ type RuleTestResponse struct {
 
 func (x *RuleTestResponse) Reset() {
 	*x = RuleTestResponse{}
-	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[25]
+	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[29]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1211,7 +1405,7 @@ func (x *RuleTestResponse) String() string {
 func (*RuleTestResponse) ProtoMessage() {}
 
 func (x *RuleTestResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[25]
+	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[29]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1224,7 +1418,7 @@ func (x *RuleTestResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use RuleTestResponse.ProtoReflect.Descriptor instead.
 func (*RuleTestResponse) Descriptor() ([]byte, []int) {
-	return file_wacky_tracky_clientapi_v1_wt_proto_rawDescGZIP(), []int{25}
+	return file_wacky_tracky_clientapi_v1_wt_proto_rawDescGZIP(), []int{29}
 }
 
 func (x *RuleTestResponse) GetCompiles() bool {
@@ -1265,7 +1459,7 @@ type Tag struct {
 
 func (x *Tag) Reset() {
 	*x = Tag{}
-	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[26]
+	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[30]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1277,7 +1471,7 @@ func (x *Tag) String() string {
 func (*Tag) ProtoMessage() {}
 
 func (x *Tag) ProtoReflect() protoreflect.Message {
-	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[26]
+	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[30]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1290,7 +1484,7 @@ func (x *Tag) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Tag.ProtoReflect.Descriptor instead.
 func (*Tag) Descriptor() ([]byte, []int) {
-	return file_wacky_tracky_clientapi_v1_wt_proto_rawDescGZIP(), []int{26}
+	return file_wacky_tracky_clientapi_v1_wt_proto_rawDescGZIP(), []int{30}
 }
 
 func (x *Tag) GetId() string {
@@ -1315,7 +1509,7 @@ type TagRequest struct {
 
 func (x *TagRequest) Reset() {
 	*x = TagRequest{}
-	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[27]
+	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[31]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1327,7 +1521,7 @@ func (x *TagRequest) String() string {
 func (*TagRequest) ProtoMessage() {}
 
 func (x *TagRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[27]
+	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[31]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1340,7 +1534,7 @@ func (x *TagRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use TagRequest.ProtoReflect.Descriptor instead.
 func (*TagRequest) Descriptor() ([]byte, []int) {
-	return file_wacky_tracky_clientapi_v1_wt_proto_rawDescGZIP(), []int{27}
+	return file_wacky_tracky_clientapi_v1_wt_proto_rawDescGZIP(), []int{31}
 }
 
 type TagResponse struct {
@@ -1351,7 +1545,7 @@ type TagResponse struct {
 
 func (x *TagResponse) Reset() {
 	*x = TagResponse{}
-	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[28]
+	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[32]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1363,7 +1557,7 @@ func (x *TagResponse) String() string {
 func (*TagResponse) ProtoMessage() {}
 
 func (x *TagResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[28]
+	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[32]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1376,7 +1570,7 @@ func (x *TagResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use TagResponse.ProtoReflect.Descriptor instead.
 func (*TagResponse) Descriptor() ([]byte, []int) {
-	return file_wacky_tracky_clientapi_v1_wt_proto_rawDescGZIP(), []int{28}
+	return file_wacky_tracky_clientapi_v1_wt_proto_rawDescGZIP(), []int{32}
 }
 
 type GetTagsRequest struct {
@@ -1387,7 +1581,7 @@ type GetTagsRequest struct {
 
 func (x *GetTagsRequest) Reset() {
 	*x = GetTagsRequest{}
-	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[29]
+	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[33]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1399,7 +1593,7 @@ func (x *GetTagsRequest) String() string {
 func (*GetTagsRequest) ProtoMessage() {}
 
 func (x *GetTagsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[29]
+	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[33]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1412,7 +1606,7 @@ func (x *GetTagsRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetTagsRequest.ProtoReflect.Descriptor instead.
 func (*GetTagsRequest) Descriptor() ([]byte, []int) {
-	return file_wacky_tracky_clientapi_v1_wt_proto_rawDescGZIP(), []int{29}
+	return file_wacky_tracky_clientapi_v1_wt_proto_rawDescGZIP(), []int{33}
 }
 
 type GetTagsResponse struct {
@@ -1424,7 +1618,7 @@ type GetTagsResponse struct {
 
 func (x *GetTagsResponse) Reset() {
 	*x = GetTagsResponse{}
-	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[30]
+	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[34]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1436,7 +1630,7 @@ func (x *GetTagsResponse) String() string {
 func (*GetTagsResponse) ProtoMessage() {}
 
 func (x *GetTagsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[30]
+	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[34]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1449,7 +1643,7 @@ func (x *GetTagsResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetTagsResponse.ProtoReflect.Descriptor instead.
 func (*GetTagsResponse) Descriptor() ([]byte, []int) {
-	return file_wacky_tracky_clientapi_v1_wt_proto_rawDescGZIP(), []int{30}
+	return file_wacky_tracky_clientapi_v1_wt_proto_rawDescGZIP(), []int{34}
 }
 
 func (x *GetTagsResponse) GetTags() []*Tag {
@@ -1466,18 +1660,21 @@ type Task struct {
 	ParentId      string                 `protobuf:"bytes,3,opt,name=parent_id,json=parentId,proto3" json:"parent_id,omitempty"`
 	ParentType    string                 `protobuf:"bytes,4,opt,name=parent_type,json=parentType,proto3" json:"parent_type,omitempty"`
 	CountSubitems int32                  `protobuf:"varint,5,opt,name=count_subitems,json=countSubitems,proto3" json:"count_subitems,omitempty"`
-	Tags          []string               `protobuf:"bytes,6,rep,name=tags,proto3" json:"tags,omitempty"`                            // parsed from #hashtag in todo.txt lines
-	Contexts      []string               `protobuf:"bytes,7,rep,name=contexts,proto3" json:"contexts,omitempty"`                    // parsed from @context in todo.txt lines (e.g. @home @work)
-	WaitUntil     string                 `protobuf:"bytes,8,opt,name=wait_until,json=waitUntil,proto3" json:"wait_until,omitempty"` // optional; ISO date-time; task is hidden from list/next-action until this time
-	Priority      string                 `protobuf:"bytes,9,opt,name=priority,proto3" json:"priority,omitempty"`                    // optional; single letter A–Z; stored as priority:X in todo.txt
-	DueDate       string                 `protobuf:"bytes,10,opt,name=due_date,json=dueDate,proto3" json:"due_date,omitempty"`      // optional; ISO date YYYY-MM-DD; stored in metadata like wait
+	Tags          []string               `protobuf:"bytes,6,rep,name=tags,proto3" json:"tags,omitempty"`                                   // parsed from #hashtag in todo.txt lines
+	Contexts      []string               `protobuf:"bytes,7,rep,name=contexts,proto3" json:"contexts,omitempty"`                           // parsed from @context in todo.txt lines (e.g. @home @work)
+	WaitUntil     string                 `protobuf:"bytes,8,opt,name=wait_until,json=waitUntil,proto3" json:"wait_until,omitempty"`        // optional; ISO date-time; task is hidden from list/next-action until this time
+	Priority      string                 `protobuf:"bytes,9,opt,name=priority,proto3" json:"priority,omitempty"`                           // optional; single letter A–Z; stored as priority:X in todo.txt
+	DueDate       string                 `protobuf:"bytes,10,opt,name=due_date,json=dueDate,proto3" json:"due_date,omitempty"`             // optional; ISO date YYYY-MM-DD; stored in metadata like wait
+	Notes         string                 `protobuf:"bytes,11,opt,name=notes,proto3" json:"notes,omitempty"`                                // optional; free-text notes; stored in metadata like wait
+	Completed     bool                   `protobuf:"varint,12,opt,name=completed,proto3" json:"completed,omitempty"`                       // true for tasks marked done
+	CompletedAt   string                 `protobuf:"bytes,13,opt,name=completed_at,json=completedAt,proto3" json:"completed_at,omitempty"` // optional; ISO date YYYY-MM-DD the task was marked done
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
 func (x *Task) Reset() {
 	*x = Task{}
-	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[31]
+	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[35]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1489,7 +1686,7 @@ func (x *Task) String() string {
 func (*Task) ProtoMessage() {}
 
 func (x *Task) ProtoReflect() protoreflect.Message {
-	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[31]
+	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[35]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1502,7 +1699,7 @@ func (x *Task) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Task.ProtoReflect.Descriptor instead.
 func (*Task) Descriptor() ([]byte, []int) {
-	return file_wacky_tracky_clientapi_v1_wt_proto_rawDescGZIP(), []int{31}
+	return file_wacky_tracky_clientapi_v1_wt_proto_rawDescGZIP(), []int{35}
 }
 
 func (x *Task) GetId() string {
@@ -1575,6 +1772,27 @@ func (x *Task) GetDueDate() string {
 	return ""
 }
 
+func (x *Task) GetNotes() string {
+	if x != nil {
+		return x.Notes
+	}
+	return ""
+}
+
+func (x *Task) GetCompleted() bool {
+	if x != nil {
+		return x.Completed
+	}
+	return false
+}
+
+func (x *Task) GetCompletedAt() string {
+	if x != nil {
+		return x.CompletedAt
+	}
+	return ""
+}
+
 type ListTasksRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	ParentId      string                 `protobuf:"bytes,1,opt,name=parent_id,json=parentId,proto3" json:"parent_id,omitempty"`
@@ -1585,7 +1803,7 @@ type ListTasksRequest struct {
 
 func (x *ListTasksRequest) Reset() {
 	*x = ListTasksRequest{}
-	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[32]
+	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[36]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1597,7 +1815,7 @@ func (x *ListTasksRequest) String() string {
 func (*ListTasksRequest) ProtoMessage() {}
 
 func (x *ListTasksRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[32]
+	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[36]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1610,7 +1828,7 @@ func (x *ListTasksRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListTasksRequest.ProtoReflect.Descriptor instead.
 func (*ListTasksRequest) Descriptor() ([]byte, []int) {
-	return file_wacky_tracky_clientapi_v1_wt_proto_rawDescGZIP(), []int{32}
+	return file_wacky_tracky_clientapi_v1_wt_proto_rawDescGZIP(), []int{36}
 }
 
 func (x *ListTasksRequest) GetParentId() string {
@@ -1637,7 +1855,7 @@ type TaskIdList struct {
 
 func (x *TaskIdList) Reset() {
 	*x = TaskIdList{}
-	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[33]
+	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[37]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1649,7 +1867,7 @@ func (x *TaskIdList) String() string {
 func (*TaskIdList) ProtoMessage() {}
 
 func (x *TaskIdList) ProtoReflect() protoreflect.Message {
-	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[33]
+	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[37]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1662,7 +1880,7 @@ func (x *TaskIdList) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use TaskIdList.ProtoReflect.Descriptor instead.
 func (*TaskIdList) Descriptor() ([]byte, []int) {
-	return file_wacky_tracky_clientapi_v1_wt_proto_rawDescGZIP(), []int{33}
+	return file_wacky_tracky_clientapi_v1_wt_proto_rawDescGZIP(), []int{37}
 }
 
 func (x *TaskIdList) GetIds() []string {
@@ -1686,7 +1904,7 @@ type ListTasksResponse struct {
 
 func (x *ListTasksResponse) Reset() {
 	*x = ListTasksResponse{}
-	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[34]
+	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[38]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1698,7 +1916,7 @@ func (x *ListTasksResponse) String() string {
 func (*ListTasksResponse) ProtoMessage() {}
 
 func (x *ListTasksResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[34]
+	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[38]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1711,7 +1929,7 @@ func (x *ListTasksResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListTasksResponse.ProtoReflect.Descriptor instead.
 func (*ListTasksResponse) Descriptor() ([]byte, []int) {
-	return file_wacky_tracky_clientapi_v1_wt_proto_rawDescGZIP(), []int{34}
+	return file_wacky_tracky_clientapi_v1_wt_proto_rawDescGZIP(), []int{38}
 }
 
 func (x *ListTasksResponse) GetTasks() []*Task {
@@ -1751,7 +1969,7 @@ type SearchTasksRequest struct {
 
 func (x *SearchTasksRequest) Reset() {
 	*x = SearchTasksRequest{}
-	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[35]
+	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[39]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1763,7 +1981,7 @@ func (x *SearchTasksRequest) String() string {
 func (*SearchTasksRequest) ProtoMessage() {}
 
 func (x *SearchTasksRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[35]
+	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[39]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1776,7 +1994,7 @@ func (x *SearchTasksRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SearchTasksRequest.ProtoReflect.Descriptor instead.
 func (*SearchTasksRequest) Descriptor() ([]byte, []int) {
-	return file_wacky_tracky_clientapi_v1_wt_proto_rawDescGZIP(), []int{35}
+	return file_wacky_tracky_clientapi_v1_wt_proto_rawDescGZIP(), []int{39}
 }
 
 func (x *SearchTasksRequest) GetQuery() string {
@@ -1795,7 +2013,7 @@ type SearchTasksResponse struct {
 
 func (x *SearchTasksResponse) Reset() {
 	*x = SearchTasksResponse{}
-	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[36]
+	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[40]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1807,7 +2025,7 @@ func (x *SearchTasksResponse) String() string {
 func (*SearchTasksResponse) ProtoMessage() {}
 
 func (x *SearchTasksResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[36]
+	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[40]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1820,7 +2038,7 @@ func (x *SearchTasksResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SearchTasksResponse.ProtoReflect.Descriptor instead.
 func (*SearchTasksResponse) Descriptor() ([]byte, []int) {
-	return file_wacky_tracky_clientapi_v1_wt_proto_rawDescGZIP(), []int{36}
+	return file_wacky_tracky_clientapi_v1_wt_proto_rawDescGZIP(), []int{40}
 }
 
 func (x *SearchTasksResponse) GetTasks() []*Task {
@@ -1840,7 +2058,7 @@ type UpdateListRequest struct {
 
 func (x *UpdateListRequest) Reset() {
 	*x = UpdateListRequest{}
-	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[37]
+	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[41]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1852,7 +2070,7 @@ func (x *UpdateListRequest) String() string {
 func (*UpdateListRequest) ProtoMessage() {}
 
 func (x *UpdateListRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[37]
+	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[41]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1865,7 +2083,7 @@ func (x *UpdateListRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UpdateListRequest.ProtoReflect.Descriptor instead.
 func (*UpdateListRequest) Descriptor() ([]byte, []int) {
-	return file_wacky_tracky_clientapi_v1_wt_proto_rawDescGZIP(), []int{37}
+	return file_wacky_tracky_clientapi_v1_wt_proto_rawDescGZIP(), []int{41}
 }
 
 func (x *UpdateListRequest) GetId() string {
@@ -1890,7 +2108,7 @@ type UpdateListResponse struct {
 
 func (x *UpdateListResponse) Reset() {
 	*x = UpdateListResponse{}
-	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[38]
+	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[42]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1902,7 +2120,7 @@ func (x *UpdateListResponse) String() string {
 func (*UpdateListResponse) ProtoMessage() {}
 
 func (x *UpdateListResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[38]
+	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[42]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1915,7 +2133,7 @@ func (x *UpdateListResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UpdateListResponse.ProtoReflect.Descriptor instead.
 func (*UpdateListResponse) Descriptor() ([]byte, []int) {
-	return file_wacky_tracky_clientapi_v1_wt_proto_rawDescGZIP(), []int{38}
+	return file_wacky_tracky_clientapi_v1_wt_proto_rawDescGZIP(), []int{42}
 }
 
 type DeleteListRequest struct {
@@ -1927,7 +2145,7 @@ type DeleteListRequest struct {
 
 func (x *DeleteListRequest) Reset() {
 	*x = DeleteListRequest{}
-	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[39]
+	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[43]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1939,7 +2157,7 @@ func (x *DeleteListRequest) String() string {
 func (*DeleteListRequest) ProtoMessage() {}
 
 func (x *DeleteListRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[39]
+	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[43]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1952,7 +2170,7 @@ func (x *DeleteListRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DeleteListRequest.ProtoReflect.Descriptor instead.
 func (*DeleteListRequest) Descriptor() ([]byte, []int) {
-	return file_wacky_tracky_clientapi_v1_wt_proto_rawDescGZIP(), []int{39}
+	return file_wacky_tracky_clientapi_v1_wt_proto_rawDescGZIP(), []int{43}
 }
 
 func (x *DeleteListRequest) GetId() string {
@@ -1970,7 +2188,7 @@ type DeleteListResponse struct {
 
 func (x *DeleteListResponse) Reset() {
 	*x = DeleteListResponse{}
-	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[40]
+	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[44]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1982,7 +2200,7 @@ func (x *DeleteListResponse) String() string {
 func (*DeleteListResponse) ProtoMessage() {}
 
 func (x *DeleteListResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[40]
+	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[44]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1995,7 +2213,7 @@ func (x *DeleteListResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DeleteListResponse.ProtoReflect.Descriptor instead.
 func (*DeleteListResponse) Descriptor() ([]byte, []int) {
-	return file_wacky_tracky_clientapi_v1_wt_proto_rawDescGZIP(), []int{40}
+	return file_wacky_tracky_clientapi_v1_wt_proto_rawDescGZIP(), []int{44}
 }
 
 type InitRequest struct {
@@ -2006,7 +2224,7 @@ type InitRequest struct {
 
 func (x *InitRequest) Reset() {
 	*x = InitRequest{}
-	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[41]
+	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[45]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2018,7 +2236,7 @@ func (x *InitRequest) String() string {
 func (*InitRequest) ProtoMessage() {}
 
 func (x *InitRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[41]
+	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[45]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2031,7 +2249,7 @@ func (x *InitRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use InitRequest.ProtoReflect.Descriptor instead.
 func (*InitRequest) Descriptor() ([]byte, []int) {
-	return file_wacky_tracky_clientapi_v1_wt_proto_rawDescGZIP(), []int{41}
+	return file_wacky_tracky_clientapi_v1_wt_proto_rawDescGZIP(), []int{45}
 }
 
 type InitResponse struct {
@@ -2049,7 +2267,7 @@ type InitResponse struct {
 
 func (x *InitResponse) Reset() {
 	*x = InitResponse{}
-	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[42]
+	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[46]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2061,7 +2279,7 @@ func (x *InitResponse) String() string {
 func (*InitResponse) ProtoMessage() {}
 
 func (x *InitResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[42]
+	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[46]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2074,7 +2292,7 @@ func (x *InitResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use InitResponse.ProtoReflect.Descriptor instead.
 func (*InitResponse) Descriptor() ([]byte, []int) {
-	return file_wacky_tracky_clientapi_v1_wt_proto_rawDescGZIP(), []int{42}
+	return file_wacky_tracky_clientapi_v1_wt_proto_rawDescGZIP(), []int{46}
 }
 
 func (x *InitResponse) GetWallpaper() string {
@@ -2134,7 +2352,7 @@ type VersionRequest struct {
 
 func (x *VersionRequest) Reset() {
 	*x = VersionRequest{}
-	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[43]
+	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[47]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2146,7 +2364,7 @@ func (x *VersionRequest) String() string {
 func (*VersionRequest) ProtoMessage() {}
 
 func (x *VersionRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[43]
+	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[47]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2159,7 +2377,7 @@ func (x *VersionRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use VersionRequest.ProtoReflect.Descriptor instead.
 func (*VersionRequest) Descriptor() ([]byte, []int) {
-	return file_wacky_tracky_clientapi_v1_wt_proto_rawDescGZIP(), []int{43}
+	return file_wacky_tracky_clientapi_v1_wt_proto_rawDescGZIP(), []int{47}
 }
 
 type VersionResponse struct {
@@ -2173,7 +2391,7 @@ type VersionResponse struct {
 
 func (x *VersionResponse) Reset() {
 	*x = VersionResponse{}
-	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[44]
+	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[48]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2185,7 +2403,7 @@ func (x *VersionResponse) String() string {
 func (*VersionResponse) ProtoMessage() {}
 
 func (x *VersionResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[44]
+	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[48]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2198,7 +2416,7 @@ func (x *VersionResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use VersionResponse.ProtoReflect.Descriptor instead.
 func (*VersionResponse) Descriptor() ([]byte, []int) {
-	return file_wacky_tracky_clientapi_v1_wt_proto_rawDescGZIP(), []int{44}
+	return file_wacky_tracky_clientapi_v1_wt_proto_rawDescGZIP(), []int{48}
 }
 
 func (x *VersionResponse) GetVersion() string {
@@ -2230,7 +2448,7 @@ type RepoStatusRequest struct {
 
 func (x *RepoStatusRequest) Reset() {
 	*x = RepoStatusRequest{}
-	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[45]
+	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[49]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2242,7 +2460,7 @@ func (x *RepoStatusRequest) String() string {
 func (*RepoStatusRequest) ProtoMessage() {}
 
 func (x *RepoStatusRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[45]
+	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[49]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2255,7 +2473,7 @@ func (x *RepoStatusRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use RepoStatusRequest.ProtoReflect.Descriptor instead.
 func (*RepoStatusRequest) Descriptor() ([]byte, []int) {
-	return file_wacky_tracky_clientapi_v1_wt_proto_rawDescGZIP(), []int{45}
+	return file_wacky_tracky_clientapi_v1_wt_proto_rawDescGZIP(), []int{49}
 }
 
 type RepoStatusResponse struct {
@@ -2267,7 +2485,7 @@ type RepoStatusResponse struct {
 
 func (x *RepoStatusResponse) Reset() {
 	*x = RepoStatusResponse{}
-	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[46]
+	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[50]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2279,7 +2497,7 @@ func (x *RepoStatusResponse) String() string {
 func (*RepoStatusResponse) ProtoMessage() {}
 
 func (x *RepoStatusResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[46]
+	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[50]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2292,7 +2510,7 @@ func (x *RepoStatusResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use RepoStatusResponse.ProtoReflect.Descriptor instead.
 func (*RepoStatusResponse) Descriptor() ([]byte, []int) {
-	return file_wacky_tracky_clientapi_v1_wt_proto_rawDescGZIP(), []int{46}
+	return file_wacky_tracky_clientapi_v1_wt_proto_rawDescGZIP(), []int{50}
 }
 
 func (x *RepoStatusResponse) GetOutput() string {
@@ -2311,7 +2529,7 @@ type RepoSyncRequest struct {
 
 func (x *RepoSyncRequest) Reset() {
 	*x = RepoSyncRequest{}
-	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[47]
+	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[51]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2323,7 +2541,7 @@ func (x *RepoSyncRequest) String() string {
 func (*RepoSyncRequest) ProtoMessage() {}
 
 func (x *RepoSyncRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[47]
+	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[51]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2336,7 +2554,7 @@ func (x *RepoSyncRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use RepoSyncRequest.ProtoReflect.Descriptor instead.
 func (*RepoSyncRequest) Descriptor() ([]byte, []int) {
-	return file_wacky_tracky_clientapi_v1_wt_proto_rawDescGZIP(), []int{47}
+	return file_wacky_tracky_clientapi_v1_wt_proto_rawDescGZIP(), []int{51}
 }
 
 func (x *RepoSyncRequest) GetServerName() string {
@@ -2357,7 +2575,7 @@ type RepoSyncResponse struct {
 
 func (x *RepoSyncResponse) Reset() {
 	*x = RepoSyncResponse{}
-	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[48]
+	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[52]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2369,7 +2587,7 @@ func (x *RepoSyncResponse) String() string {
 func (*RepoSyncResponse) ProtoMessage() {}
 
 func (x *RepoSyncResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[48]
+	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[52]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2382,7 +2600,7 @@ func (x *RepoSyncResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use RepoSyncResponse.ProtoReflect.Descriptor instead.
 func (*RepoSyncResponse) Descriptor() ([]byte, []int) {
-	return file_wacky_tracky_clientapi_v1_wt_proto_rawDescGZIP(), []int{48}
+	return file_wacky_tracky_clientapi_v1_wt_proto_rawDescGZIP(), []int{52}
 }
 
 func (x *RepoSyncResponse) GetSuccess() bool {
@@ -2417,7 +2635,7 @@ type SavedSearch struct {
 
 func (x *SavedSearch) Reset() {
 	*x = SavedSearch{}
-	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[49]
+	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[53]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2429,7 +2647,7 @@ func (x *SavedSearch) String() string {
 func (*SavedSearch) ProtoMessage() {}
 
 func (x *SavedSearch) ProtoReflect() protoreflect.Message {
-	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[49]
+	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[53]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2442,7 +2660,7 @@ func (x *SavedSearch) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SavedSearch.ProtoReflect.Descriptor instead.
 func (*SavedSearch) Descriptor() ([]byte, []int) {
-	return file_wacky_tracky_clientapi_v1_wt_proto_rawDescGZIP(), []int{49}
+	return file_wacky_tracky_clientapi_v1_wt_proto_rawDescGZIP(), []int{53}
 }
 
 func (x *SavedSearch) GetId() string {
@@ -2474,7 +2692,7 @@ type GetSavedSearchesRequest struct {
 
 func (x *GetSavedSearchesRequest) Reset() {
 	*x = GetSavedSearchesRequest{}
-	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[50]
+	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[54]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2486,7 +2704,7 @@ func (x *GetSavedSearchesRequest) String() string {
 func (*GetSavedSearchesRequest) ProtoMessage() {}
 
 func (x *GetSavedSearchesRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[50]
+	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[54]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2499,7 +2717,7 @@ func (x *GetSavedSearchesRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetSavedSearchesRequest.ProtoReflect.Descriptor instead.
 func (*GetSavedSearchesRequest) Descriptor() ([]byte, []int) {
-	return file_wacky_tracky_clientapi_v1_wt_proto_rawDescGZIP(), []int{50}
+	return file_wacky_tracky_clientapi_v1_wt_proto_rawDescGZIP(), []int{54}
 }
 
 type GetSavedSearchesResponse struct {
@@ -2511,7 +2729,7 @@ type GetSavedSearchesResponse struct {
 
 func (x *GetSavedSearchesResponse) Reset() {
 	*x = GetSavedSearchesResponse{}
-	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[51]
+	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[55]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2523,7 +2741,7 @@ func (x *GetSavedSearchesResponse) String() string {
 func (*GetSavedSearchesResponse) ProtoMessage() {}
 
 func (x *GetSavedSearchesResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[51]
+	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[55]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2536,7 +2754,7 @@ func (x *GetSavedSearchesResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetSavedSearchesResponse.ProtoReflect.Descriptor instead.
 func (*GetSavedSearchesResponse) Descriptor() ([]byte, []int) {
-	return file_wacky_tracky_clientapi_v1_wt_proto_rawDescGZIP(), []int{51}
+	return file_wacky_tracky_clientapi_v1_wt_proto_rawDescGZIP(), []int{55}
 }
 
 func (x *GetSavedSearchesResponse) GetSavedSearches() []*SavedSearch {
@@ -2555,7 +2773,7 @@ type SetSavedSearchesRequest struct {
 
 func (x *SetSavedSearchesRequest) Reset() {
 	*x = SetSavedSearchesRequest{}
-	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[52]
+	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[56]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2567,7 +2785,7 @@ func (x *SetSavedSearchesRequest) String() string {
 func (*SetSavedSearchesRequest) ProtoMessage() {}
 
 func (x *SetSavedSearchesRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[52]
+	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[56]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2580,7 +2798,7 @@ func (x *SetSavedSearchesRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SetSavedSearchesRequest.ProtoReflect.Descriptor instead.
 func (*SetSavedSearchesRequest) Descriptor() ([]byte, []int) {
-	return file_wacky_tracky_clientapi_v1_wt_proto_rawDescGZIP(), []int{52}
+	return file_wacky_tracky_clientapi_v1_wt_proto_rawDescGZIP(), []int{56}
 }
 
 func (x *SetSavedSearchesRequest) GetSavedSearches() []*SavedSearch {
@@ -2598,7 +2816,7 @@ type SetSavedSearchesResponse struct {
 
 func (x *SetSavedSearchesResponse) Reset() {
 	*x = SetSavedSearchesResponse{}
-	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[53]
+	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[57]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2610,7 +2828,7 @@ func (x *SetSavedSearchesResponse) String() string {
 func (*SetSavedSearchesResponse) ProtoMessage() {}
 
 func (x *SetSavedSearchesResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[53]
+	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[57]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2623,7 +2841,7 @@ func (x *SetSavedSearchesResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SetSavedSearchesResponse.ProtoReflect.Descriptor instead.
 func (*SetSavedSearchesResponse) Descriptor() ([]byte, []int) {
-	return file_wacky_tracky_clientapi_v1_wt_proto_rawDescGZIP(), []int{53}
+	return file_wacky_tracky_clientapi_v1_wt_proto_rawDescGZIP(), []int{57}
 }
 
 type StandardResponse struct {
@@ -2636,7 +2854,7 @@ type StandardResponse struct {
 
 func (x *StandardResponse) Reset() {
 	*x = StandardResponse{}
-	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[54]
+	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[58]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2648,7 +2866,7 @@ func (x *StandardResponse) String() string {
 func (*StandardResponse) ProtoMessage() {}
 
 func (x *StandardResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[54]
+	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[58]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2661,7 +2879,7 @@ func (x *StandardResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use StandardResponse.ProtoReflect.Descriptor instead.
 func (*StandardResponse) Descriptor() ([]byte, []int) {
-	return file_wacky_tracky_clientapi_v1_wt_proto_rawDescGZIP(), []int{54}
+	return file_wacky_tracky_clientapi_v1_wt_proto_rawDescGZIP(), []int{58}
 }
 
 func (x *StandardResponse) GetSuccess() bool {
@@ -2686,7 +2904,7 @@ type GetStatusRequest struct {
 
 func (x *GetStatusRequest) Reset() {
 	*x = GetStatusRequest{}
-	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[55]
+	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[59]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2698,7 +2916,7 @@ func (x *GetStatusRequest) String() string {
 func (*GetStatusRequest) ProtoMessage() {}
 
 func (x *GetStatusRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[55]
+	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[59]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2711,7 +2929,7 @@ func (x *GetStatusRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetStatusRequest.ProtoReflect.Descriptor instead.
 func (*GetStatusRequest) Descriptor() ([]byte, []int) {
-	return file_wacky_tracky_clientapi_v1_wt_proto_rawDescGZIP(), []int{55}
+	return file_wacky_tracky_clientapi_v1_wt_proto_rawDescGZIP(), []int{59}
 }
 
 type GetStatusResponse struct {
@@ -2733,7 +2951,7 @@ type GetStatusResponse struct {
 
 func (x *GetStatusResponse) Reset() {
 	*x = GetStatusResponse{}
-	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[56]
+	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[60]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2745,7 +2963,7 @@ func (x *GetStatusResponse) String() string {
 func (*GetStatusResponse) ProtoMessage() {}
 
 func (x *GetStatusResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[56]
+	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[60]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2758,7 +2976,7 @@ func (x *GetStatusResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetStatusResponse.ProtoReflect.Descriptor instead.
 func (*GetStatusResponse) Descriptor() ([]byte, []int) {
-	return file_wacky_tracky_clientapi_v1_wt_proto_rawDescGZIP(), []int{56}
+	return file_wacky_tracky_clientapi_v1_wt_proto_rawDescGZIP(), []int{60}
 }
 
 func (x *GetStatusResponse) GetUsername() string {
@@ -2834,7 +3052,7 @@ type LoginWithUsernameAndPasswordRequest struct {
 
 func (x *LoginWithUsernameAndPasswordRequest) Reset() {
 	*x = LoginWithUsernameAndPasswordRequest{}
-	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[57]
+	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[61]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2846,7 +3064,7 @@ func (x *LoginWithUsernameAndPasswordRequest) String() string {
 func (*LoginWithUsernameAndPasswordRequest) ProtoMessage() {}
 
 func (x *LoginWithUsernameAndPasswordRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[57]
+	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[61]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2859,7 +3077,7 @@ func (x *LoginWithUsernameAndPasswordRequest) ProtoReflect() protoreflect.Messag
 
 // Deprecated: Use LoginWithUsernameAndPasswordRequest.ProtoReflect.Descriptor instead.
 func (*LoginWithUsernameAndPasswordRequest) Descriptor() ([]byte, []int) {
-	return file_wacky_tracky_clientapi_v1_wt_proto_rawDescGZIP(), []int{57}
+	return file_wacky_tracky_clientapi_v1_wt_proto_rawDescGZIP(), []int{61}
 }
 
 func (x *LoginWithUsernameAndPasswordRequest) GetUsername() string {
@@ -2886,7 +3104,7 @@ type LoginWithUsernameAndPasswordResponse struct {
 
 func (x *LoginWithUsernameAndPasswordResponse) Reset() {
 	*x = LoginWithUsernameAndPasswordResponse{}
-	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[58]
+	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[62]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2898,7 +3116,7 @@ func (x *LoginWithUsernameAndPasswordResponse) String() string {
 func (*LoginWithUsernameAndPasswordResponse) ProtoMessage() {}
 
 func (x *LoginWithUsernameAndPasswordResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[58]
+	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[62]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2911,7 +3129,7 @@ func (x *LoginWithUsernameAndPasswordResponse) ProtoReflect() protoreflect.Messa
 
 // Deprecated: Use LoginWithUsernameAndPasswordResponse.ProtoReflect.Descriptor instead.
 func (*LoginWithUsernameAndPasswordResponse) Descriptor() ([]byte, []int) {
-	return file_wacky_tracky_clientapi_v1_wt_proto_rawDescGZIP(), []int{58}
+	return file_wacky_tracky_clientapi_v1_wt_proto_rawDescGZIP(), []int{62}
 }
 
 func (x *LoginWithUsernameAndPasswordResponse) GetStandardResponse() *StandardResponse {
@@ -2936,7 +3154,7 @@ type LogoutRequest struct {
 
 func (x *LogoutRequest) Reset() {
 	*x = LogoutRequest{}
-	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[59]
+	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[63]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2948,7 +3166,7 @@ func (x *LogoutRequest) String() string {
 func (*LogoutRequest) ProtoMessage() {}
 
 func (x *LogoutRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[59]
+	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[63]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2961,7 +3179,7 @@ func (x *LogoutRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use LogoutRequest.ProtoReflect.Descriptor instead.
 func (*LogoutRequest) Descriptor() ([]byte, []int) {
-	return file_wacky_tracky_clientapi_v1_wt_proto_rawDescGZIP(), []int{59}
+	return file_wacky_tracky_clientapi_v1_wt_proto_rawDescGZIP(), []int{63}
 }
 
 type LogoutResponse struct {
@@ -2973,7 +3191,7 @@ type LogoutResponse struct {
 
 func (x *LogoutResponse) Reset() {
 	*x = LogoutResponse{}
-	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[60]
+	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[64]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2985,7 +3203,7 @@ func (x *LogoutResponse) String() string {
 func (*LogoutResponse) ProtoMessage() {}
 
 func (x *LogoutResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[60]
+	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[64]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2998,7 +3216,7 @@ func (x *LogoutResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use LogoutResponse.ProtoReflect.Descriptor instead.
 func (*LogoutResponse) Descriptor() ([]byte, []int) {
-	return file_wacky_tracky_clientapi_v1_wt_proto_rawDescGZIP(), []int{60}
+	return file_wacky_tracky_clientapi_v1_wt_proto_rawDescGZIP(), []int{64}
 }
 
 func (x *LogoutResponse) GetStandardResponse() *StandardResponse {
@@ -3018,7 +3236,7 @@ type ChangePasswordRequest struct {
 
 func (x *ChangePasswordRequest) Reset() {
 	*x = ChangePasswordRequest{}
-	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[61]
+	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[65]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3030,7 +3248,7 @@ func (x *ChangePasswordRequest) String() string {
 func (*ChangePasswordRequest) ProtoMessage() {}
 
 func (x *ChangePasswordRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[61]
+	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[65]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3043,7 +3261,7 @@ func (x *ChangePasswordRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ChangePasswordRequest.ProtoReflect.Descriptor instead.
 func (*ChangePasswordRequest) Descriptor() ([]byte, []int) {
-	return file_wacky_tracky_clientapi_v1_wt_proto_rawDescGZIP(), []int{61}
+	return file_wacky_tracky_clientapi_v1_wt_proto_rawDescGZIP(), []int{65}
 }
 
 func (x *ChangePasswordRequest) GetCurrentPassword() string {
@@ -3069,7 +3287,7 @@ type ChangePasswordResponse struct {
 
 func (x *ChangePasswordResponse) Reset() {
 	*x = ChangePasswordResponse{}
-	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[62]
+	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[66]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3081,7 +3299,7 @@ func (x *ChangePasswordResponse) String() string {
 func (*ChangePasswordResponse) ProtoMessage() {}
 
 func (x *ChangePasswordResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[62]
+	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[66]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3094,7 +3312,7 @@ func (x *ChangePasswordResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ChangePasswordResponse.ProtoReflect.Descriptor instead.
 func (*ChangePasswordResponse) Descriptor() ([]byte, []int) {
-	return file_wacky_tracky_clientapi_v1_wt_proto_rawDescGZIP(), []int{62}
+	return file_wacky_tracky_clientapi_v1_wt_proto_rawDescGZIP(), []int{66}
 }
 
 func (x *ChangePasswordResponse) GetStandardResponse() *StandardResponse {
@@ -3117,7 +3335,7 @@ type UserAccount struct {
 
 func (x *UserAccount) Reset() {
 	*x = UserAccount{}
-	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[63]
+	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[67]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3129,7 +3347,7 @@ func (x *UserAccount) String() string {
 func (*UserAccount) ProtoMessage() {}
 
 func (x *UserAccount) ProtoReflect() protoreflect.Message {
-	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[63]
+	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[67]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3142,7 +3360,7 @@ func (x *UserAccount) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UserAccount.ProtoReflect.Descriptor instead.
 func (*UserAccount) Descriptor() ([]byte, []int) {
-	return file_wacky_tracky_clientapi_v1_wt_proto_rawDescGZIP(), []int{63}
+	return file_wacky_tracky_clientapi_v1_wt_proto_rawDescGZIP(), []int{67}
 }
 
 func (x *UserAccount) GetId() int32 {
@@ -3188,7 +3406,7 @@ type GetUsersRequest struct {
 
 func (x *GetUsersRequest) Reset() {
 	*x = GetUsersRequest{}
-	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[64]
+	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[68]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3200,7 +3418,7 @@ func (x *GetUsersRequest) String() string {
 func (*GetUsersRequest) ProtoMessage() {}
 
 func (x *GetUsersRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[64]
+	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[68]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3213,7 +3431,7 @@ func (x *GetUsersRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetUsersRequest.ProtoReflect.Descriptor instead.
 func (*GetUsersRequest) Descriptor() ([]byte, []int) {
-	return file_wacky_tracky_clientapi_v1_wt_proto_rawDescGZIP(), []int{64}
+	return file_wacky_tracky_clientapi_v1_wt_proto_rawDescGZIP(), []int{68}
 }
 
 type GetUsersResponse struct {
@@ -3225,7 +3443,7 @@ type GetUsersResponse struct {
 
 func (x *GetUsersResponse) Reset() {
 	*x = GetUsersResponse{}
-	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[65]
+	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[69]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3237,7 +3455,7 @@ func (x *GetUsersResponse) String() string {
 func (*GetUsersResponse) ProtoMessage() {}
 
 func (x *GetUsersResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[65]
+	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[69]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3250,7 +3468,7 @@ func (x *GetUsersResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetUsersResponse.ProtoReflect.Descriptor instead.
 func (*GetUsersResponse) Descriptor() ([]byte, []int) {
-	return file_wacky_tracky_clientapi_v1_wt_proto_rawDescGZIP(), []int{65}
+	return file_wacky_tracky_clientapi_v1_wt_proto_rawDescGZIP(), []int{69}
 }
 
 func (x *GetUsersResponse) GetUsers() []*UserAccount {
@@ -3269,7 +3487,7 @@ type GetUserRequest struct {
 
 func (x *GetUserRequest) Reset() {
 	*x = GetUserRequest{}
-	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[66]
+	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[70]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3281,7 +3499,7 @@ func (x *GetUserRequest) String() string {
 func (*GetUserRequest) ProtoMessage() {}
 
 func (x *GetUserRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[66]
+	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[70]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3294,7 +3512,7 @@ func (x *GetUserRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetUserRequest.ProtoReflect.Descriptor instead.
 func (*GetUserRequest) Descriptor() ([]byte, []int) {
-	return file_wacky_tracky_clientapi_v1_wt_proto_rawDescGZIP(), []int{66}
+	return file_wacky_tracky_clientapi_v1_wt_proto_rawDescGZIP(), []int{70}
 }
 
 func (x *GetUserRequest) GetUserId() int32 {
@@ -3314,7 +3532,7 @@ type GetUserResponse struct {
 
 func (x *GetUserResponse) Reset() {
 	*x = GetUserResponse{}
-	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[67]
+	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[71]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3326,7 +3544,7 @@ func (x *GetUserResponse) String() string {
 func (*GetUserResponse) ProtoMessage() {}
 
 func (x *GetUserResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[67]
+	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[71]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3339,7 +3557,7 @@ func (x *GetUserResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetUserResponse.ProtoReflect.Descriptor instead.
 func (*GetUserResponse) Descriptor() ([]byte, []int) {
-	return file_wacky_tracky_clientapi_v1_wt_proto_rawDescGZIP(), []int{67}
+	return file_wacky_tracky_clientapi_v1_wt_proto_rawDescGZIP(), []int{71}
 }
 
 func (x *GetUserResponse) GetUser() *UserAccount {
@@ -3366,7 +3584,7 @@ type CreateUserRequest struct {
 
 func (x *CreateUserRequest) Reset() {
 	*x = CreateUserRequest{}
-	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[68]
+	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[72]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3378,7 +3596,7 @@ func (x *CreateUserRequest) String() string {
 func (*CreateUserRequest) ProtoMessage() {}
 
 func (x *CreateUserRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[68]
+	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[72]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3391,7 +3609,7 @@ func (x *CreateUserRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CreateUserRequest.ProtoReflect.Descriptor instead.
 func (*CreateUserRequest) Descriptor() ([]byte, []int) {
-	return file_wacky_tracky_clientapi_v1_wt_proto_rawDescGZIP(), []int{68}
+	return file_wacky_tracky_clientapi_v1_wt_proto_rawDescGZIP(), []int{72}
 }
 
 func (x *CreateUserRequest) GetUsername() string {
@@ -3418,7 +3636,7 @@ type CreateUserResponse struct {
 
 func (x *CreateUserResponse) Reset() {
 	*x = CreateUserResponse{}
-	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[69]
+	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[73]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3430,7 +3648,7 @@ func (x *CreateUserResponse) String() string {
 func (*CreateUserResponse) ProtoMessage() {}
 
 func (x *CreateUserResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[69]
+	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[73]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3443,7 +3661,7 @@ func (x *CreateUserResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CreateUserResponse.ProtoReflect.Descriptor instead.
 func (*CreateUserResponse) Descriptor() ([]byte, []int) {
-	return file_wacky_tracky_clientapi_v1_wt_proto_rawDescGZIP(), []int{69}
+	return file_wacky_tracky_clientapi_v1_wt_proto_rawDescGZIP(), []int{73}
 }
 
 func (x *CreateUserResponse) GetStandardResponse() *StandardResponse {
@@ -3469,7 +3687,7 @@ type DeleteUserRequest struct {
 
 func (x *DeleteUserRequest) Reset() {
 	*x = DeleteUserRequest{}
-	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[70]
+	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[74]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3481,7 +3699,7 @@ func (x *DeleteUserRequest) String() string {
 func (*DeleteUserRequest) ProtoMessage() {}
 
 func (x *DeleteUserRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[70]
+	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[74]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3494,7 +3712,7 @@ func (x *DeleteUserRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DeleteUserRequest.ProtoReflect.Descriptor instead.
 func (*DeleteUserRequest) Descriptor() ([]byte, []int) {
-	return file_wacky_tracky_clientapi_v1_wt_proto_rawDescGZIP(), []int{70}
+	return file_wacky_tracky_clientapi_v1_wt_proto_rawDescGZIP(), []int{74}
 }
 
 func (x *DeleteUserRequest) GetUserId() int32 {
@@ -3513,7 +3731,7 @@ type DeleteUserResponse struct {
 
 func (x *DeleteUserResponse) Reset() {
 	*x = DeleteUserResponse{}
-	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[71]
+	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[75]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3525,7 +3743,7 @@ func (x *DeleteUserResponse) String() string {
 func (*DeleteUserResponse) ProtoMessage() {}
 
 func (x *DeleteUserResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[71]
+	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[75]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3538,7 +3756,7 @@ func (x *DeleteUserResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DeleteUserResponse.ProtoReflect.Descriptor instead.
 func (*DeleteUserResponse) Descriptor() ([]byte, []int) {
-	return file_wacky_tracky_clientapi_v1_wt_proto_rawDescGZIP(), []int{71}
+	return file_wacky_tracky_clientapi_v1_wt_proto_rawDescGZIP(), []int{75}
 }
 
 func (x *DeleteUserResponse) GetStandardResponse() *StandardResponse {
@@ -3558,7 +3776,7 @@ type ResetUserPasswordRequest struct {
 
 func (x *ResetUserPasswordRequest) Reset() {
 	*x = ResetUserPasswordRequest{}
-	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[72]
+	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[76]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3570,7 +3788,7 @@ func (x *ResetUserPasswordRequest) String() string {
 func (*ResetUserPasswordRequest) ProtoMessage() {}
 
 func (x *ResetUserPasswordRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[72]
+	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[76]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3583,7 +3801,7 @@ func (x *ResetUserPasswordRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ResetUserPasswordRequest.ProtoReflect.Descriptor instead.
 func (*ResetUserPasswordRequest) Descriptor() ([]byte, []int) {
-	return file_wacky_tracky_clientapi_v1_wt_proto_rawDescGZIP(), []int{72}
+	return file_wacky_tracky_clientapi_v1_wt_proto_rawDescGZIP(), []int{76}
 }
 
 func (x *ResetUserPasswordRequest) GetUserId() int32 {
@@ -3609,7 +3827,7 @@ type ResetUserPasswordResponse struct {
 
 func (x *ResetUserPasswordResponse) Reset() {
 	*x = ResetUserPasswordResponse{}
-	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[73]
+	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[77]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3621,7 +3839,7 @@ func (x *ResetUserPasswordResponse) String() string {
 func (*ResetUserPasswordResponse) ProtoMessage() {}
 
 func (x *ResetUserPasswordResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[73]
+	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[77]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3634,7 +3852,7 @@ func (x *ResetUserPasswordResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ResetUserPasswordResponse.ProtoReflect.Descriptor instead.
 func (*ResetUserPasswordResponse) Descriptor() ([]byte, []int) {
-	return file_wacky_tracky_clientapi_v1_wt_proto_rawDescGZIP(), []int{73}
+	return file_wacky_tracky_clientapi_v1_wt_proto_rawDescGZIP(), []int{77}
 }
 
 func (x *ResetUserPasswordResponse) GetStandardResponse() *StandardResponse {
@@ -3655,7 +3873,7 @@ type RbacPermission struct {
 
 func (x *RbacPermission) Reset() {
 	*x = RbacPermission{}
-	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[74]
+	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[78]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3667,7 +3885,7 @@ func (x *RbacPermission) String() string {
 func (*RbacPermission) ProtoMessage() {}
 
 func (x *RbacPermission) ProtoReflect() protoreflect.Message {
-	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[74]
+	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[78]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3680,7 +3898,7 @@ func (x *RbacPermission) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use RbacPermission.ProtoReflect.Descriptor instead.
 func (*RbacPermission) Descriptor() ([]byte, []int) {
-	return file_wacky_tracky_clientapi_v1_wt_proto_rawDescGZIP(), []int{74}
+	return file_wacky_tracky_clientapi_v1_wt_proto_rawDescGZIP(), []int{78}
 }
 
 func (x *RbacPermission) GetId() int32 {
@@ -3718,7 +3936,7 @@ type RbacRole struct {
 
 func (x *RbacRole) Reset() {
 	*x = RbacRole{}
-	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[75]
+	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[79]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3730,7 +3948,7 @@ func (x *RbacRole) String() string {
 func (*RbacRole) ProtoMessage() {}
 
 func (x *RbacRole) ProtoReflect() protoreflect.Message {
-	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[75]
+	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[79]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3743,7 +3961,7 @@ func (x *RbacRole) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use RbacRole.ProtoReflect.Descriptor instead.
 func (*RbacRole) Descriptor() ([]byte, []int) {
-	return file_wacky_tracky_clientapi_v1_wt_proto_rawDescGZIP(), []int{75}
+	return file_wacky_tracky_clientapi_v1_wt_proto_rawDescGZIP(), []int{79}
 }
 
 func (x *RbacRole) GetId() int32 {
@@ -3796,7 +4014,7 @@ type ListRbacPermissionsRequest struct {
 
 func (x *ListRbacPermissionsRequest) Reset() {
 	*x = ListRbacPermissionsRequest{}
-	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[76]
+	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[80]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3808,7 +4026,7 @@ func (x *ListRbacPermissionsRequest) String() string {
 func (*ListRbacPermissionsRequest) ProtoMessage() {}
 
 func (x *ListRbacPermissionsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[76]
+	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[80]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3821,7 +4039,7 @@ func (x *ListRbacPermissionsRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListRbacPermissionsRequest.ProtoReflect.Descriptor instead.
 func (*ListRbacPermissionsRequest) Descriptor() ([]byte, []int) {
-	return file_wacky_tracky_clientapi_v1_wt_proto_rawDescGZIP(), []int{76}
+	return file_wacky_tracky_clientapi_v1_wt_proto_rawDescGZIP(), []int{80}
 }
 
 type ListRbacPermissionsResponse struct {
@@ -3833,7 +4051,7 @@ type ListRbacPermissionsResponse struct {
 
 func (x *ListRbacPermissionsResponse) Reset() {
 	*x = ListRbacPermissionsResponse{}
-	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[77]
+	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[81]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3845,7 +4063,7 @@ func (x *ListRbacPermissionsResponse) String() string {
 func (*ListRbacPermissionsResponse) ProtoMessage() {}
 
 func (x *ListRbacPermissionsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[77]
+	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[81]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3858,7 +4076,7 @@ func (x *ListRbacPermissionsResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListRbacPermissionsResponse.ProtoReflect.Descriptor instead.
 func (*ListRbacPermissionsResponse) Descriptor() ([]byte, []int) {
-	return file_wacky_tracky_clientapi_v1_wt_proto_rawDescGZIP(), []int{77}
+	return file_wacky_tracky_clientapi_v1_wt_proto_rawDescGZIP(), []int{81}
 }
 
 func (x *ListRbacPermissionsResponse) GetPermissions() []*RbacPermission {
@@ -3876,7 +4094,7 @@ type ListRbacRolesRequest struct {
 
 func (x *ListRbacRolesRequest) Reset() {
 	*x = ListRbacRolesRequest{}
-	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[78]
+	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[82]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3888,7 +4106,7 @@ func (x *ListRbacRolesRequest) String() string {
 func (*ListRbacRolesRequest) ProtoMessage() {}
 
 func (x *ListRbacRolesRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[78]
+	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[82]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3901,7 +4119,7 @@ func (x *ListRbacRolesRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListRbacRolesRequest.ProtoReflect.Descriptor instead.
 func (*ListRbacRolesRequest) Descriptor() ([]byte, []int) {
-	return file_wacky_tracky_clientapi_v1_wt_proto_rawDescGZIP(), []int{78}
+	return file_wacky_tracky_clientapi_v1_wt_proto_rawDescGZIP(), []int{82}
 }
 
 type ListRbacRolesResponse struct {
@@ -3913,7 +4131,7 @@ type ListRbacRolesResponse struct {
 
 func (x *ListRbacRolesResponse) Reset() {
 	*x = ListRbacRolesResponse{}
-	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[79]
+	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[83]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3925,7 +4143,7 @@ func (x *ListRbacRolesResponse) String() string {
 func (*ListRbacRolesResponse) ProtoMessage() {}
 
 func (x *ListRbacRolesResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[79]
+	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[83]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3938,7 +4156,7 @@ func (x *ListRbacRolesResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListRbacRolesResponse.ProtoReflect.Descriptor instead.
 func (*ListRbacRolesResponse) Descriptor() ([]byte, []int) {
-	return file_wacky_tracky_clientapi_v1_wt_proto_rawDescGZIP(), []int{79}
+	return file_wacky_tracky_clientapi_v1_wt_proto_rawDescGZIP(), []int{83}
 }
 
 func (x *ListRbacRolesResponse) GetRoles() []*RbacRole {
@@ -3959,7 +4177,7 @@ type CreateRbacRoleRequest struct {
 
 func (x *CreateRbacRoleRequest) Reset() {
 	*x = CreateRbacRoleRequest{}
-	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[80]
+	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[84]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3971,7 +4189,7 @@ func (x *CreateRbacRoleRequest) String() string {
 func (*CreateRbacRoleRequest) ProtoMessage() {}
 
 func (x *CreateRbacRoleRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[80]
+	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[84]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3984,7 +4202,7 @@ func (x *CreateRbacRoleRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CreateRbacRoleRequest.ProtoReflect.Descriptor instead.
 func (*CreateRbacRoleRequest) Descriptor() ([]byte, []int) {
-	return file_wacky_tracky_clientapi_v1_wt_proto_rawDescGZIP(), []int{80}
+	return file_wacky_tracky_clientapi_v1_wt_proto_rawDescGZIP(), []int{84}
 }
 
 func (x *CreateRbacRoleRequest) GetName() string {
@@ -4017,7 +4235,7 @@ type CreateRbacRoleResponse struct {
 
 func (x *CreateRbacRoleResponse) Reset() {
 	*x = CreateRbacRoleResponse{}
-	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[81]
+	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[85]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -4029,7 +4247,7 @@ func (x *CreateRbacRoleResponse) String() string {
 func (*CreateRbacRoleResponse) ProtoMessage() {}
 
 func (x *CreateRbacRoleResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[81]
+	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[85]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4042,7 +4260,7 @@ func (x *CreateRbacRoleResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CreateRbacRoleResponse.ProtoReflect.Descriptor instead.
 func (*CreateRbacRoleResponse) Descriptor() ([]byte, []int) {
-	return file_wacky_tracky_clientapi_v1_wt_proto_rawDescGZIP(), []int{81}
+	return file_wacky_tracky_clientapi_v1_wt_proto_rawDescGZIP(), []int{85}
 }
 
 func (x *CreateRbacRoleResponse) GetRole() *RbacRole {
@@ -4064,7 +4282,7 @@ type UpdateRbacRoleRequest struct {
 
 func (x *UpdateRbacRoleRequest) Reset() {
 	*x = UpdateRbacRoleRequest{}
-	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[82]
+	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[86]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -4076,7 +4294,7 @@ func (x *UpdateRbacRoleRequest) String() string {
 func (*UpdateRbacRoleRequest) ProtoMessage() {}
 
 func (x *UpdateRbacRoleRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[82]
+	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[86]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4089,7 +4307,7 @@ func (x *UpdateRbacRoleRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UpdateRbacRoleRequest.ProtoReflect.Descriptor instead.
 func (*UpdateRbacRoleRequest) Descriptor() ([]byte, []int) {
-	return file_wacky_tracky_clientapi_v1_wt_proto_rawDescGZIP(), []int{82}
+	return file_wacky_tracky_clientapi_v1_wt_proto_rawDescGZIP(), []int{86}
 }
 
 func (x *UpdateRbacRoleRequest) GetId() int32 {
@@ -4129,7 +4347,7 @@ type DeleteRbacRoleRequest struct {
 
 func (x *DeleteRbacRoleRequest) Reset() {
 	*x = DeleteRbacRoleRequest{}
-	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[83]
+	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[87]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -4141,7 +4359,7 @@ func (x *DeleteRbacRoleRequest) String() string {
 func (*DeleteRbacRoleRequest) ProtoMessage() {}
 
 func (x *DeleteRbacRoleRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[83]
+	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[87]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4154,7 +4372,7 @@ func (x *DeleteRbacRoleRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DeleteRbacRoleRequest.ProtoReflect.Descriptor instead.
 func (*DeleteRbacRoleRequest) Descriptor() ([]byte, []int) {
-	return file_wacky_tracky_clientapi_v1_wt_proto_rawDescGZIP(), []int{83}
+	return file_wacky_tracky_clientapi_v1_wt_proto_rawDescGZIP(), []int{87}
 }
 
 func (x *DeleteRbacRoleRequest) GetId() int32 {
@@ -4172,7 +4390,7 @@ type DeleteRbacRoleResponse struct {
 
 func (x *DeleteRbacRoleResponse) Reset() {
 	*x = DeleteRbacRoleResponse{}
-	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[84]
+	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[88]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -4184,7 +4402,7 @@ func (x *DeleteRbacRoleResponse) String() string {
 func (*DeleteRbacRoleResponse) ProtoMessage() {}
 
 func (x *DeleteRbacRoleResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[84]
+	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[88]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4197,7 +4415,7 @@ func (x *DeleteRbacRoleResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DeleteRbacRoleResponse.ProtoReflect.Descriptor instead.
 func (*DeleteRbacRoleResponse) Descriptor() ([]byte, []int) {
-	return file_wacky_tracky_clientapi_v1_wt_proto_rawDescGZIP(), []int{84}
+	return file_wacky_tracky_clientapi_v1_wt_proto_rawDescGZIP(), []int{88}
 }
 
 type GetUserRbacRolesRequest struct {
@@ -4209,7 +4427,7 @@ type GetUserRbacRolesRequest struct {
 
 func (x *GetUserRbacRolesRequest) Reset() {
 	*x = GetUserRbacRolesRequest{}
-	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[85]
+	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[89]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -4221,7 +4439,7 @@ func (x *GetUserRbacRolesRequest) String() string {
 func (*GetUserRbacRolesRequest) ProtoMessage() {}
 
 func (x *GetUserRbacRolesRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[85]
+	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[89]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4234,7 +4452,7 @@ func (x *GetUserRbacRolesRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetUserRbacRolesRequest.ProtoReflect.Descriptor instead.
 func (*GetUserRbacRolesRequest) Descriptor() ([]byte, []int) {
-	return file_wacky_tracky_clientapi_v1_wt_proto_rawDescGZIP(), []int{85}
+	return file_wacky_tracky_clientapi_v1_wt_proto_rawDescGZIP(), []int{89}
 }
 
 func (x *GetUserRbacRolesRequest) GetUserId() int32 {
@@ -4253,7 +4471,7 @@ type GetUserRbacRolesResponse struct {
 
 func (x *GetUserRbacRolesResponse) Reset() {
 	*x = GetUserRbacRolesResponse{}
-	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[86]
+	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[90]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -4265,7 +4483,7 @@ func (x *GetUserRbacRolesResponse) String() string {
 func (*GetUserRbacRolesResponse) ProtoMessage() {}
 
 func (x *GetUserRbacRolesResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[86]
+	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[90]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4278,7 +4496,7 @@ func (x *GetUserRbacRolesResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetUserRbacRolesResponse.ProtoReflect.Descriptor instead.
 func (*GetUserRbacRolesResponse) Descriptor() ([]byte, []int) {
-	return file_wacky_tracky_clientapi_v1_wt_proto_rawDescGZIP(), []int{86}
+	return file_wacky_tracky_clientapi_v1_wt_proto_rawDescGZIP(), []int{90}
 }
 
 func (x *GetUserRbacRolesResponse) GetRoles() []*RbacRole {
@@ -4297,7 +4515,7 @@ type GetUserGroupRbacRolesRequest struct {
 
 func (x *GetUserGroupRbacRolesRequest) Reset() {
 	*x = GetUserGroupRbacRolesRequest{}
-	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[87]
+	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[91]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -4309,7 +4527,7 @@ func (x *GetUserGroupRbacRolesRequest) String() string {
 func (*GetUserGroupRbacRolesRequest) ProtoMessage() {}
 
 func (x *GetUserGroupRbacRolesRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[87]
+	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[91]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4322,7 +4540,7 @@ func (x *GetUserGroupRbacRolesRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetUserGroupRbacRolesRequest.ProtoReflect.Descriptor instead.
 func (*GetUserGroupRbacRolesRequest) Descriptor() ([]byte, []int) {
-	return file_wacky_tracky_clientapi_v1_wt_proto_rawDescGZIP(), []int{87}
+	return file_wacky_tracky_clientapi_v1_wt_proto_rawDescGZIP(), []int{91}
 }
 
 func (x *GetUserGroupRbacRolesRequest) GetGroupId() int32 {
@@ -4341,7 +4559,7 @@ type GetUserGroupRbacRolesResponse struct {
 
 func (x *GetUserGroupRbacRolesResponse) Reset() {
 	*x = GetUserGroupRbacRolesResponse{}
-	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[88]
+	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[92]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -4353,7 +4571,7 @@ func (x *GetUserGroupRbacRolesResponse) String() string {
 func (*GetUserGroupRbacRolesResponse) ProtoMessage() {}
 
 func (x *GetUserGroupRbacRolesResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[88]
+	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[92]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4366,7 +4584,7 @@ func (x *GetUserGroupRbacRolesResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetUserGroupRbacRolesResponse.ProtoReflect.Descriptor instead.
 func (*GetUserGroupRbacRolesResponse) Descriptor() ([]byte, []int) {
-	return file_wacky_tracky_clientapi_v1_wt_proto_rawDescGZIP(), []int{88}
+	return file_wacky_tracky_clientapi_v1_wt_proto_rawDescGZIP(), []int{92}
 }
 
 func (x *GetUserGroupRbacRolesResponse) GetRoleIds() []int32 {
@@ -4386,7 +4604,7 @@ type SetUserGroupRbacRolesRequest struct {
 
 func (x *SetUserGroupRbacRolesRequest) Reset() {
 	*x = SetUserGroupRbacRolesRequest{}
-	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[89]
+	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[93]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -4398,7 +4616,7 @@ func (x *SetUserGroupRbacRolesRequest) String() string {
 func (*SetUserGroupRbacRolesRequest) ProtoMessage() {}
 
 func (x *SetUserGroupRbacRolesRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[89]
+	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[93]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4411,7 +4629,7 @@ func (x *SetUserGroupRbacRolesRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SetUserGroupRbacRolesRequest.ProtoReflect.Descriptor instead.
 func (*SetUserGroupRbacRolesRequest) Descriptor() ([]byte, []int) {
-	return file_wacky_tracky_clientapi_v1_wt_proto_rawDescGZIP(), []int{89}
+	return file_wacky_tracky_clientapi_v1_wt_proto_rawDescGZIP(), []int{93}
 }
 
 func (x *SetUserGroupRbacRolesRequest) GetGroupId() int32 {
@@ -4437,7 +4655,7 @@ type SetUserGroupRbacRolesResponse struct {
 
 func (x *SetUserGroupRbacRolesResponse) Reset() {
 	*x = SetUserGroupRbacRolesResponse{}
-	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[90]
+	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[94]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -4449,7 +4667,7 @@ func (x *SetUserGroupRbacRolesResponse) String() string {
 func (*SetUserGroupRbacRolesResponse) ProtoMessage() {}
 
 func (x *SetUserGroupRbacRolesResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[90]
+	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[94]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4462,7 +4680,7 @@ func (x *SetUserGroupRbacRolesResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SetUserGroupRbacRolesResponse.ProtoReflect.Descriptor instead.
 func (*SetUserGroupRbacRolesResponse) Descriptor() ([]byte, []int) {
-	return file_wacky_tracky_clientapi_v1_wt_proto_rawDescGZIP(), []int{90}
+	return file_wacky_tracky_clientapi_v1_wt_proto_rawDescGZIP(), []int{94}
 }
 
 func (x *SetUserGroupRbacRolesResponse) GetStandardResponse() *StandardResponse {
@@ -4481,7 +4699,7 @@ type GetRbacRoleUsersRequest struct {
 
 func (x *GetRbacRoleUsersRequest) Reset() {
 	*x = GetRbacRoleUsersRequest{}
-	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[91]
+	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[95]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -4493,7 +4711,7 @@ func (x *GetRbacRoleUsersRequest) String() string {
 func (*GetRbacRoleUsersRequest) ProtoMessage() {}
 
 func (x *GetRbacRoleUsersRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[91]
+	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[95]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4506,7 +4724,7 @@ func (x *GetRbacRoleUsersRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetRbacRoleUsersRequest.ProtoReflect.Descriptor instead.
 func (*GetRbacRoleUsersRequest) Descriptor() ([]byte, []int) {
-	return file_wacky_tracky_clientapi_v1_wt_proto_rawDescGZIP(), []int{91}
+	return file_wacky_tracky_clientapi_v1_wt_proto_rawDescGZIP(), []int{95}
 }
 
 func (x *GetRbacRoleUsersRequest) GetRoleId() int32 {
@@ -4525,7 +4743,7 @@ type GetRbacRoleUsersResponse struct {
 
 func (x *GetRbacRoleUsersResponse) Reset() {
 	*x = GetRbacRoleUsersResponse{}
-	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[92]
+	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[96]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -4537,7 +4755,7 @@ func (x *GetRbacRoleUsersResponse) String() string {
 func (*GetRbacRoleUsersResponse) ProtoMessage() {}
 
 func (x *GetRbacRoleUsersResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[92]
+	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[96]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4550,7 +4768,7 @@ func (x *GetRbacRoleUsersResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetRbacRoleUsersResponse.ProtoReflect.Descriptor instead.
 func (*GetRbacRoleUsersResponse) Descriptor() ([]byte, []int) {
-	return file_wacky_tracky_clientapi_v1_wt_proto_rawDescGZIP(), []int{92}
+	return file_wacky_tracky_clientapi_v1_wt_proto_rawDescGZIP(), []int{96}
 }
 
 func (x *GetRbacRoleUsersResponse) GetUsernames() []string {
@@ -4569,7 +4787,7 @@ type GetRbacRoleGroupsRequest struct {
 
 func (x *GetRbacRoleGroupsRequest) Reset() {
 	*x = GetRbacRoleGroupsRequest{}
-	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[93]
+	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[97]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -4581,7 +4799,7 @@ func (x *GetRbacRoleGroupsRequest) String() string {
 func (*GetRbacRoleGroupsRequest) ProtoMessage() {}
 
 func (x *GetRbacRoleGroupsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[93]
+	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[97]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4594,7 +4812,7 @@ func (x *GetRbacRoleGroupsRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetRbacRoleGroupsRequest.ProtoReflect.Descriptor instead.
 func (*GetRbacRoleGroupsRequest) Descriptor() ([]byte, []int) {
-	return file_wacky_tracky_clientapi_v1_wt_proto_rawDescGZIP(), []int{93}
+	return file_wacky_tracky_clientapi_v1_wt_proto_rawDescGZIP(), []int{97}
 }
 
 func (x *GetRbacRoleGroupsRequest) GetRoleId() int32 {
@@ -4613,7 +4831,7 @@ type GetRbacRoleGroupsResponse struct {
 
 func (x *GetRbacRoleGroupsResponse) Reset() {
 	*x = GetRbacRoleGroupsResponse{}
-	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[94]
+	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[98]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -4625,7 +4843,7 @@ func (x *GetRbacRoleGroupsResponse) String() string {
 func (*GetRbacRoleGroupsResponse) ProtoMessage() {}
 
 func (x *GetRbacRoleGroupsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[94]
+	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[98]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4638,7 +4856,7 @@ func (x *GetRbacRoleGroupsResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetRbacRoleGroupsResponse.ProtoReflect.Descriptor instead.
 func (*GetRbacRoleGroupsResponse) Descriptor() ([]byte, []int) {
-	return file_wacky_tracky_clientapi_v1_wt_proto_rawDescGZIP(), []int{94}
+	return file_wacky_tracky_clientapi_v1_wt_proto_rawDescGZIP(), []int{98}
 }
 
 func (x *GetRbacRoleGroupsResponse) GetGroupNames() []string {
@@ -4659,7 +4877,7 @@ type MyPermissionAuditRow struct {
 
 func (x *MyPermissionAuditRow) Reset() {
 	*x = MyPermissionAuditRow{}
-	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[95]
+	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[99]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -4671,7 +4889,7 @@ func (x *MyPermissionAuditRow) String() string {
 func (*MyPermissionAuditRow) ProtoMessage() {}
 
 func (x *MyPermissionAuditRow) ProtoReflect() protoreflect.Message {
-	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[95]
+	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[99]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4684,7 +4902,7 @@ func (x *MyPermissionAuditRow) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use MyPermissionAuditRow.ProtoReflect.Descriptor instead.
 func (*MyPermissionAuditRow) Descriptor() ([]byte, []int) {
-	return file_wacky_tracky_clientapi_v1_wt_proto_rawDescGZIP(), []int{95}
+	return file_wacky_tracky_clientapi_v1_wt_proto_rawDescGZIP(), []int{99}
 }
 
 func (x *MyPermissionAuditRow) GetPermission() string {
@@ -4716,7 +4934,7 @@ type GetMyPermissionsAuditRequest struct {
 
 func (x *GetMyPermissionsAuditRequest) Reset() {
 	*x = GetMyPermissionsAuditRequest{}
-	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[96]
+	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[100]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -4728,7 +4946,7 @@ func (x *GetMyPermissionsAuditRequest) String() string {
 func (*GetMyPermissionsAuditRequest) ProtoMessage() {}
 
 func (x *GetMyPermissionsAuditRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[96]
+	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[100]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4741,7 +4959,7 @@ func (x *GetMyPermissionsAuditRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetMyPermissionsAuditRequest.ProtoReflect.Descriptor instead.
 func (*GetMyPermissionsAuditRequest) Descriptor() ([]byte, []int) {
-	return file_wacky_tracky_clientapi_v1_wt_proto_rawDescGZIP(), []int{96}
+	return file_wacky_tracky_clientapi_v1_wt_proto_rawDescGZIP(), []int{100}
 }
 
 type GetMyPermissionsAuditResponse struct {
@@ -4756,7 +4974,7 @@ type GetMyPermissionsAuditResponse struct {
 
 func (x *GetMyPermissionsAuditResponse) Reset() {
 	*x = GetMyPermissionsAuditResponse{}
-	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[97]
+	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[101]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -4768,7 +4986,7 @@ func (x *GetMyPermissionsAuditResponse) String() string {
 func (*GetMyPermissionsAuditResponse) ProtoMessage() {}
 
 func (x *GetMyPermissionsAuditResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[97]
+	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[101]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4781,7 +4999,7 @@ func (x *GetMyPermissionsAuditResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetMyPermissionsAuditResponse.ProtoReflect.Descriptor instead.
 func (*GetMyPermissionsAuditResponse) Descriptor() ([]byte, []int) {
-	return file_wacky_tracky_clientapi_v1_wt_proto_rawDescGZIP(), []int{97}
+	return file_wacky_tracky_clientapi_v1_wt_proto_rawDescGZIP(), []int{101}
 }
 
 func (x *GetMyPermissionsAuditResponse) GetGroupNames() []string {
@@ -4823,7 +5041,7 @@ type UserGroup struct {
 
 func (x *UserGroup) Reset() {
 	*x = UserGroup{}
-	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[98]
+	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[102]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -4835,7 +5053,7 @@ func (x *UserGroup) String() string {
 func (*UserGroup) ProtoMessage() {}
 
 func (x *UserGroup) ProtoReflect() protoreflect.Message {
-	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[98]
+	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[102]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4848,7 +5066,7 @@ func (x *UserGroup) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UserGroup.ProtoReflect.Descriptor instead.
 func (*UserGroup) Descriptor() ([]byte, []int) {
-	return file_wacky_tracky_clientapi_v1_wt_proto_rawDescGZIP(), []int{98}
+	return file_wacky_tracky_clientapi_v1_wt_proto_rawDescGZIP(), []int{102}
 }
 
 func (x *UserGroup) GetId() int32 {
@@ -4880,7 +5098,7 @@ type ListUserGroupsRequest struct {
 
 func (x *ListUserGroupsRequest) Reset() {
 	*x = ListUserGroupsRequest{}
-	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[99]
+	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[103]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -4892,7 +5110,7 @@ func (x *ListUserGroupsRequest) String() string {
 func (*ListUserGroupsRequest) ProtoMessage() {}
 
 func (x *ListUserGroupsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[99]
+	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[103]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4905,7 +5123,7 @@ func (x *ListUserGroupsRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListUserGroupsRequest.ProtoReflect.Descriptor instead.
 func (*ListUserGroupsRequest) Descriptor() ([]byte, []int) {
-	return file_wacky_tracky_clientapi_v1_wt_proto_rawDescGZIP(), []int{99}
+	return file_wacky_tracky_clientapi_v1_wt_proto_rawDescGZIP(), []int{103}
 }
 
 type ListUserGroupsResponse struct {
@@ -4917,7 +5135,7 @@ type ListUserGroupsResponse struct {
 
 func (x *ListUserGroupsResponse) Reset() {
 	*x = ListUserGroupsResponse{}
-	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[100]
+	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[104]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -4929,7 +5147,7 @@ func (x *ListUserGroupsResponse) String() string {
 func (*ListUserGroupsResponse) ProtoMessage() {}
 
 func (x *ListUserGroupsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[100]
+	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[104]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4942,7 +5160,7 @@ func (x *ListUserGroupsResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListUserGroupsResponse.ProtoReflect.Descriptor instead.
 func (*ListUserGroupsResponse) Descriptor() ([]byte, []int) {
-	return file_wacky_tracky_clientapi_v1_wt_proto_rawDescGZIP(), []int{100}
+	return file_wacky_tracky_clientapi_v1_wt_proto_rawDescGZIP(), []int{104}
 }
 
 func (x *ListUserGroupsResponse) GetGroups() []*UserGroup {
@@ -4961,7 +5179,7 @@ type CreateUserGroupRequest struct {
 
 func (x *CreateUserGroupRequest) Reset() {
 	*x = CreateUserGroupRequest{}
-	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[101]
+	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[105]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -4973,7 +5191,7 @@ func (x *CreateUserGroupRequest) String() string {
 func (*CreateUserGroupRequest) ProtoMessage() {}
 
 func (x *CreateUserGroupRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[101]
+	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[105]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4986,7 +5204,7 @@ func (x *CreateUserGroupRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CreateUserGroupRequest.ProtoReflect.Descriptor instead.
 func (*CreateUserGroupRequest) Descriptor() ([]byte, []int) {
-	return file_wacky_tracky_clientapi_v1_wt_proto_rawDescGZIP(), []int{101}
+	return file_wacky_tracky_clientapi_v1_wt_proto_rawDescGZIP(), []int{105}
 }
 
 func (x *CreateUserGroupRequest) GetName() string {
@@ -5005,7 +5223,7 @@ type CreateUserGroupResponse struct {
 
 func (x *CreateUserGroupResponse) Reset() {
 	*x = CreateUserGroupResponse{}
-	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[102]
+	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[106]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -5017,7 +5235,7 @@ func (x *CreateUserGroupResponse) String() string {
 func (*CreateUserGroupResponse) ProtoMessage() {}
 
 func (x *CreateUserGroupResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[102]
+	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[106]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -5030,7 +5248,7 @@ func (x *CreateUserGroupResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CreateUserGroupResponse.ProtoReflect.Descriptor instead.
 func (*CreateUserGroupResponse) Descriptor() ([]byte, []int) {
-	return file_wacky_tracky_clientapi_v1_wt_proto_rawDescGZIP(), []int{102}
+	return file_wacky_tracky_clientapi_v1_wt_proto_rawDescGZIP(), []int{106}
 }
 
 func (x *CreateUserGroupResponse) GetGroup() *UserGroup {
@@ -5049,7 +5267,7 @@ type DeleteUserGroupRequest struct {
 
 func (x *DeleteUserGroupRequest) Reset() {
 	*x = DeleteUserGroupRequest{}
-	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[103]
+	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[107]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -5061,7 +5279,7 @@ func (x *DeleteUserGroupRequest) String() string {
 func (*DeleteUserGroupRequest) ProtoMessage() {}
 
 func (x *DeleteUserGroupRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[103]
+	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[107]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -5074,7 +5292,7 @@ func (x *DeleteUserGroupRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DeleteUserGroupRequest.ProtoReflect.Descriptor instead.
 func (*DeleteUserGroupRequest) Descriptor() ([]byte, []int) {
-	return file_wacky_tracky_clientapi_v1_wt_proto_rawDescGZIP(), []int{103}
+	return file_wacky_tracky_clientapi_v1_wt_proto_rawDescGZIP(), []int{107}
 }
 
 func (x *DeleteUserGroupRequest) GetGroupId() int32 {
@@ -5092,7 +5310,7 @@ type DeleteUserGroupResponse struct {
 
 func (x *DeleteUserGroupResponse) Reset() {
 	*x = DeleteUserGroupResponse{}
-	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[104]
+	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[108]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -5104,7 +5322,7 @@ func (x *DeleteUserGroupResponse) String() string {
 func (*DeleteUserGroupResponse) ProtoMessage() {}
 
 func (x *DeleteUserGroupResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[104]
+	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[108]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -5117,7 +5335,7 @@ func (x *DeleteUserGroupResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DeleteUserGroupResponse.ProtoReflect.Descriptor instead.
 func (*DeleteUserGroupResponse) Descriptor() ([]byte, []int) {
-	return file_wacky_tracky_clientapi_v1_wt_proto_rawDescGZIP(), []int{104}
+	return file_wacky_tracky_clientapi_v1_wt_proto_rawDescGZIP(), []int{108}
 }
 
 type GetUserGroupMembersRequest struct {
@@ -5129,7 +5347,7 @@ type GetUserGroupMembersRequest struct {
 
 func (x *GetUserGroupMembersRequest) Reset() {
 	*x = GetUserGroupMembersRequest{}
-	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[105]
+	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[109]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -5141,7 +5359,7 @@ func (x *GetUserGroupMembersRequest) String() string {
 func (*GetUserGroupMembersRequest) ProtoMessage() {}
 
 func (x *GetUserGroupMembersRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[105]
+	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[109]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -5154,7 +5372,7 @@ func (x *GetUserGroupMembersRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetUserGroupMembersRequest.ProtoReflect.Descriptor instead.
 func (*GetUserGroupMembersRequest) Descriptor() ([]byte, []int) {
-	return file_wacky_tracky_clientapi_v1_wt_proto_rawDescGZIP(), []int{105}
+	return file_wacky_tracky_clientapi_v1_wt_proto_rawDescGZIP(), []int{109}
 }
 
 func (x *GetUserGroupMembersRequest) GetGroupId() int32 {
@@ -5173,7 +5391,7 @@ type GetUserGroupMembersResponse struct {
 
 func (x *GetUserGroupMembersResponse) Reset() {
 	*x = GetUserGroupMembersResponse{}
-	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[106]
+	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[110]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -5185,7 +5403,7 @@ func (x *GetUserGroupMembersResponse) String() string {
 func (*GetUserGroupMembersResponse) ProtoMessage() {}
 
 func (x *GetUserGroupMembersResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[106]
+	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[110]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -5198,7 +5416,7 @@ func (x *GetUserGroupMembersResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetUserGroupMembersResponse.ProtoReflect.Descriptor instead.
 func (*GetUserGroupMembersResponse) Descriptor() ([]byte, []int) {
-	return file_wacky_tracky_clientapi_v1_wt_proto_rawDescGZIP(), []int{106}
+	return file_wacky_tracky_clientapi_v1_wt_proto_rawDescGZIP(), []int{110}
 }
 
 func (x *GetUserGroupMembersResponse) GetMembers() []*UserAccount {
@@ -5218,7 +5436,7 @@ type SetUserGroupMembersRequest struct {
 
 func (x *SetUserGroupMembersRequest) Reset() {
 	*x = SetUserGroupMembersRequest{}
-	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[107]
+	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[111]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -5230,7 +5448,7 @@ func (x *SetUserGroupMembersRequest) String() string {
 func (*SetUserGroupMembersRequest) ProtoMessage() {}
 
 func (x *SetUserGroupMembersRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[107]
+	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[111]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -5243,7 +5461,7 @@ func (x *SetUserGroupMembersRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SetUserGroupMembersRequest.ProtoReflect.Descriptor instead.
 func (*SetUserGroupMembersRequest) Descriptor() ([]byte, []int) {
-	return file_wacky_tracky_clientapi_v1_wt_proto_rawDescGZIP(), []int{107}
+	return file_wacky_tracky_clientapi_v1_wt_proto_rawDescGZIP(), []int{111}
 }
 
 func (x *SetUserGroupMembersRequest) GetGroupId() int32 {
@@ -5269,7 +5487,7 @@ type SetUserGroupMembersResponse struct {
 
 func (x *SetUserGroupMembersResponse) Reset() {
 	*x = SetUserGroupMembersResponse{}
-	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[108]
+	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[112]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -5281,7 +5499,7 @@ func (x *SetUserGroupMembersResponse) String() string {
 func (*SetUserGroupMembersResponse) ProtoMessage() {}
 
 func (x *SetUserGroupMembersResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[108]
+	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[112]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -5294,7 +5512,7 @@ func (x *SetUserGroupMembersResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SetUserGroupMembersResponse.ProtoReflect.Descriptor instead.
 func (*SetUserGroupMembersResponse) Descriptor() ([]byte, []int) {
-	return file_wacky_tracky_clientapi_v1_wt_proto_rawDescGZIP(), []int{108}
+	return file_wacky_tracky_clientapi_v1_wt_proto_rawDescGZIP(), []int{112}
 }
 
 func (x *SetUserGroupMembersResponse) GetStandardResponse() *StandardResponse {
@@ -5313,7 +5531,7 @@ type ImpersonateUserRequest struct {
 
 func (x *ImpersonateUserRequest) Reset() {
 	*x = ImpersonateUserRequest{}
-	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[109]
+	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[113]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -5325,7 +5543,7 @@ func (x *ImpersonateUserRequest) String() string {
 func (*ImpersonateUserRequest) ProtoMessage() {}
 
 func (x *ImpersonateUserRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[109]
+	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[113]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -5338,7 +5556,7 @@ func (x *ImpersonateUserRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ImpersonateUserRequest.ProtoReflect.Descriptor instead.
 func (*ImpersonateUserRequest) Descriptor() ([]byte, []int) {
-	return file_wacky_tracky_clientapi_v1_wt_proto_rawDescGZIP(), []int{109}
+	return file_wacky_tracky_clientapi_v1_wt_proto_rawDescGZIP(), []int{113}
 }
 
 func (x *ImpersonateUserRequest) GetUserId() int32 {
@@ -5357,7 +5575,7 @@ type ImpersonateUserResponse struct {
 
 func (x *ImpersonateUserResponse) Reset() {
 	*x = ImpersonateUserResponse{}
-	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[110]
+	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[114]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -5369,7 +5587,7 @@ func (x *ImpersonateUserResponse) String() string {
 func (*ImpersonateUserResponse) ProtoMessage() {}
 
 func (x *ImpersonateUserResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[110]
+	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[114]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -5382,7 +5600,7 @@ func (x *ImpersonateUserResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ImpersonateUserResponse.ProtoReflect.Descriptor instead.
 func (*ImpersonateUserResponse) Descriptor() ([]byte, []int) {
-	return file_wacky_tracky_clientapi_v1_wt_proto_rawDescGZIP(), []int{110}
+	return file_wacky_tracky_clientapi_v1_wt_proto_rawDescGZIP(), []int{114}
 }
 
 func (x *ImpersonateUserResponse) GetStandardResponse() *StandardResponse {
@@ -5400,7 +5618,7 @@ type StopImpersonationRequest struct {
 
 func (x *StopImpersonationRequest) Reset() {
 	*x = StopImpersonationRequest{}
-	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[111]
+	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[115]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -5412,7 +5630,7 @@ func (x *StopImpersonationRequest) String() string {
 func (*StopImpersonationRequest) ProtoMessage() {}
 
 func (x *StopImpersonationRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[111]
+	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[115]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -5425,7 +5643,7 @@ func (x *StopImpersonationRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use StopImpersonationRequest.ProtoReflect.Descriptor instead.
 func (*StopImpersonationRequest) Descriptor() ([]byte, []int) {
-	return file_wacky_tracky_clientapi_v1_wt_proto_rawDescGZIP(), []int{111}
+	return file_wacky_tracky_clientapi_v1_wt_proto_rawDescGZIP(), []int{115}
 }
 
 type StopImpersonationResponse struct {
@@ -5437,7 +5655,7 @@ type StopImpersonationResponse struct {
 
 func (x *StopImpersonationResponse) Reset() {
 	*x = StopImpersonationResponse{}
-	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[112]
+	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[116]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -5449,7 +5667,7 @@ func (x *StopImpersonationResponse) String() string {
 func (*StopImpersonationResponse) ProtoMessage() {}
 
 func (x *StopImpersonationResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[112]
+	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[116]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -5462,7 +5680,7 @@ func (x *StopImpersonationResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use StopImpersonationResponse.ProtoReflect.Descriptor instead.
 func (*StopImpersonationResponse) Descriptor() ([]byte, []int) {
-	return file_wacky_tracky_clientapi_v1_wt_proto_rawDescGZIP(), []int{112}
+	return file_wacky_tracky_clientapi_v1_wt_proto_rawDescGZIP(), []int{116}
 }
 
 func (x *StopImpersonationResponse) GetStandardResponse() *StandardResponse {
@@ -5485,7 +5703,7 @@ type ApiKey struct {
 
 func (x *ApiKey) Reset() {
 	*x = ApiKey{}
-	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[113]
+	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[117]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -5497,7 +5715,7 @@ func (x *ApiKey) String() string {
 func (*ApiKey) ProtoMessage() {}
 
 func (x *ApiKey) ProtoReflect() protoreflect.Message {
-	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[113]
+	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[117]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -5510,7 +5728,7 @@ func (x *ApiKey) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ApiKey.ProtoReflect.Descriptor instead.
 func (*ApiKey) Descriptor() ([]byte, []int) {
-	return file_wacky_tracky_clientapi_v1_wt_proto_rawDescGZIP(), []int{113}
+	return file_wacky_tracky_clientapi_v1_wt_proto_rawDescGZIP(), []int{117}
 }
 
 func (x *ApiKey) GetId() int32 {
@@ -5556,7 +5774,7 @@ type ListApiKeysRequest struct {
 
 func (x *ListApiKeysRequest) Reset() {
 	*x = ListApiKeysRequest{}
-	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[114]
+	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[118]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -5568,7 +5786,7 @@ func (x *ListApiKeysRequest) String() string {
 func (*ListApiKeysRequest) ProtoMessage() {}
 
 func (x *ListApiKeysRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[114]
+	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[118]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -5581,7 +5799,7 @@ func (x *ListApiKeysRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListApiKeysRequest.ProtoReflect.Descriptor instead.
 func (*ListApiKeysRequest) Descriptor() ([]byte, []int) {
-	return file_wacky_tracky_clientapi_v1_wt_proto_rawDescGZIP(), []int{114}
+	return file_wacky_tracky_clientapi_v1_wt_proto_rawDescGZIP(), []int{118}
 }
 
 type ListApiKeysResponse struct {
@@ -5593,7 +5811,7 @@ type ListApiKeysResponse struct {
 
 func (x *ListApiKeysResponse) Reset() {
 	*x = ListApiKeysResponse{}
-	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[115]
+	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[119]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -5605,7 +5823,7 @@ func (x *ListApiKeysResponse) String() string {
 func (*ListApiKeysResponse) ProtoMessage() {}
 
 func (x *ListApiKeysResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[115]
+	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[119]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -5618,7 +5836,7 @@ func (x *ListApiKeysResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListApiKeysResponse.ProtoReflect.Descriptor instead.
 func (*ListApiKeysResponse) Descriptor() ([]byte, []int) {
-	return file_wacky_tracky_clientapi_v1_wt_proto_rawDescGZIP(), []int{115}
+	return file_wacky_tracky_clientapi_v1_wt_proto_rawDescGZIP(), []int{119}
 }
 
 func (x *ListApiKeysResponse) GetKeys() []*ApiKey {
@@ -5638,7 +5856,7 @@ type CreateApiKeyRequest struct {
 
 func (x *CreateApiKeyRequest) Reset() {
 	*x = CreateApiKeyRequest{}
-	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[116]
+	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[120]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -5650,7 +5868,7 @@ func (x *CreateApiKeyRequest) String() string {
 func (*CreateApiKeyRequest) ProtoMessage() {}
 
 func (x *CreateApiKeyRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[116]
+	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[120]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -5663,7 +5881,7 @@ func (x *CreateApiKeyRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CreateApiKeyRequest.ProtoReflect.Descriptor instead.
 func (*CreateApiKeyRequest) Descriptor() ([]byte, []int) {
-	return file_wacky_tracky_clientapi_v1_wt_proto_rawDescGZIP(), []int{116}
+	return file_wacky_tracky_clientapi_v1_wt_proto_rawDescGZIP(), []int{120}
 }
 
 func (x *CreateApiKeyRequest) GetName() string {
@@ -5690,7 +5908,7 @@ type CreateApiKeyResponse struct {
 
 func (x *CreateApiKeyResponse) Reset() {
 	*x = CreateApiKeyResponse{}
-	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[117]
+	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[121]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -5702,7 +5920,7 @@ func (x *CreateApiKeyResponse) String() string {
 func (*CreateApiKeyResponse) ProtoMessage() {}
 
 func (x *CreateApiKeyResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[117]
+	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[121]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -5715,7 +5933,7 @@ func (x *CreateApiKeyResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CreateApiKeyResponse.ProtoReflect.Descriptor instead.
 func (*CreateApiKeyResponse) Descriptor() ([]byte, []int) {
-	return file_wacky_tracky_clientapi_v1_wt_proto_rawDescGZIP(), []int{117}
+	return file_wacky_tracky_clientapi_v1_wt_proto_rawDescGZIP(), []int{121}
 }
 
 func (x *CreateApiKeyResponse) GetKey() *ApiKey {
@@ -5741,7 +5959,7 @@ type DeleteApiKeyRequest struct {
 
 func (x *DeleteApiKeyRequest) Reset() {
 	*x = DeleteApiKeyRequest{}
-	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[118]
+	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[122]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -5753,7 +5971,7 @@ func (x *DeleteApiKeyRequest) String() string {
 func (*DeleteApiKeyRequest) ProtoMessage() {}
 
 func (x *DeleteApiKeyRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[118]
+	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[122]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -5766,7 +5984,7 @@ func (x *DeleteApiKeyRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DeleteApiKeyRequest.ProtoReflect.Descriptor instead.
 func (*DeleteApiKeyRequest) Descriptor() ([]byte, []int) {
-	return file_wacky_tracky_clientapi_v1_wt_proto_rawDescGZIP(), []int{118}
+	return file_wacky_tracky_clientapi_v1_wt_proto_rawDescGZIP(), []int{122}
 }
 
 func (x *DeleteApiKeyRequest) GetId() int32 {
@@ -5784,7 +6002,7 @@ type DeleteApiKeyResponse struct {
 
 func (x *DeleteApiKeyResponse) Reset() {
 	*x = DeleteApiKeyResponse{}
-	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[119]
+	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[123]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -5796,7 +6014,7 @@ func (x *DeleteApiKeyResponse) String() string {
 func (*DeleteApiKeyResponse) ProtoMessage() {}
 
 func (x *DeleteApiKeyResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[119]
+	mi := &file_wacky_tracky_clientapi_v1_wt_proto_msgTypes[123]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -5809,7 +6027,7 @@ func (x *DeleteApiKeyResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DeleteApiKeyResponse.ProtoReflect.Descriptor instead.
 func (*DeleteApiKeyResponse) Descriptor() ([]byte, []int) {
-	return file_wacky_tracky_clientapi_v1_wt_proto_rawDescGZIP(), []int{119}
+	return file_wacky_tracky_clientapi_v1_wt_proto_rawDescGZIP(), []int{123}
 }
 
 var File_wacky_tracky_clientapi_v1_wt_proto protoreflect.FileDescriptor
@@ -5841,12 +6059,21 @@ const file_wacky_tracky_clientapi_v1_wt_proto_rawDesc = "" +
 	"\x04task\x18\x01 \x01(\v2\x1e.wackytracky.clientapi.v1.TaskR\x04task\"!\n" +
 	"\x0fDoneTaskRequest\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\"\x12\n" +
-	"\x10DoneTaskResponse\"P\n" +
+	"\x10DoneTaskResponse\"\x83\x01\n" +
 	"\x0fMoveTaskRequest\x12\x17\n" +
 	"\atask_id\x18\x01 \x01(\tR\x06taskId\x12$\n" +
-	"\x0etarget_list_id\x18\x02 \x01(\tR\ftargetListId\"F\n" +
+	"\x0etarget_list_id\x18\x02 \x01(\tR\ftargetListId\x121\n" +
+	"\x15target_parent_task_id\x18\x03 \x01(\tR\x12targetParentTaskId\"F\n" +
 	"\x10MoveTaskResponse\x122\n" +
-	"\x04task\x18\x01 \x01(\v2\x1e.wackytracky.clientapi.v1.TaskR\x04task\"1\n" +
+	"\x04task\x18\x01 \x01(\v2\x1e.wackytracky.clientapi.v1.TaskR\x04task\"#\n" +
+	"\x11DeleteTaskRequest\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\"\x14\n" +
+	"\x12DeleteTaskResponse\"J\n" +
+	"\x19ListCompletedTasksRequest\x12\x14\n" +
+	"\x05since\x18\x01 \x01(\tR\x05since\x12\x17\n" +
+	"\alist_id\x18\x02 \x01(\tR\x06listId\"R\n" +
+	"\x1aListCompletedTasksResponse\x124\n" +
+	"\x05tasks\x18\x01 \x03(\v2\x1e.wackytracky.clientapi.v1.TaskR\x05tasks\"1\n" +
 	"\x16GetTaskMetadataRequest\x12\x17\n" +
 	"\atask_id\x18\x01 \x01(\tR\x06taskId\"\xab\x01\n" +
 	"\x17GetTaskMetadataResponse\x12U\n" +
@@ -5904,7 +6131,7 @@ const file_wacky_tracky_clientapi_v1_wt_proto_rawDesc = "" +
 	"\vTagResponse\"\x10\n" +
 	"\x0eGetTagsRequest\"D\n" +
 	"\x0fGetTagsResponse\x121\n" +
-	"\x04tags\x18\x01 \x03(\v2\x1d.wackytracky.clientapi.v1.TagR\x04tags\"\x9b\x02\n" +
+	"\x04tags\x18\x01 \x03(\v2\x1d.wackytracky.clientapi.v1.TagR\x04tags\"\xf2\x02\n" +
 	"\x04Task\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x18\n" +
 	"\acontent\x18\x02 \x01(\tR\acontent\x12\x1b\n" +
@@ -5918,7 +6145,10 @@ const file_wacky_tracky_clientapi_v1_wt_proto_rawDesc = "" +
 	"wait_until\x18\b \x01(\tR\twaitUntil\x12\x1a\n" +
 	"\bpriority\x18\t \x01(\tR\bpriority\x12\x19\n" +
 	"\bdue_date\x18\n" +
-	" \x01(\tR\adueDate\"P\n" +
+	" \x01(\tR\adueDate\x12\x14\n" +
+	"\x05notes\x18\v \x01(\tR\x05notes\x12\x1c\n" +
+	"\tcompleted\x18\f \x01(\bR\tcompleted\x12!\n" +
+	"\fcompleted_at\x18\r \x01(\tR\vcompletedAt\"P\n" +
 	"\x10ListTasksRequest\x12\x1b\n" +
 	"\tparent_id\x18\x01 \x01(\tR\bparentId\x12\x1f\n" +
 	"\vparent_type\x18\x02 \x01(\tR\n" +
@@ -6161,7 +6391,7 @@ const file_wacky_tracky_clientapi_v1_wt_proto_rawDesc = "" +
 	"\x06secret\x18\x02 \x01(\tR\x06secret\"%\n" +
 	"\x13DeleteApiKeyRequest\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\x05R\x02id\"\x16\n" +
-	"\x14DeleteApiKeyResponse2\x961\n" +
+	"\x14DeleteApiKeyResponse2\x853\n" +
 	"\x18WackyTrackyClientService\x12`\n" +
 	"\aVersion\x12(.wackytracky.clientapi.v1.VersionRequest\x1a).wackytracky.clientapi.v1.VersionResponse\"\x00\x12W\n" +
 	"\x04Init\x12%.wackytracky.clientapi.v1.InitRequest\x1a&.wackytracky.clientapi.v1.InitResponse\"\x00\x12f\n" +
@@ -6207,6 +6437,9 @@ const file_wacky_tracky_clientapi_v1_wt_proto_rawDesc = "" +
 	"\bDoneTask\x12).wackytracky.clientapi.v1.DoneTaskRequest\x1a*.wackytracky.clientapi.v1.DoneTaskResponse\"\x00\x12c\n" +
 	"\bMoveTask\x12).wackytracky.clientapi.v1.MoveTaskRequest\x1a*.wackytracky.clientapi.v1.MoveTaskResponse\"\x00\x12i\n" +
 	"\n" +
+	"DeleteTask\x12+.wackytracky.clientapi.v1.DeleteTaskRequest\x1a,.wackytracky.clientapi.v1.DeleteTaskResponse\"\x00\x12\x81\x01\n" +
+	"\x12ListCompletedTasks\x123.wackytracky.clientapi.v1.ListCompletedTasksRequest\x1a4.wackytracky.clientapi.v1.ListCompletedTasksResponse\"\x00\x12i\n" +
+	"\n" +
 	"CreateList\x12+.wackytracky.clientapi.v1.CreateListRequest\x1a,.wackytracky.clientapi.v1.CreateListResponse\"\x00\x12T\n" +
 	"\x03Tag\x12$.wackytracky.clientapi.v1.TagRequest\x1a%.wackytracky.clientapi.v1.TagResponse\"\x00\x12i\n" +
 	"\n" +
@@ -6239,7 +6472,7 @@ func file_wacky_tracky_clientapi_v1_wt_proto_rawDescGZIP() []byte {
 	return file_wacky_tracky_clientapi_v1_wt_proto_rawDescData
 }
 
-var file_wacky_tracky_clientapi_v1_wt_proto_msgTypes = make([]protoimpl.MessageInfo, 125)
+var file_wacky_tracky_clientapi_v1_wt_proto_msgTypes = make([]protoimpl.MessageInfo, 129)
 var file_wacky_tracky_clientapi_v1_wt_proto_goTypes = []any{
 	(*List)(nil),                                 // 0: wackytracky.clientapi.v1.List
 	(*GetListsRequest)(nil),                      // 1: wackytracky.clientapi.v1.GetListsRequest
@@ -6254,275 +6487,284 @@ var file_wacky_tracky_clientapi_v1_wt_proto_goTypes = []any{
 	(*DoneTaskResponse)(nil),                     // 10: wackytracky.clientapi.v1.DoneTaskResponse
 	(*MoveTaskRequest)(nil),                      // 11: wackytracky.clientapi.v1.MoveTaskRequest
 	(*MoveTaskResponse)(nil),                     // 12: wackytracky.clientapi.v1.MoveTaskResponse
-	(*GetTaskMetadataRequest)(nil),               // 13: wackytracky.clientapi.v1.GetTaskMetadataRequest
-	(*GetTaskMetadataResponse)(nil),              // 14: wackytracky.clientapi.v1.GetTaskMetadataResponse
-	(*SetTaskMetadataRequest)(nil),               // 15: wackytracky.clientapi.v1.SetTaskMetadataRequest
-	(*SetTaskMetadataResponse)(nil),              // 16: wackytracky.clientapi.v1.SetTaskMetadataResponse
-	(*TaskPropertyProps)(nil),                    // 17: wackytracky.clientapi.v1.TaskPropertyProps
-	(*GetTaskPropertyPropertiesRequest)(nil),     // 18: wackytracky.clientapi.v1.GetTaskPropertyPropertiesRequest
-	(*GetTaskPropertyPropertiesResponse)(nil),    // 19: wackytracky.clientapi.v1.GetTaskPropertyPropertiesResponse
-	(*SetTaskPropertyPropertyRequest)(nil),       // 20: wackytracky.clientapi.v1.SetTaskPropertyPropertyRequest
-	(*SetTaskPropertyPropertyResponse)(nil),      // 21: wackytracky.clientapi.v1.SetTaskPropertyPropertyResponse
-	(*RuleStatusRequest)(nil),                    // 22: wackytracky.clientapi.v1.RuleStatusRequest
-	(*RuleStatusResponse)(nil),                   // 23: wackytracky.clientapi.v1.RuleStatusResponse
-	(*RuleTestRequest)(nil),                      // 24: wackytracky.clientapi.v1.RuleTestRequest
-	(*RuleTestResponse)(nil),                     // 25: wackytracky.clientapi.v1.RuleTestResponse
-	(*Tag)(nil),                                  // 26: wackytracky.clientapi.v1.Tag
-	(*TagRequest)(nil),                           // 27: wackytracky.clientapi.v1.TagRequest
-	(*TagResponse)(nil),                          // 28: wackytracky.clientapi.v1.TagResponse
-	(*GetTagsRequest)(nil),                       // 29: wackytracky.clientapi.v1.GetTagsRequest
-	(*GetTagsResponse)(nil),                      // 30: wackytracky.clientapi.v1.GetTagsResponse
-	(*Task)(nil),                                 // 31: wackytracky.clientapi.v1.Task
-	(*ListTasksRequest)(nil),                     // 32: wackytracky.clientapi.v1.ListTasksRequest
-	(*TaskIdList)(nil),                           // 33: wackytracky.clientapi.v1.TaskIdList
-	(*ListTasksResponse)(nil),                    // 34: wackytracky.clientapi.v1.ListTasksResponse
-	(*SearchTasksRequest)(nil),                   // 35: wackytracky.clientapi.v1.SearchTasksRequest
-	(*SearchTasksResponse)(nil),                  // 36: wackytracky.clientapi.v1.SearchTasksResponse
-	(*UpdateListRequest)(nil),                    // 37: wackytracky.clientapi.v1.UpdateListRequest
-	(*UpdateListResponse)(nil),                   // 38: wackytracky.clientapi.v1.UpdateListResponse
-	(*DeleteListRequest)(nil),                    // 39: wackytracky.clientapi.v1.DeleteListRequest
-	(*DeleteListResponse)(nil),                   // 40: wackytracky.clientapi.v1.DeleteListResponse
-	(*InitRequest)(nil),                          // 41: wackytracky.clientapi.v1.InitRequest
-	(*InitResponse)(nil),                         // 42: wackytracky.clientapi.v1.InitResponse
-	(*VersionRequest)(nil),                       // 43: wackytracky.clientapi.v1.VersionRequest
-	(*VersionResponse)(nil),                      // 44: wackytracky.clientapi.v1.VersionResponse
-	(*RepoStatusRequest)(nil),                    // 45: wackytracky.clientapi.v1.RepoStatusRequest
-	(*RepoStatusResponse)(nil),                   // 46: wackytracky.clientapi.v1.RepoStatusResponse
-	(*RepoSyncRequest)(nil),                      // 47: wackytracky.clientapi.v1.RepoSyncRequest
-	(*RepoSyncResponse)(nil),                     // 48: wackytracky.clientapi.v1.RepoSyncResponse
-	(*SavedSearch)(nil),                          // 49: wackytracky.clientapi.v1.SavedSearch
-	(*GetSavedSearchesRequest)(nil),              // 50: wackytracky.clientapi.v1.GetSavedSearchesRequest
-	(*GetSavedSearchesResponse)(nil),             // 51: wackytracky.clientapi.v1.GetSavedSearchesResponse
-	(*SetSavedSearchesRequest)(nil),              // 52: wackytracky.clientapi.v1.SetSavedSearchesRequest
-	(*SetSavedSearchesResponse)(nil),             // 53: wackytracky.clientapi.v1.SetSavedSearchesResponse
-	(*StandardResponse)(nil),                     // 54: wackytracky.clientapi.v1.StandardResponse
-	(*GetStatusRequest)(nil),                     // 55: wackytracky.clientapi.v1.GetStatusRequest
-	(*GetStatusResponse)(nil),                    // 56: wackytracky.clientapi.v1.GetStatusResponse
-	(*LoginWithUsernameAndPasswordRequest)(nil),  // 57: wackytracky.clientapi.v1.LoginWithUsernameAndPasswordRequest
-	(*LoginWithUsernameAndPasswordResponse)(nil), // 58: wackytracky.clientapi.v1.LoginWithUsernameAndPasswordResponse
-	(*LogoutRequest)(nil),                        // 59: wackytracky.clientapi.v1.LogoutRequest
-	(*LogoutResponse)(nil),                       // 60: wackytracky.clientapi.v1.LogoutResponse
-	(*ChangePasswordRequest)(nil),                // 61: wackytracky.clientapi.v1.ChangePasswordRequest
-	(*ChangePasswordResponse)(nil),               // 62: wackytracky.clientapi.v1.ChangePasswordResponse
-	(*UserAccount)(nil),                          // 63: wackytracky.clientapi.v1.UserAccount
-	(*GetUsersRequest)(nil),                      // 64: wackytracky.clientapi.v1.GetUsersRequest
-	(*GetUsersResponse)(nil),                     // 65: wackytracky.clientapi.v1.GetUsersResponse
-	(*GetUserRequest)(nil),                       // 66: wackytracky.clientapi.v1.GetUserRequest
-	(*GetUserResponse)(nil),                      // 67: wackytracky.clientapi.v1.GetUserResponse
-	(*CreateUserRequest)(nil),                    // 68: wackytracky.clientapi.v1.CreateUserRequest
-	(*CreateUserResponse)(nil),                   // 69: wackytracky.clientapi.v1.CreateUserResponse
-	(*DeleteUserRequest)(nil),                    // 70: wackytracky.clientapi.v1.DeleteUserRequest
-	(*DeleteUserResponse)(nil),                   // 71: wackytracky.clientapi.v1.DeleteUserResponse
-	(*ResetUserPasswordRequest)(nil),             // 72: wackytracky.clientapi.v1.ResetUserPasswordRequest
-	(*ResetUserPasswordResponse)(nil),            // 73: wackytracky.clientapi.v1.ResetUserPasswordResponse
-	(*RbacPermission)(nil),                       // 74: wackytracky.clientapi.v1.RbacPermission
-	(*RbacRole)(nil),                             // 75: wackytracky.clientapi.v1.RbacRole
-	(*ListRbacPermissionsRequest)(nil),           // 76: wackytracky.clientapi.v1.ListRbacPermissionsRequest
-	(*ListRbacPermissionsResponse)(nil),          // 77: wackytracky.clientapi.v1.ListRbacPermissionsResponse
-	(*ListRbacRolesRequest)(nil),                 // 78: wackytracky.clientapi.v1.ListRbacRolesRequest
-	(*ListRbacRolesResponse)(nil),                // 79: wackytracky.clientapi.v1.ListRbacRolesResponse
-	(*CreateRbacRoleRequest)(nil),                // 80: wackytracky.clientapi.v1.CreateRbacRoleRequest
-	(*CreateRbacRoleResponse)(nil),               // 81: wackytracky.clientapi.v1.CreateRbacRoleResponse
-	(*UpdateRbacRoleRequest)(nil),                // 82: wackytracky.clientapi.v1.UpdateRbacRoleRequest
-	(*DeleteRbacRoleRequest)(nil),                // 83: wackytracky.clientapi.v1.DeleteRbacRoleRequest
-	(*DeleteRbacRoleResponse)(nil),               // 84: wackytracky.clientapi.v1.DeleteRbacRoleResponse
-	(*GetUserRbacRolesRequest)(nil),              // 85: wackytracky.clientapi.v1.GetUserRbacRolesRequest
-	(*GetUserRbacRolesResponse)(nil),             // 86: wackytracky.clientapi.v1.GetUserRbacRolesResponse
-	(*GetUserGroupRbacRolesRequest)(nil),         // 87: wackytracky.clientapi.v1.GetUserGroupRbacRolesRequest
-	(*GetUserGroupRbacRolesResponse)(nil),        // 88: wackytracky.clientapi.v1.GetUserGroupRbacRolesResponse
-	(*SetUserGroupRbacRolesRequest)(nil),         // 89: wackytracky.clientapi.v1.SetUserGroupRbacRolesRequest
-	(*SetUserGroupRbacRolesResponse)(nil),        // 90: wackytracky.clientapi.v1.SetUserGroupRbacRolesResponse
-	(*GetRbacRoleUsersRequest)(nil),              // 91: wackytracky.clientapi.v1.GetRbacRoleUsersRequest
-	(*GetRbacRoleUsersResponse)(nil),             // 92: wackytracky.clientapi.v1.GetRbacRoleUsersResponse
-	(*GetRbacRoleGroupsRequest)(nil),             // 93: wackytracky.clientapi.v1.GetRbacRoleGroupsRequest
-	(*GetRbacRoleGroupsResponse)(nil),            // 94: wackytracky.clientapi.v1.GetRbacRoleGroupsResponse
-	(*MyPermissionAuditRow)(nil),                 // 95: wackytracky.clientapi.v1.MyPermissionAuditRow
-	(*GetMyPermissionsAuditRequest)(nil),         // 96: wackytracky.clientapi.v1.GetMyPermissionsAuditRequest
-	(*GetMyPermissionsAuditResponse)(nil),        // 97: wackytracky.clientapi.v1.GetMyPermissionsAuditResponse
-	(*UserGroup)(nil),                            // 98: wackytracky.clientapi.v1.UserGroup
-	(*ListUserGroupsRequest)(nil),                // 99: wackytracky.clientapi.v1.ListUserGroupsRequest
-	(*ListUserGroupsResponse)(nil),               // 100: wackytracky.clientapi.v1.ListUserGroupsResponse
-	(*CreateUserGroupRequest)(nil),               // 101: wackytracky.clientapi.v1.CreateUserGroupRequest
-	(*CreateUserGroupResponse)(nil),              // 102: wackytracky.clientapi.v1.CreateUserGroupResponse
-	(*DeleteUserGroupRequest)(nil),               // 103: wackytracky.clientapi.v1.DeleteUserGroupRequest
-	(*DeleteUserGroupResponse)(nil),              // 104: wackytracky.clientapi.v1.DeleteUserGroupResponse
-	(*GetUserGroupMembersRequest)(nil),           // 105: wackytracky.clientapi.v1.GetUserGroupMembersRequest
-	(*GetUserGroupMembersResponse)(nil),          // 106: wackytracky.clientapi.v1.GetUserGroupMembersResponse
-	(*SetUserGroupMembersRequest)(nil),           // 107: wackytracky.clientapi.v1.SetUserGroupMembersRequest
-	(*SetUserGroupMembersResponse)(nil),          // 108: wackytracky.clientapi.v1.SetUserGroupMembersResponse
-	(*ImpersonateUserRequest)(nil),               // 109: wackytracky.clientapi.v1.ImpersonateUserRequest
-	(*ImpersonateUserResponse)(nil),              // 110: wackytracky.clientapi.v1.ImpersonateUserResponse
-	(*StopImpersonationRequest)(nil),             // 111: wackytracky.clientapi.v1.StopImpersonationRequest
-	(*StopImpersonationResponse)(nil),            // 112: wackytracky.clientapi.v1.StopImpersonationResponse
-	(*ApiKey)(nil),                               // 113: wackytracky.clientapi.v1.ApiKey
-	(*ListApiKeysRequest)(nil),                   // 114: wackytracky.clientapi.v1.ListApiKeysRequest
-	(*ListApiKeysResponse)(nil),                  // 115: wackytracky.clientapi.v1.ListApiKeysResponse
-	(*CreateApiKeyRequest)(nil),                  // 116: wackytracky.clientapi.v1.CreateApiKeyRequest
-	(*CreateApiKeyResponse)(nil),                 // 117: wackytracky.clientapi.v1.CreateApiKeyResponse
-	(*DeleteApiKeyRequest)(nil),                  // 118: wackytracky.clientapi.v1.DeleteApiKeyRequest
-	(*DeleteApiKeyResponse)(nil),                 // 119: wackytracky.clientapi.v1.DeleteApiKeyResponse
-	nil,                                          // 120: wackytracky.clientapi.v1.GetTaskMetadataResponse.FieldsEntry
-	nil,                                          // 121: wackytracky.clientapi.v1.TaskPropertyProps.PropsEntry
-	nil,                                          // 122: wackytracky.clientapi.v1.GetTaskPropertyPropertiesResponse.TagPropertiesEntry
-	nil,                                          // 123: wackytracky.clientapi.v1.GetTaskPropertyPropertiesResponse.ContextPropertiesEntry
-	nil,                                          // 124: wackytracky.clientapi.v1.ListTasksResponse.TreeEntry
+	(*DeleteTaskRequest)(nil),                    // 13: wackytracky.clientapi.v1.DeleteTaskRequest
+	(*DeleteTaskResponse)(nil),                   // 14: wackytracky.clientapi.v1.DeleteTaskResponse
+	(*ListCompletedTasksRequest)(nil),            // 15: wackytracky.clientapi.v1.ListCompletedTasksRequest
+	(*ListCompletedTasksResponse)(nil),           // 16: wackytracky.clientapi.v1.ListCompletedTasksResponse
+	(*GetTaskMetadataRequest)(nil),               // 17: wackytracky.clientapi.v1.GetTaskMetadataRequest
+	(*GetTaskMetadataResponse)(nil),              // 18: wackytracky.clientapi.v1.GetTaskMetadataResponse
+	(*SetTaskMetadataRequest)(nil),               // 19: wackytracky.clientapi.v1.SetTaskMetadataRequest
+	(*SetTaskMetadataResponse)(nil),              // 20: wackytracky.clientapi.v1.SetTaskMetadataResponse
+	(*TaskPropertyProps)(nil),                    // 21: wackytracky.clientapi.v1.TaskPropertyProps
+	(*GetTaskPropertyPropertiesRequest)(nil),     // 22: wackytracky.clientapi.v1.GetTaskPropertyPropertiesRequest
+	(*GetTaskPropertyPropertiesResponse)(nil),    // 23: wackytracky.clientapi.v1.GetTaskPropertyPropertiesResponse
+	(*SetTaskPropertyPropertyRequest)(nil),       // 24: wackytracky.clientapi.v1.SetTaskPropertyPropertyRequest
+	(*SetTaskPropertyPropertyResponse)(nil),      // 25: wackytracky.clientapi.v1.SetTaskPropertyPropertyResponse
+	(*RuleStatusRequest)(nil),                    // 26: wackytracky.clientapi.v1.RuleStatusRequest
+	(*RuleStatusResponse)(nil),                   // 27: wackytracky.clientapi.v1.RuleStatusResponse
+	(*RuleTestRequest)(nil),                      // 28: wackytracky.clientapi.v1.RuleTestRequest
+	(*RuleTestResponse)(nil),                     // 29: wackytracky.clientapi.v1.RuleTestResponse
+	(*Tag)(nil),                                  // 30: wackytracky.clientapi.v1.Tag
+	(*TagRequest)(nil),                           // 31: wackytracky.clientapi.v1.TagRequest
+	(*TagResponse)(nil),                          // 32: wackytracky.clientapi.v1.TagResponse
+	(*GetTagsRequest)(nil),                       // 33: wackytracky.clientapi.v1.GetTagsRequest
+	(*GetTagsResponse)(nil),                      // 34: wackytracky.clientapi.v1.GetTagsResponse
+	(*Task)(nil),                                 // 35: wackytracky.clientapi.v1.Task
+	(*ListTasksRequest)(nil),                     // 36: wackytracky.clientapi.v1.ListTasksRequest
+	(*TaskIdList)(nil),                           // 37: wackytracky.clientapi.v1.TaskIdList
+	(*ListTasksResponse)(nil),                    // 38: wackytracky.clientapi.v1.ListTasksResponse
+	(*SearchTasksRequest)(nil),                   // 39: wackytracky.clientapi.v1.SearchTasksRequest
+	(*SearchTasksResponse)(nil),                  // 40: wackytracky.clientapi.v1.SearchTasksResponse
+	(*UpdateListRequest)(nil),                    // 41: wackytracky.clientapi.v1.UpdateListRequest
+	(*UpdateListResponse)(nil),                   // 42: wackytracky.clientapi.v1.UpdateListResponse
+	(*DeleteListRequest)(nil),                    // 43: wackytracky.clientapi.v1.DeleteListRequest
+	(*DeleteListResponse)(nil),                   // 44: wackytracky.clientapi.v1.DeleteListResponse
+	(*InitRequest)(nil),                          // 45: wackytracky.clientapi.v1.InitRequest
+	(*InitResponse)(nil),                         // 46: wackytracky.clientapi.v1.InitResponse
+	(*VersionRequest)(nil),                       // 47: wackytracky.clientapi.v1.VersionRequest
+	(*VersionResponse)(nil),                      // 48: wackytracky.clientapi.v1.VersionResponse
+	(*RepoStatusRequest)(nil),                    // 49: wackytracky.clientapi.v1.RepoStatusRequest
+	(*RepoStatusResponse)(nil),                   // 50: wackytracky.clientapi.v1.RepoStatusResponse
+	(*RepoSyncRequest)(nil),                      // 51: wackytracky.clientapi.v1.RepoSyncRequest
+	(*RepoSyncResponse)(nil),                     // 52: wackytracky.clientapi.v1.RepoSyncResponse
+	(*SavedSearch)(nil),                          // 53: wackytracky.clientapi.v1.SavedSearch
+	(*GetSavedSearchesRequest)(nil),              // 54: wackytracky.clientapi.v1.GetSavedSearchesRequest
+	(*GetSavedSearchesResponse)(nil),             // 55: wackytracky.clientapi.v1.GetSavedSearchesResponse
+	(*SetSavedSearchesRequest)(nil),              // 56: wackytracky.clientapi.v1.SetSavedSearchesRequest
+	(*SetSavedSearchesResponse)(nil),             // 57: wackytracky.clientapi.v1.SetSavedSearchesResponse
+	(*StandardResponse)(nil),                     // 58: wackytracky.clientapi.v1.StandardResponse
+	(*GetStatusRequest)(nil),                     // 59: wackytracky.clientapi.v1.GetStatusRequest
+	(*GetStatusResponse)(nil),                    // 60: wackytracky.clientapi.v1.GetStatusResponse
+	(*LoginWithUsernameAndPasswordRequest)(nil),  // 61: wackytracky.clientapi.v1.LoginWithUsernameAndPasswordRequest
+	(*LoginWithUsernameAndPasswordResponse)(nil), // 62: wackytracky.clientapi.v1.LoginWithUsernameAndPasswordResponse
+	(*LogoutRequest)(nil),                        // 63: wackytracky.clientapi.v1.LogoutRequest
+	(*LogoutResponse)(nil),                       // 64: wackytracky.clientapi.v1.LogoutResponse
+	(*ChangePasswordRequest)(nil),                // 65: wackytracky.clientapi.v1.ChangePasswordRequest
+	(*ChangePasswordResponse)(nil),               // 66: wackytracky.clientapi.v1.ChangePasswordResponse
+	(*UserAccount)(nil),                          // 67: wackytracky.clientapi.v1.UserAccount
+	(*GetUsersRequest)(nil),                      // 68: wackytracky.clientapi.v1.GetUsersRequest
+	(*GetUsersResponse)(nil),                     // 69: wackytracky.clientapi.v1.GetUsersResponse
+	(*GetUserRequest)(nil),                       // 70: wackytracky.clientapi.v1.GetUserRequest
+	(*GetUserResponse)(nil),                      // 71: wackytracky.clientapi.v1.GetUserResponse
+	(*CreateUserRequest)(nil),                    // 72: wackytracky.clientapi.v1.CreateUserRequest
+	(*CreateUserResponse)(nil),                   // 73: wackytracky.clientapi.v1.CreateUserResponse
+	(*DeleteUserRequest)(nil),                    // 74: wackytracky.clientapi.v1.DeleteUserRequest
+	(*DeleteUserResponse)(nil),                   // 75: wackytracky.clientapi.v1.DeleteUserResponse
+	(*ResetUserPasswordRequest)(nil),             // 76: wackytracky.clientapi.v1.ResetUserPasswordRequest
+	(*ResetUserPasswordResponse)(nil),            // 77: wackytracky.clientapi.v1.ResetUserPasswordResponse
+	(*RbacPermission)(nil),                       // 78: wackytracky.clientapi.v1.RbacPermission
+	(*RbacRole)(nil),                             // 79: wackytracky.clientapi.v1.RbacRole
+	(*ListRbacPermissionsRequest)(nil),           // 80: wackytracky.clientapi.v1.ListRbacPermissionsRequest
+	(*ListRbacPermissionsResponse)(nil),          // 81: wackytracky.clientapi.v1.ListRbacPermissionsResponse
+	(*ListRbacRolesRequest)(nil),                 // 82: wackytracky.clientapi.v1.ListRbacRolesRequest
+	(*ListRbacRolesResponse)(nil),                // 83: wackytracky.clientapi.v1.ListRbacRolesResponse
+	(*CreateRbacRoleRequest)(nil),                // 84: wackytracky.clientapi.v1.CreateRbacRoleRequest
+	(*CreateRbacRoleResponse)(nil),               // 85: wackytracky.clientapi.v1.CreateRbacRoleResponse
+	(*UpdateRbacRoleRequest)(nil),                // 86: wackytracky.clientapi.v1.UpdateRbacRoleRequest
+	(*DeleteRbacRoleRequest)(nil),                // 87: wackytracky.clientapi.v1.DeleteRbacRoleRequest
+	(*DeleteRbacRoleResponse)(nil),               // 88: wackytracky.clientapi.v1.DeleteRbacRoleResponse
+	(*GetUserRbacRolesRequest)(nil),              // 89: wackytracky.clientapi.v1.GetUserRbacRolesRequest
+	(*GetUserRbacRolesResponse)(nil),             // 90: wackytracky.clientapi.v1.GetUserRbacRolesResponse
+	(*GetUserGroupRbacRolesRequest)(nil),         // 91: wackytracky.clientapi.v1.GetUserGroupRbacRolesRequest
+	(*GetUserGroupRbacRolesResponse)(nil),        // 92: wackytracky.clientapi.v1.GetUserGroupRbacRolesResponse
+	(*SetUserGroupRbacRolesRequest)(nil),         // 93: wackytracky.clientapi.v1.SetUserGroupRbacRolesRequest
+	(*SetUserGroupRbacRolesResponse)(nil),        // 94: wackytracky.clientapi.v1.SetUserGroupRbacRolesResponse
+	(*GetRbacRoleUsersRequest)(nil),              // 95: wackytracky.clientapi.v1.GetRbacRoleUsersRequest
+	(*GetRbacRoleUsersResponse)(nil),             // 96: wackytracky.clientapi.v1.GetRbacRoleUsersResponse
+	(*GetRbacRoleGroupsRequest)(nil),             // 97: wackytracky.clientapi.v1.GetRbacRoleGroupsRequest
+	(*GetRbacRoleGroupsResponse)(nil),            // 98: wackytracky.clientapi.v1.GetRbacRoleGroupsResponse
+	(*MyPermissionAuditRow)(nil),                 // 99: wackytracky.clientapi.v1.MyPermissionAuditRow
+	(*GetMyPermissionsAuditRequest)(nil),         // 100: wackytracky.clientapi.v1.GetMyPermissionsAuditRequest
+	(*GetMyPermissionsAuditResponse)(nil),        // 101: wackytracky.clientapi.v1.GetMyPermissionsAuditResponse
+	(*UserGroup)(nil),                            // 102: wackytracky.clientapi.v1.UserGroup
+	(*ListUserGroupsRequest)(nil),                // 103: wackytracky.clientapi.v1.ListUserGroupsRequest
+	(*ListUserGroupsResponse)(nil),               // 104: wackytracky.clientapi.v1.ListUserGroupsResponse
+	(*CreateUserGroupRequest)(nil),               // 105: wackytracky.clientapi.v1.CreateUserGroupRequest
+	(*CreateUserGroupResponse)(nil),              // 106: wackytracky.clientapi.v1.CreateUserGroupResponse
+	(*DeleteUserGroupRequest)(nil),               // 107: wackytracky.clientapi.v1.DeleteUserGroupRequest
+	(*DeleteUserGroupResponse)(nil),              // 108: wackytracky.clientapi.v1.DeleteUserGroupResponse
+	(*GetUserGroupMembersRequest)(nil),           // 109: wackytracky.clientapi.v1.GetUserGroupMembersRequest
+	(*GetUserGroupMembersResponse)(nil),          // 110: wackytracky.clientapi.v1.GetUserGroupMembersResponse
+	(*SetUserGroupMembersRequest)(nil),           // 111: wackytracky.clientapi.v1.SetUserGroupMembersRequest
+	(*SetUserGroupMembersResponse)(nil),          // 112: wackytracky.clientapi.v1.SetUserGroupMembersResponse
+	(*ImpersonateUserRequest)(nil),               // 113: wackytracky.clientapi.v1.ImpersonateUserRequest
+	(*ImpersonateUserResponse)(nil),              // 114: wackytracky.clientapi.v1.ImpersonateUserResponse
+	(*StopImpersonationRequest)(nil),             // 115: wackytracky.clientapi.v1.StopImpersonationRequest
+	(*StopImpersonationResponse)(nil),            // 116: wackytracky.clientapi.v1.StopImpersonationResponse
+	(*ApiKey)(nil),                               // 117: wackytracky.clientapi.v1.ApiKey
+	(*ListApiKeysRequest)(nil),                   // 118: wackytracky.clientapi.v1.ListApiKeysRequest
+	(*ListApiKeysResponse)(nil),                  // 119: wackytracky.clientapi.v1.ListApiKeysResponse
+	(*CreateApiKeyRequest)(nil),                  // 120: wackytracky.clientapi.v1.CreateApiKeyRequest
+	(*CreateApiKeyResponse)(nil),                 // 121: wackytracky.clientapi.v1.CreateApiKeyResponse
+	(*DeleteApiKeyRequest)(nil),                  // 122: wackytracky.clientapi.v1.DeleteApiKeyRequest
+	(*DeleteApiKeyResponse)(nil),                 // 123: wackytracky.clientapi.v1.DeleteApiKeyResponse
+	nil,                                          // 124: wackytracky.clientapi.v1.GetTaskMetadataResponse.FieldsEntry
+	nil,                                          // 125: wackytracky.clientapi.v1.TaskPropertyProps.PropsEntry
+	nil,                                          // 126: wackytracky.clientapi.v1.GetTaskPropertyPropertiesResponse.TagPropertiesEntry
+	nil,                                          // 127: wackytracky.clientapi.v1.GetTaskPropertyPropertiesResponse.ContextPropertiesEntry
+	nil,                                          // 128: wackytracky.clientapi.v1.ListTasksResponse.TreeEntry
 }
 var file_wacky_tracky_clientapi_v1_wt_proto_depIdxs = []int32{
 	0,   // 0: wackytracky.clientapi.v1.GetListsResponse.lists:type_name -> wackytracky.clientapi.v1.List
-	31,  // 1: wackytracky.clientapi.v1.CreateTaskResponse.task:type_name -> wackytracky.clientapi.v1.Task
-	31,  // 2: wackytracky.clientapi.v1.UpdateTaskResponse.task:type_name -> wackytracky.clientapi.v1.Task
-	31,  // 3: wackytracky.clientapi.v1.MoveTaskResponse.task:type_name -> wackytracky.clientapi.v1.Task
-	120, // 4: wackytracky.clientapi.v1.GetTaskMetadataResponse.fields:type_name -> wackytracky.clientapi.v1.GetTaskMetadataResponse.FieldsEntry
-	121, // 5: wackytracky.clientapi.v1.TaskPropertyProps.props:type_name -> wackytracky.clientapi.v1.TaskPropertyProps.PropsEntry
-	122, // 6: wackytracky.clientapi.v1.GetTaskPropertyPropertiesResponse.tag_properties:type_name -> wackytracky.clientapi.v1.GetTaskPropertyPropertiesResponse.TagPropertiesEntry
-	123, // 7: wackytracky.clientapi.v1.GetTaskPropertyPropertiesResponse.context_properties:type_name -> wackytracky.clientapi.v1.GetTaskPropertyPropertiesResponse.ContextPropertiesEntry
-	26,  // 8: wackytracky.clientapi.v1.GetTagsResponse.tags:type_name -> wackytracky.clientapi.v1.Tag
-	31,  // 9: wackytracky.clientapi.v1.ListTasksResponse.tasks:type_name -> wackytracky.clientapi.v1.Task
-	124, // 10: wackytracky.clientapi.v1.ListTasksResponse.tree:type_name -> wackytracky.clientapi.v1.ListTasksResponse.TreeEntry
-	31,  // 11: wackytracky.clientapi.v1.SearchTasksResponse.tasks:type_name -> wackytracky.clientapi.v1.Task
-	49,  // 12: wackytracky.clientapi.v1.GetSavedSearchesResponse.saved_searches:type_name -> wackytracky.clientapi.v1.SavedSearch
-	49,  // 13: wackytracky.clientapi.v1.SetSavedSearchesRequest.saved_searches:type_name -> wackytracky.clientapi.v1.SavedSearch
-	54,  // 14: wackytracky.clientapi.v1.LoginWithUsernameAndPasswordResponse.standard_response:type_name -> wackytracky.clientapi.v1.StandardResponse
-	54,  // 15: wackytracky.clientapi.v1.LogoutResponse.standard_response:type_name -> wackytracky.clientapi.v1.StandardResponse
-	54,  // 16: wackytracky.clientapi.v1.ChangePasswordResponse.standard_response:type_name -> wackytracky.clientapi.v1.StandardResponse
-	98,  // 17: wackytracky.clientapi.v1.UserAccount.user_groups:type_name -> wackytracky.clientapi.v1.UserGroup
-	63,  // 18: wackytracky.clientapi.v1.GetUsersResponse.users:type_name -> wackytracky.clientapi.v1.UserAccount
-	63,  // 19: wackytracky.clientapi.v1.GetUserResponse.user:type_name -> wackytracky.clientapi.v1.UserAccount
-	98,  // 20: wackytracky.clientapi.v1.GetUserResponse.user_groups:type_name -> wackytracky.clientapi.v1.UserGroup
-	54,  // 21: wackytracky.clientapi.v1.CreateUserResponse.standard_response:type_name -> wackytracky.clientapi.v1.StandardResponse
-	63,  // 22: wackytracky.clientapi.v1.CreateUserResponse.user:type_name -> wackytracky.clientapi.v1.UserAccount
-	54,  // 23: wackytracky.clientapi.v1.DeleteUserResponse.standard_response:type_name -> wackytracky.clientapi.v1.StandardResponse
-	54,  // 24: wackytracky.clientapi.v1.ResetUserPasswordResponse.standard_response:type_name -> wackytracky.clientapi.v1.StandardResponse
-	74,  // 25: wackytracky.clientapi.v1.ListRbacPermissionsResponse.permissions:type_name -> wackytracky.clientapi.v1.RbacPermission
-	75,  // 26: wackytracky.clientapi.v1.ListRbacRolesResponse.roles:type_name -> wackytracky.clientapi.v1.RbacRole
-	75,  // 27: wackytracky.clientapi.v1.CreateRbacRoleResponse.role:type_name -> wackytracky.clientapi.v1.RbacRole
-	75,  // 28: wackytracky.clientapi.v1.GetUserRbacRolesResponse.roles:type_name -> wackytracky.clientapi.v1.RbacRole
-	54,  // 29: wackytracky.clientapi.v1.SetUserGroupRbacRolesResponse.standard_response:type_name -> wackytracky.clientapi.v1.StandardResponse
-	95,  // 30: wackytracky.clientapi.v1.GetMyPermissionsAuditResponse.permissions:type_name -> wackytracky.clientapi.v1.MyPermissionAuditRow
-	98,  // 31: wackytracky.clientapi.v1.ListUserGroupsResponse.groups:type_name -> wackytracky.clientapi.v1.UserGroup
-	98,  // 32: wackytracky.clientapi.v1.CreateUserGroupResponse.group:type_name -> wackytracky.clientapi.v1.UserGroup
-	63,  // 33: wackytracky.clientapi.v1.GetUserGroupMembersResponse.members:type_name -> wackytracky.clientapi.v1.UserAccount
-	54,  // 34: wackytracky.clientapi.v1.SetUserGroupMembersResponse.standard_response:type_name -> wackytracky.clientapi.v1.StandardResponse
-	54,  // 35: wackytracky.clientapi.v1.ImpersonateUserResponse.standard_response:type_name -> wackytracky.clientapi.v1.StandardResponse
-	54,  // 36: wackytracky.clientapi.v1.StopImpersonationResponse.standard_response:type_name -> wackytracky.clientapi.v1.StandardResponse
-	113, // 37: wackytracky.clientapi.v1.ListApiKeysResponse.keys:type_name -> wackytracky.clientapi.v1.ApiKey
-	113, // 38: wackytracky.clientapi.v1.CreateApiKeyResponse.key:type_name -> wackytracky.clientapi.v1.ApiKey
-	17,  // 39: wackytracky.clientapi.v1.GetTaskPropertyPropertiesResponse.TagPropertiesEntry.value:type_name -> wackytracky.clientapi.v1.TaskPropertyProps
-	17,  // 40: wackytracky.clientapi.v1.GetTaskPropertyPropertiesResponse.ContextPropertiesEntry.value:type_name -> wackytracky.clientapi.v1.TaskPropertyProps
-	33,  // 41: wackytracky.clientapi.v1.ListTasksResponse.TreeEntry.value:type_name -> wackytracky.clientapi.v1.TaskIdList
-	43,  // 42: wackytracky.clientapi.v1.WackyTrackyClientService.Version:input_type -> wackytracky.clientapi.v1.VersionRequest
-	41,  // 43: wackytracky.clientapi.v1.WackyTrackyClientService.Init:input_type -> wackytracky.clientapi.v1.InitRequest
-	55,  // 44: wackytracky.clientapi.v1.WackyTrackyClientService.GetStatus:input_type -> wackytracky.clientapi.v1.GetStatusRequest
-	57,  // 45: wackytracky.clientapi.v1.WackyTrackyClientService.LoginWithUsernameAndPassword:input_type -> wackytracky.clientapi.v1.LoginWithUsernameAndPasswordRequest
-	59,  // 46: wackytracky.clientapi.v1.WackyTrackyClientService.Logout:input_type -> wackytracky.clientapi.v1.LogoutRequest
-	61,  // 47: wackytracky.clientapi.v1.WackyTrackyClientService.ChangePassword:input_type -> wackytracky.clientapi.v1.ChangePasswordRequest
-	64,  // 48: wackytracky.clientapi.v1.WackyTrackyClientService.GetUsers:input_type -> wackytracky.clientapi.v1.GetUsersRequest
-	66,  // 49: wackytracky.clientapi.v1.WackyTrackyClientService.GetUser:input_type -> wackytracky.clientapi.v1.GetUserRequest
-	68,  // 50: wackytracky.clientapi.v1.WackyTrackyClientService.CreateUser:input_type -> wackytracky.clientapi.v1.CreateUserRequest
-	70,  // 51: wackytracky.clientapi.v1.WackyTrackyClientService.DeleteUser:input_type -> wackytracky.clientapi.v1.DeleteUserRequest
-	72,  // 52: wackytracky.clientapi.v1.WackyTrackyClientService.ResetUserPassword:input_type -> wackytracky.clientapi.v1.ResetUserPasswordRequest
-	76,  // 53: wackytracky.clientapi.v1.WackyTrackyClientService.ListRbacPermissions:input_type -> wackytracky.clientapi.v1.ListRbacPermissionsRequest
-	78,  // 54: wackytracky.clientapi.v1.WackyTrackyClientService.ListRbacRoles:input_type -> wackytracky.clientapi.v1.ListRbacRolesRequest
-	80,  // 55: wackytracky.clientapi.v1.WackyTrackyClientService.CreateRbacRole:input_type -> wackytracky.clientapi.v1.CreateRbacRoleRequest
-	82,  // 56: wackytracky.clientapi.v1.WackyTrackyClientService.UpdateRbacRole:input_type -> wackytracky.clientapi.v1.UpdateRbacRoleRequest
-	83,  // 57: wackytracky.clientapi.v1.WackyTrackyClientService.DeleteRbacRole:input_type -> wackytracky.clientapi.v1.DeleteRbacRoleRequest
-	85,  // 58: wackytracky.clientapi.v1.WackyTrackyClientService.GetUserRbacRoles:input_type -> wackytracky.clientapi.v1.GetUserRbacRolesRequest
-	87,  // 59: wackytracky.clientapi.v1.WackyTrackyClientService.GetUserGroupRbacRoles:input_type -> wackytracky.clientapi.v1.GetUserGroupRbacRolesRequest
-	89,  // 60: wackytracky.clientapi.v1.WackyTrackyClientService.SetUserGroupRbacRoles:input_type -> wackytracky.clientapi.v1.SetUserGroupRbacRolesRequest
-	91,  // 61: wackytracky.clientapi.v1.WackyTrackyClientService.GetRbacRoleUsers:input_type -> wackytracky.clientapi.v1.GetRbacRoleUsersRequest
-	93,  // 62: wackytracky.clientapi.v1.WackyTrackyClientService.GetRbacRoleGroups:input_type -> wackytracky.clientapi.v1.GetRbacRoleGroupsRequest
-	96,  // 63: wackytracky.clientapi.v1.WackyTrackyClientService.GetMyPermissionsAudit:input_type -> wackytracky.clientapi.v1.GetMyPermissionsAuditRequest
-	99,  // 64: wackytracky.clientapi.v1.WackyTrackyClientService.ListUserGroups:input_type -> wackytracky.clientapi.v1.ListUserGroupsRequest
-	101, // 65: wackytracky.clientapi.v1.WackyTrackyClientService.CreateUserGroup:input_type -> wackytracky.clientapi.v1.CreateUserGroupRequest
-	103, // 66: wackytracky.clientapi.v1.WackyTrackyClientService.DeleteUserGroup:input_type -> wackytracky.clientapi.v1.DeleteUserGroupRequest
-	105, // 67: wackytracky.clientapi.v1.WackyTrackyClientService.GetUserGroupMembers:input_type -> wackytracky.clientapi.v1.GetUserGroupMembersRequest
-	107, // 68: wackytracky.clientapi.v1.WackyTrackyClientService.SetUserGroupMembers:input_type -> wackytracky.clientapi.v1.SetUserGroupMembersRequest
-	109, // 69: wackytracky.clientapi.v1.WackyTrackyClientService.ImpersonateUser:input_type -> wackytracky.clientapi.v1.ImpersonateUserRequest
-	111, // 70: wackytracky.clientapi.v1.WackyTrackyClientService.StopImpersonation:input_type -> wackytracky.clientapi.v1.StopImpersonationRequest
-	114, // 71: wackytracky.clientapi.v1.WackyTrackyClientService.ListApiKeys:input_type -> wackytracky.clientapi.v1.ListApiKeysRequest
-	116, // 72: wackytracky.clientapi.v1.WackyTrackyClientService.CreateApiKey:input_type -> wackytracky.clientapi.v1.CreateApiKeyRequest
-	118, // 73: wackytracky.clientapi.v1.WackyTrackyClientService.DeleteApiKey:input_type -> wackytracky.clientapi.v1.DeleteApiKeyRequest
-	1,   // 74: wackytracky.clientapi.v1.WackyTrackyClientService.GetLists:input_type -> wackytracky.clientapi.v1.GetListsRequest
-	32,  // 75: wackytracky.clientapi.v1.WackyTrackyClientService.ListTasks:input_type -> wackytracky.clientapi.v1.ListTasksRequest
-	35,  // 76: wackytracky.clientapi.v1.WackyTrackyClientService.SearchTasks:input_type -> wackytracky.clientapi.v1.SearchTasksRequest
-	5,   // 77: wackytracky.clientapi.v1.WackyTrackyClientService.CreateTask:input_type -> wackytracky.clientapi.v1.CreateTaskRequest
-	7,   // 78: wackytracky.clientapi.v1.WackyTrackyClientService.UpdateTask:input_type -> wackytracky.clientapi.v1.UpdateTaskRequest
-	9,   // 79: wackytracky.clientapi.v1.WackyTrackyClientService.DoneTask:input_type -> wackytracky.clientapi.v1.DoneTaskRequest
-	11,  // 80: wackytracky.clientapi.v1.WackyTrackyClientService.MoveTask:input_type -> wackytracky.clientapi.v1.MoveTaskRequest
-	3,   // 81: wackytracky.clientapi.v1.WackyTrackyClientService.CreateList:input_type -> wackytracky.clientapi.v1.CreateListRequest
-	27,  // 82: wackytracky.clientapi.v1.WackyTrackyClientService.Tag:input_type -> wackytracky.clientapi.v1.TagRequest
-	37,  // 83: wackytracky.clientapi.v1.WackyTrackyClientService.UpdateList:input_type -> wackytracky.clientapi.v1.UpdateListRequest
-	39,  // 84: wackytracky.clientapi.v1.WackyTrackyClientService.DeleteList:input_type -> wackytracky.clientapi.v1.DeleteListRequest
-	29,  // 85: wackytracky.clientapi.v1.WackyTrackyClientService.GetTags:input_type -> wackytracky.clientapi.v1.GetTagsRequest
-	45,  // 86: wackytracky.clientapi.v1.WackyTrackyClientService.RepoStatus:input_type -> wackytracky.clientapi.v1.RepoStatusRequest
-	47,  // 87: wackytracky.clientapi.v1.WackyTrackyClientService.RepoSync:input_type -> wackytracky.clientapi.v1.RepoSyncRequest
-	50,  // 88: wackytracky.clientapi.v1.WackyTrackyClientService.GetSavedSearches:input_type -> wackytracky.clientapi.v1.GetSavedSearchesRequest
-	52,  // 89: wackytracky.clientapi.v1.WackyTrackyClientService.SetSavedSearches:input_type -> wackytracky.clientapi.v1.SetSavedSearchesRequest
-	13,  // 90: wackytracky.clientapi.v1.WackyTrackyClientService.GetTaskMetadata:input_type -> wackytracky.clientapi.v1.GetTaskMetadataRequest
-	15,  // 91: wackytracky.clientapi.v1.WackyTrackyClientService.SetTaskMetadata:input_type -> wackytracky.clientapi.v1.SetTaskMetadataRequest
-	18,  // 92: wackytracky.clientapi.v1.WackyTrackyClientService.GetTaskPropertyProperties:input_type -> wackytracky.clientapi.v1.GetTaskPropertyPropertiesRequest
-	20,  // 93: wackytracky.clientapi.v1.WackyTrackyClientService.SetTaskPropertyProperty:input_type -> wackytracky.clientapi.v1.SetTaskPropertyPropertyRequest
-	22,  // 94: wackytracky.clientapi.v1.WackyTrackyClientService.RuleStatus:input_type -> wackytracky.clientapi.v1.RuleStatusRequest
-	24,  // 95: wackytracky.clientapi.v1.WackyTrackyClientService.RuleTest:input_type -> wackytracky.clientapi.v1.RuleTestRequest
-	44,  // 96: wackytracky.clientapi.v1.WackyTrackyClientService.Version:output_type -> wackytracky.clientapi.v1.VersionResponse
-	42,  // 97: wackytracky.clientapi.v1.WackyTrackyClientService.Init:output_type -> wackytracky.clientapi.v1.InitResponse
-	56,  // 98: wackytracky.clientapi.v1.WackyTrackyClientService.GetStatus:output_type -> wackytracky.clientapi.v1.GetStatusResponse
-	58,  // 99: wackytracky.clientapi.v1.WackyTrackyClientService.LoginWithUsernameAndPassword:output_type -> wackytracky.clientapi.v1.LoginWithUsernameAndPasswordResponse
-	60,  // 100: wackytracky.clientapi.v1.WackyTrackyClientService.Logout:output_type -> wackytracky.clientapi.v1.LogoutResponse
-	62,  // 101: wackytracky.clientapi.v1.WackyTrackyClientService.ChangePassword:output_type -> wackytracky.clientapi.v1.ChangePasswordResponse
-	65,  // 102: wackytracky.clientapi.v1.WackyTrackyClientService.GetUsers:output_type -> wackytracky.clientapi.v1.GetUsersResponse
-	67,  // 103: wackytracky.clientapi.v1.WackyTrackyClientService.GetUser:output_type -> wackytracky.clientapi.v1.GetUserResponse
-	69,  // 104: wackytracky.clientapi.v1.WackyTrackyClientService.CreateUser:output_type -> wackytracky.clientapi.v1.CreateUserResponse
-	71,  // 105: wackytracky.clientapi.v1.WackyTrackyClientService.DeleteUser:output_type -> wackytracky.clientapi.v1.DeleteUserResponse
-	73,  // 106: wackytracky.clientapi.v1.WackyTrackyClientService.ResetUserPassword:output_type -> wackytracky.clientapi.v1.ResetUserPasswordResponse
-	77,  // 107: wackytracky.clientapi.v1.WackyTrackyClientService.ListRbacPermissions:output_type -> wackytracky.clientapi.v1.ListRbacPermissionsResponse
-	79,  // 108: wackytracky.clientapi.v1.WackyTrackyClientService.ListRbacRoles:output_type -> wackytracky.clientapi.v1.ListRbacRolesResponse
-	81,  // 109: wackytracky.clientapi.v1.WackyTrackyClientService.CreateRbacRole:output_type -> wackytracky.clientapi.v1.CreateRbacRoleResponse
-	75,  // 110: wackytracky.clientapi.v1.WackyTrackyClientService.UpdateRbacRole:output_type -> wackytracky.clientapi.v1.RbacRole
-	84,  // 111: wackytracky.clientapi.v1.WackyTrackyClientService.DeleteRbacRole:output_type -> wackytracky.clientapi.v1.DeleteRbacRoleResponse
-	86,  // 112: wackytracky.clientapi.v1.WackyTrackyClientService.GetUserRbacRoles:output_type -> wackytracky.clientapi.v1.GetUserRbacRolesResponse
-	88,  // 113: wackytracky.clientapi.v1.WackyTrackyClientService.GetUserGroupRbacRoles:output_type -> wackytracky.clientapi.v1.GetUserGroupRbacRolesResponse
-	90,  // 114: wackytracky.clientapi.v1.WackyTrackyClientService.SetUserGroupRbacRoles:output_type -> wackytracky.clientapi.v1.SetUserGroupRbacRolesResponse
-	92,  // 115: wackytracky.clientapi.v1.WackyTrackyClientService.GetRbacRoleUsers:output_type -> wackytracky.clientapi.v1.GetRbacRoleUsersResponse
-	94,  // 116: wackytracky.clientapi.v1.WackyTrackyClientService.GetRbacRoleGroups:output_type -> wackytracky.clientapi.v1.GetRbacRoleGroupsResponse
-	97,  // 117: wackytracky.clientapi.v1.WackyTrackyClientService.GetMyPermissionsAudit:output_type -> wackytracky.clientapi.v1.GetMyPermissionsAuditResponse
-	100, // 118: wackytracky.clientapi.v1.WackyTrackyClientService.ListUserGroups:output_type -> wackytracky.clientapi.v1.ListUserGroupsResponse
-	102, // 119: wackytracky.clientapi.v1.WackyTrackyClientService.CreateUserGroup:output_type -> wackytracky.clientapi.v1.CreateUserGroupResponse
-	104, // 120: wackytracky.clientapi.v1.WackyTrackyClientService.DeleteUserGroup:output_type -> wackytracky.clientapi.v1.DeleteUserGroupResponse
-	106, // 121: wackytracky.clientapi.v1.WackyTrackyClientService.GetUserGroupMembers:output_type -> wackytracky.clientapi.v1.GetUserGroupMembersResponse
-	108, // 122: wackytracky.clientapi.v1.WackyTrackyClientService.SetUserGroupMembers:output_type -> wackytracky.clientapi.v1.SetUserGroupMembersResponse
-	110, // 123: wackytracky.clientapi.v1.WackyTrackyClientService.ImpersonateUser:output_type -> wackytracky.clientapi.v1.ImpersonateUserResponse
-	112, // 124: wackytracky.clientapi.v1.WackyTrackyClientService.StopImpersonation:output_type -> wackytracky.clientapi.v1.StopImpersonationResponse
-	115, // 125: wackytracky.clientapi.v1.WackyTrackyClientService.ListApiKeys:output_type -> wackytracky.clientapi.v1.ListApiKeysResponse
-	117, // 126: wackytracky.clientapi.v1.WackyTrackyClientService.CreateApiKey:output_type -> wackytracky.clientapi.v1.CreateApiKeyResponse
-	119, // 127: wackytracky.clientapi.v1.WackyTrackyClientService.DeleteApiKey:output_type -> wackytracky.clientapi.v1.DeleteApiKeyResponse
-	2,   // 128: wackytracky.clientapi.v1.WackyTrackyClientService.GetLists:output_type -> wackytracky.clientapi.v1.GetListsResponse
-	34,  // 129: wackytracky.clientapi.v1.WackyTrackyClientService.ListTasks:output_type -> wackytracky.clientapi.v1.ListTasksResponse
-	36,  // 130: wackytracky.clientapi.v1.WackyTrackyClientService.SearchTasks:output_type -> wackytracky.clientapi.v1.SearchTasksResponse
-	6,   // 131: wackytracky.clientapi.v1.WackyTrackyClientService.CreateTask:output_type -> wackytracky.clientapi.v1.CreateTaskResponse
-	8,   // 132: wackytracky.clientapi.v1.WackyTrackyClientService.UpdateTask:output_type -> wackytracky.clientapi.v1.UpdateTaskResponse
-	10,  // 133: wackytracky.clientapi.v1.WackyTrackyClientService.DoneTask:output_type -> wackytracky.clientapi.v1.DoneTaskResponse
-	12,  // 134: wackytracky.clientapi.v1.WackyTrackyClientService.MoveTask:output_type -> wackytracky.clientapi.v1.MoveTaskResponse
-	4,   // 135: wackytracky.clientapi.v1.WackyTrackyClientService.CreateList:output_type -> wackytracky.clientapi.v1.CreateListResponse
-	28,  // 136: wackytracky.clientapi.v1.WackyTrackyClientService.Tag:output_type -> wackytracky.clientapi.v1.TagResponse
-	38,  // 137: wackytracky.clientapi.v1.WackyTrackyClientService.UpdateList:output_type -> wackytracky.clientapi.v1.UpdateListResponse
-	40,  // 138: wackytracky.clientapi.v1.WackyTrackyClientService.DeleteList:output_type -> wackytracky.clientapi.v1.DeleteListResponse
-	30,  // 139: wackytracky.clientapi.v1.WackyTrackyClientService.GetTags:output_type -> wackytracky.clientapi.v1.GetTagsResponse
-	46,  // 140: wackytracky.clientapi.v1.WackyTrackyClientService.RepoStatus:output_type -> wackytracky.clientapi.v1.RepoStatusResponse
-	48,  // 141: wackytracky.clientapi.v1.WackyTrackyClientService.RepoSync:output_type -> wackytracky.clientapi.v1.RepoSyncResponse
-	51,  // 142: wackytracky.clientapi.v1.WackyTrackyClientService.GetSavedSearches:output_type -> wackytracky.clientapi.v1.GetSavedSearchesResponse
-	53,  // 143: wackytracky.clientapi.v1.WackyTrackyClientService.SetSavedSearches:output_type -> wackytracky.clientapi.v1.SetSavedSearchesResponse
-	14,  // 144: wackytracky.clientapi.v1.WackyTrackyClientService.GetTaskMetadata:output_type -> wackytracky.clientapi.v1.GetTaskMetadataResponse
-	16,  // 145: wackytracky.clientapi.v1.WackyTrackyClientService.SetTaskMetadata:output_type -> wackytracky.clientapi.v1.SetTaskMetadataResponse
-	19,  // 146: wackytracky.clientapi.v1.WackyTrackyClientService.GetTaskPropertyProperties:output_type -> wackytracky.clientapi.v1.GetTaskPropertyPropertiesResponse
-	21,  // 147: wackytracky.clientapi.v1.WackyTrackyClientService.SetTaskPropertyProperty:output_type -> wackytracky.clientapi.v1.SetTaskPropertyPropertyResponse
-	23,  // 148: wackytracky.clientapi.v1.WackyTrackyClientService.RuleStatus:output_type -> wackytracky.clientapi.v1.RuleStatusResponse
-	25,  // 149: wackytracky.clientapi.v1.WackyTrackyClientService.RuleTest:output_type -> wackytracky.clientapi.v1.RuleTestResponse
-	96,  // [96:150] is the sub-list for method output_type
-	42,  // [42:96] is the sub-list for method input_type
-	42,  // [42:42] is the sub-list for extension type_name
-	42,  // [42:42] is the sub-list for extension extendee
-	0,   // [0:42] is the sub-list for field type_name
+	35,  // 1: wackytracky.clientapi.v1.CreateTaskResponse.task:type_name -> wackytracky.clientapi.v1.Task
+	35,  // 2: wackytracky.clientapi.v1.UpdateTaskResponse.task:type_name -> wackytracky.clientapi.v1.Task
+	35,  // 3: wackytracky.clientapi.v1.MoveTaskResponse.task:type_name -> wackytracky.clientapi.v1.Task
+	35,  // 4: wackytracky.clientapi.v1.ListCompletedTasksResponse.tasks:type_name -> wackytracky.clientapi.v1.Task
+	124, // 5: wackytracky.clientapi.v1.GetTaskMetadataResponse.fields:type_name -> wackytracky.clientapi.v1.GetTaskMetadataResponse.FieldsEntry
+	125, // 6: wackytracky.clientapi.v1.TaskPropertyProps.props:type_name -> wackytracky.clientapi.v1.TaskPropertyProps.PropsEntry
+	126, // 7: wackytracky.clientapi.v1.GetTaskPropertyPropertiesResponse.tag_properties:type_name -> wackytracky.clientapi.v1.GetTaskPropertyPropertiesResponse.TagPropertiesEntry
+	127, // 8: wackytracky.clientapi.v1.GetTaskPropertyPropertiesResponse.context_properties:type_name -> wackytracky.clientapi.v1.GetTaskPropertyPropertiesResponse.ContextPropertiesEntry
+	30,  // 9: wackytracky.clientapi.v1.GetTagsResponse.tags:type_name -> wackytracky.clientapi.v1.Tag
+	35,  // 10: wackytracky.clientapi.v1.ListTasksResponse.tasks:type_name -> wackytracky.clientapi.v1.Task
+	128, // 11: wackytracky.clientapi.v1.ListTasksResponse.tree:type_name -> wackytracky.clientapi.v1.ListTasksResponse.TreeEntry
+	35,  // 12: wackytracky.clientapi.v1.SearchTasksResponse.tasks:type_name -> wackytracky.clientapi.v1.Task
+	53,  // 13: wackytracky.clientapi.v1.GetSavedSearchesResponse.saved_searches:type_name -> wackytracky.clientapi.v1.SavedSearch
+	53,  // 14: wackytracky.clientapi.v1.SetSavedSearchesRequest.saved_searches:type_name -> wackytracky.clientapi.v1.SavedSearch
+	58,  // 15: wackytracky.clientapi.v1.LoginWithUsernameAndPasswordResponse.standard_response:type_name -> wackytracky.clientapi.v1.StandardResponse
+	58,  // 16: wackytracky.clientapi.v1.LogoutResponse.standard_response:type_name -> wackytracky.clientapi.v1.StandardResponse
+	58,  // 17: wackytracky.clientapi.v1.ChangePasswordResponse.standard_response:type_name -> wackytracky.clientapi.v1.StandardResponse
+	102, // 18: wackytracky.clientapi.v1.UserAccount.user_groups:type_name -> wackytracky.clientapi.v1.UserGroup
+	67,  // 19: wackytracky.clientapi.v1.GetUsersResponse.users:type_name -> wackytracky.clientapi.v1.UserAccount
+	67,  // 20: wackytracky.clientapi.v1.GetUserResponse.user:type_name -> wackytracky.clientapi.v1.UserAccount
+	102, // 21: wackytracky.clientapi.v1.GetUserResponse.user_groups:type_name -> wackytracky.clientapi.v1.UserGroup
+	58,  // 22: wackytracky.clientapi.v1.CreateUserResponse.standard_response:type_name -> wackytracky.clientapi.v1.StandardResponse
+	67,  // 23: wackytracky.clientapi.v1.CreateUserResponse.user:type_name -> wackytracky.clientapi.v1.UserAccount
+	58,  // 24: wackytracky.clientapi.v1.DeleteUserResponse.standard_response:type_name -> wackytracky.clientapi.v1.StandardResponse
+	58,  // 25: wackytracky.clientapi.v1.ResetUserPasswordResponse.standard_response:type_name -> wackytracky.clientapi.v1.StandardResponse
+	78,  // 26: wackytracky.clientapi.v1.ListRbacPermissionsResponse.permissions:type_name -> wackytracky.clientapi.v1.RbacPermission
+	79,  // 27: wackytracky.clientapi.v1.ListRbacRolesResponse.roles:type_name -> wackytracky.clientapi.v1.RbacRole
+	79,  // 28: wackytracky.clientapi.v1.CreateRbacRoleResponse.role:type_name -> wackytracky.clientapi.v1.RbacRole
+	79,  // 29: wackytracky.clientapi.v1.GetUserRbacRolesResponse.roles:type_name -> wackytracky.clientapi.v1.RbacRole
+	58,  // 30: wackytracky.clientapi.v1.SetUserGroupRbacRolesResponse.standard_response:type_name -> wackytracky.clientapi.v1.StandardResponse
+	99,  // 31: wackytracky.clientapi.v1.GetMyPermissionsAuditResponse.permissions:type_name -> wackytracky.clientapi.v1.MyPermissionAuditRow
+	102, // 32: wackytracky.clientapi.v1.ListUserGroupsResponse.groups:type_name -> wackytracky.clientapi.v1.UserGroup
+	102, // 33: wackytracky.clientapi.v1.CreateUserGroupResponse.group:type_name -> wackytracky.clientapi.v1.UserGroup
+	67,  // 34: wackytracky.clientapi.v1.GetUserGroupMembersResponse.members:type_name -> wackytracky.clientapi.v1.UserAccount
+	58,  // 35: wackytracky.clientapi.v1.SetUserGroupMembersResponse.standard_response:type_name -> wackytracky.clientapi.v1.StandardResponse
+	58,  // 36: wackytracky.clientapi.v1.ImpersonateUserResponse.standard_response:type_name -> wackytracky.clientapi.v1.StandardResponse
+	58,  // 37: wackytracky.clientapi.v1.StopImpersonationResponse.standard_response:type_name -> wackytracky.clientapi.v1.StandardResponse
+	117, // 38: wackytracky.clientapi.v1.ListApiKeysResponse.keys:type_name -> wackytracky.clientapi.v1.ApiKey
+	117, // 39: wackytracky.clientapi.v1.CreateApiKeyResponse.key:type_name -> wackytracky.clientapi.v1.ApiKey
+	21,  // 40: wackytracky.clientapi.v1.GetTaskPropertyPropertiesResponse.TagPropertiesEntry.value:type_name -> wackytracky.clientapi.v1.TaskPropertyProps
+	21,  // 41: wackytracky.clientapi.v1.GetTaskPropertyPropertiesResponse.ContextPropertiesEntry.value:type_name -> wackytracky.clientapi.v1.TaskPropertyProps
+	37,  // 42: wackytracky.clientapi.v1.ListTasksResponse.TreeEntry.value:type_name -> wackytracky.clientapi.v1.TaskIdList
+	47,  // 43: wackytracky.clientapi.v1.WackyTrackyClientService.Version:input_type -> wackytracky.clientapi.v1.VersionRequest
+	45,  // 44: wackytracky.clientapi.v1.WackyTrackyClientService.Init:input_type -> wackytracky.clientapi.v1.InitRequest
+	59,  // 45: wackytracky.clientapi.v1.WackyTrackyClientService.GetStatus:input_type -> wackytracky.clientapi.v1.GetStatusRequest
+	61,  // 46: wackytracky.clientapi.v1.WackyTrackyClientService.LoginWithUsernameAndPassword:input_type -> wackytracky.clientapi.v1.LoginWithUsernameAndPasswordRequest
+	63,  // 47: wackytracky.clientapi.v1.WackyTrackyClientService.Logout:input_type -> wackytracky.clientapi.v1.LogoutRequest
+	65,  // 48: wackytracky.clientapi.v1.WackyTrackyClientService.ChangePassword:input_type -> wackytracky.clientapi.v1.ChangePasswordRequest
+	68,  // 49: wackytracky.clientapi.v1.WackyTrackyClientService.GetUsers:input_type -> wackytracky.clientapi.v1.GetUsersRequest
+	70,  // 50: wackytracky.clientapi.v1.WackyTrackyClientService.GetUser:input_type -> wackytracky.clientapi.v1.GetUserRequest
+	72,  // 51: wackytracky.clientapi.v1.WackyTrackyClientService.CreateUser:input_type -> wackytracky.clientapi.v1.CreateUserRequest
+	74,  // 52: wackytracky.clientapi.v1.WackyTrackyClientService.DeleteUser:input_type -> wackytracky.clientapi.v1.DeleteUserRequest
+	76,  // 53: wackytracky.clientapi.v1.WackyTrackyClientService.ResetUserPassword:input_type -> wackytracky.clientapi.v1.ResetUserPasswordRequest
+	80,  // 54: wackytracky.clientapi.v1.WackyTrackyClientService.ListRbacPermissions:input_type -> wackytracky.clientapi.v1.ListRbacPermissionsRequest
+	82,  // 55: wackytracky.clientapi.v1.WackyTrackyClientService.ListRbacRoles:input_type -> wackytracky.clientapi.v1.ListRbacRolesRequest
+	84,  // 56: wackytracky.clientapi.v1.WackyTrackyClientService.CreateRbacRole:input_type -> wackytracky.clientapi.v1.CreateRbacRoleRequest
+	86,  // 57: wackytracky.clientapi.v1.WackyTrackyClientService.UpdateRbacRole:input_type -> wackytracky.clientapi.v1.UpdateRbacRoleRequest
+	87,  // 58: wackytracky.clientapi.v1.WackyTrackyClientService.DeleteRbacRole:input_type -> wackytracky.clientapi.v1.DeleteRbacRoleRequest
+	89,  // 59: wackytracky.clientapi.v1.WackyTrackyClientService.GetUserRbacRoles:input_type -> wackytracky.clientapi.v1.GetUserRbacRolesRequest
+	91,  // 60: wackytracky.clientapi.v1.WackyTrackyClientService.GetUserGroupRbacRoles:input_type -> wackytracky.clientapi.v1.GetUserGroupRbacRolesRequest
+	93,  // 61: wackytracky.clientapi.v1.WackyTrackyClientService.SetUserGroupRbacRoles:input_type -> wackytracky.clientapi.v1.SetUserGroupRbacRolesRequest
+	95,  // 62: wackytracky.clientapi.v1.WackyTrackyClientService.GetRbacRoleUsers:input_type -> wackytracky.clientapi.v1.GetRbacRoleUsersRequest
+	97,  // 63: wackytracky.clientapi.v1.WackyTrackyClientService.GetRbacRoleGroups:input_type -> wackytracky.clientapi.v1.GetRbacRoleGroupsRequest
+	100, // 64: wackytracky.clientapi.v1.WackyTrackyClientService.GetMyPermissionsAudit:input_type -> wackytracky.clientapi.v1.GetMyPermissionsAuditRequest
+	103, // 65: wackytracky.clientapi.v1.WackyTrackyClientService.ListUserGroups:input_type -> wackytracky.clientapi.v1.ListUserGroupsRequest
+	105, // 66: wackytracky.clientapi.v1.WackyTrackyClientService.CreateUserGroup:input_type -> wackytracky.clientapi.v1.CreateUserGroupRequest
+	107, // 67: wackytracky.clientapi.v1.WackyTrackyClientService.DeleteUserGroup:input_type -> wackytracky.clientapi.v1.DeleteUserGroupRequest
+	109, // 68: wackytracky.clientapi.v1.WackyTrackyClientService.GetUserGroupMembers:input_type -> wackytracky.clientapi.v1.GetUserGroupMembersRequest
+	111, // 69: wackytracky.clientapi.v1.WackyTrackyClientService.SetUserGroupMembers:input_type -> wackytracky.clientapi.v1.SetUserGroupMembersRequest
+	113, // 70: wackytracky.clientapi.v1.WackyTrackyClientService.ImpersonateUser:input_type -> wackytracky.clientapi.v1.ImpersonateUserRequest
+	115, // 71: wackytracky.clientapi.v1.WackyTrackyClientService.StopImpersonation:input_type -> wackytracky.clientapi.v1.StopImpersonationRequest
+	118, // 72: wackytracky.clientapi.v1.WackyTrackyClientService.ListApiKeys:input_type -> wackytracky.clientapi.v1.ListApiKeysRequest
+	120, // 73: wackytracky.clientapi.v1.WackyTrackyClientService.CreateApiKey:input_type -> wackytracky.clientapi.v1.CreateApiKeyRequest
+	122, // 74: wackytracky.clientapi.v1.WackyTrackyClientService.DeleteApiKey:input_type -> wackytracky.clientapi.v1.DeleteApiKeyRequest
+	1,   // 75: wackytracky.clientapi.v1.WackyTrackyClientService.GetLists:input_type -> wackytracky.clientapi.v1.GetListsRequest
+	36,  // 76: wackytracky.clientapi.v1.WackyTrackyClientService.ListTasks:input_type -> wackytracky.clientapi.v1.ListTasksRequest
+	39,  // 77: wackytracky.clientapi.v1.WackyTrackyClientService.SearchTasks:input_type -> wackytracky.clientapi.v1.SearchTasksRequest
+	5,   // 78: wackytracky.clientapi.v1.WackyTrackyClientService.CreateTask:input_type -> wackytracky.clientapi.v1.CreateTaskRequest
+	7,   // 79: wackytracky.clientapi.v1.WackyTrackyClientService.UpdateTask:input_type -> wackytracky.clientapi.v1.UpdateTaskRequest
+	9,   // 80: wackytracky.clientapi.v1.WackyTrackyClientService.DoneTask:input_type -> wackytracky.clientapi.v1.DoneTaskRequest
+	11,  // 81: wackytracky.clientapi.v1.WackyTrackyClientService.MoveTask:input_type -> wackytracky.clientapi.v1.MoveTaskRequest
+	13,  // 82: wackytracky.clientapi.v1.WackyTrackyClientService.DeleteTask:input_type -> wackytracky.clientapi.v1.DeleteTaskRequest
+	15,  // 83: wackytracky.clientapi.v1.WackyTrackyClientService.ListCompletedTasks:input_type -> wackytracky.clientapi.v1.ListCompletedTasksRequest
+	3,   // 84: wackytracky.clientapi.v1.WackyTrackyClientService.CreateList:input_type -> wackytracky.clientapi.v1.CreateListRequest
+	31,  // 85: wackytracky.clientapi.v1.WackyTrackyClientService.Tag:input_type -> wackytracky.clientapi.v1.TagRequest
+	41,  // 86: wackytracky.clientapi.v1.WackyTrackyClientService.UpdateList:input_type -> wackytracky.clientapi.v1.UpdateListRequest
+	43,  // 87: wackytracky.clientapi.v1.WackyTrackyClientService.DeleteList:input_type -> wackytracky.clientapi.v1.DeleteListRequest
+	33,  // 88: wackytracky.clientapi.v1.WackyTrackyClientService.GetTags:input_type -> wackytracky.clientapi.v1.GetTagsRequest
+	49,  // 89: wackytracky.clientapi.v1.WackyTrackyClientService.RepoStatus:input_type -> wackytracky.clientapi.v1.RepoStatusRequest
+	51,  // 90: wackytracky.clientapi.v1.WackyTrackyClientService.RepoSync:input_type -> wackytracky.clientapi.v1.RepoSyncRequest
+	54,  // 91: wackytracky.clientapi.v1.WackyTrackyClientService.GetSavedSearches:input_type -> wackytracky.clientapi.v1.GetSavedSearchesRequest
+	56,  // 92: wackytracky.clientapi.v1.WackyTrackyClientService.SetSavedSearches:input_type -> wackytracky.clientapi.v1.SetSavedSearchesRequest
+	17,  // 93: wackytracky.clientapi.v1.WackyTrackyClientService.GetTaskMetadata:input_type -> wackytracky.clientapi.v1.GetTaskMetadataRequest
+	19,  // 94: wackytracky.clientapi.v1.WackyTrackyClientService.SetTaskMetadata:input_type -> wackytracky.clientapi.v1.SetTaskMetadataRequest
+	22,  // 95: wackytracky.clientapi.v1.WackyTrackyClientService.GetTaskPropertyProperties:input_type -> wackytracky.clientapi.v1.GetTaskPropertyPropertiesRequest
+	24,  // 96: wackytracky.clientapi.v1.WackyTrackyClientService.SetTaskPropertyProperty:input_type -> wackytracky.clientapi.v1.SetTaskPropertyPropertyRequest
+	26,  // 97: wackytracky.clientapi.v1.WackyTrackyClientService.RuleStatus:input_type -> wackytracky.clientapi.v1.RuleStatusRequest
+	28,  // 98: wackytracky.clientapi.v1.WackyTrackyClientService.RuleTest:input_type -> wackytracky.clientapi.v1.RuleTestRequest
+	48,  // 99: wackytracky.clientapi.v1.WackyTrackyClientService.Version:output_type -> wackytracky.clientapi.v1.VersionResponse
+	46,  // 100: wackytracky.clientapi.v1.WackyTrackyClientService.Init:output_type -> wackytracky.clientapi.v1.InitResponse
+	60,  // 101: wackytracky.clientapi.v1.WackyTrackyClientService.GetStatus:output_type -> wackytracky.clientapi.v1.GetStatusResponse
+	62,  // 102: wackytracky.clientapi.v1.WackyTrackyClientService.LoginWithUsernameAndPassword:output_type -> wackytracky.clientapi.v1.LoginWithUsernameAndPasswordResponse
+	64,  // 103: wackytracky.clientapi.v1.WackyTrackyClientService.Logout:output_type -> wackytracky.clientapi.v1.LogoutResponse
+	66,  // 104: wackytracky.clientapi.v1.WackyTrackyClientService.ChangePassword:output_type -> wackytracky.clientapi.v1.ChangePasswordResponse
+	69,  // 105: wackytracky.clientapi.v1.WackyTrackyClientService.GetUsers:output_type -> wackytracky.clientapi.v1.GetUsersResponse
+	71,  // 106: wackytracky.clientapi.v1.WackyTrackyClientService.GetUser:output_type -> wackytracky.clientapi.v1.GetUserResponse
+	73,  // 107: wackytracky.clientapi.v1.WackyTrackyClientService.CreateUser:output_type -> wackytracky.clientapi.v1.CreateUserResponse
+	75,  // 108: wackytracky.clientapi.v1.WackyTrackyClientService.DeleteUser:output_type -> wackytracky.clientapi.v1.DeleteUserResponse
+	77,  // 109: wackytracky.clientapi.v1.WackyTrackyClientService.ResetUserPassword:output_type -> wackytracky.clientapi.v1.ResetUserPasswordResponse
+	81,  // 110: wackytracky.clientapi.v1.WackyTrackyClientService.ListRbacPermissions:output_type -> wackytracky.clientapi.v1.ListRbacPermissionsResponse
+	83,  // 111: wackytracky.clientapi.v1.WackyTrackyClientService.ListRbacRoles:output_type -> wackytracky.clientapi.v1.ListRbacRolesResponse
+	85,  // 112: wackytracky.clientapi.v1.WackyTrackyClientService.CreateRbacRole:output_type -> wackytracky.clientapi.v1.CreateRbacRoleResponse
+	79,  // 113: wackytracky.clientapi.v1.WackyTrackyClientService.UpdateRbacRole:output_type -> wackytracky.clientapi.v1.RbacRole
+	88,  // 114: wackytracky.clientapi.v1.WackyTrackyClientService.DeleteRbacRole:output_type -> wackytracky.clientapi.v1.DeleteRbacRoleResponse
+	90,  // 115: wackytracky.clientapi.v1.WackyTrackyClientService.GetUserRbacRoles:output_type -> wackytracky.clientapi.v1.GetUserRbacRolesResponse
+	92,  // 116: wackytracky.clientapi.v1.WackyTrackyClientService.GetUserGroupRbacRoles:output_type -> wackytracky.clientapi.v1.GetUserGroupRbacRolesResponse
+	94,  // 117: wackytracky.clientapi.v1.WackyTrackyClientService.SetUserGroupRbacRoles:output_type -> wackytracky.clientapi.v1.SetUserGroupRbacRolesResponse
+	96,  // 118: wackytracky.clientapi.v1.WackyTrackyClientService.GetRbacRoleUsers:output_type -> wackytracky.clientapi.v1.GetRbacRoleUsersResponse
+	98,  // 119: wackytracky.clientapi.v1.WackyTrackyClientService.GetRbacRoleGroups:output_type -> wackytracky.clientapi.v1.GetRbacRoleGroupsResponse
+	101, // 120: wackytracky.clientapi.v1.WackyTrackyClientService.GetMyPermissionsAudit:output_type -> wackytracky.clientapi.v1.GetMyPermissionsAuditResponse
+	104, // 121: wackytracky.clientapi.v1.WackyTrackyClientService.ListUserGroups:output_type -> wackytracky.clientapi.v1.ListUserGroupsResponse
+	106, // 122: wackytracky.clientapi.v1.WackyTrackyClientService.CreateUserGroup:output_type -> wackytracky.clientapi.v1.CreateUserGroupResponse
+	108, // 123: wackytracky.clientapi.v1.WackyTrackyClientService.DeleteUserGroup:output_type -> wackytracky.clientapi.v1.DeleteUserGroupResponse
+	110, // 124: wackytracky.clientapi.v1.WackyTrackyClientService.GetUserGroupMembers:output_type -> wackytracky.clientapi.v1.GetUserGroupMembersResponse
+	112, // 125: wackytracky.clientapi.v1.WackyTrackyClientService.SetUserGroupMembers:output_type -> wackytracky.clientapi.v1.SetUserGroupMembersResponse
+	114, // 126: wackytracky.clientapi.v1.WackyTrackyClientService.ImpersonateUser:output_type -> wackytracky.clientapi.v1.ImpersonateUserResponse
+	116, // 127: wackytracky.clientapi.v1.WackyTrackyClientService.StopImpersonation:output_type -> wackytracky.clientapi.v1.StopImpersonationResponse
+	119, // 128: wackytracky.clientapi.v1.WackyTrackyClientService.ListApiKeys:output_type -> wackytracky.clientapi.v1.ListApiKeysResponse
+	121, // 129: wackytracky.clientapi.v1.WackyTrackyClientService.CreateApiKey:output_type -> wackytracky.clientapi.v1.CreateApiKeyResponse
+	123, // 130: wackytracky.clientapi.v1.WackyTrackyClientService.DeleteApiKey:output_type -> wackytracky.clientapi.v1.DeleteApiKeyResponse
+	2,   // 131: wackytracky.clientapi.v1.WackyTrackyClientService.GetLists:output_type -> wackytracky.clientapi.v1.GetListsResponse
+	38,  // 132: wackytracky.clientapi.v1.WackyTrackyClientService.ListTasks:output_type -> wackytracky.clientapi.v1.ListTasksResponse
+	40,  // 133: wackytracky.clientapi.v1.WackyTrackyClientService.SearchTasks:output_type -> wackytracky.clientapi.v1.SearchTasksResponse
+	6,   // 134: wackytracky.clientapi.v1.WackyTrackyClientService.CreateTask:output_type -> wackytracky.clientapi.v1.CreateTaskResponse
+	8,   // 135: wackytracky.clientapi.v1.WackyTrackyClientService.UpdateTask:output_type -> wackytracky.clientapi.v1.UpdateTaskResponse
+	10,  // 136: wackytracky.clientapi.v1.WackyTrackyClientService.DoneTask:output_type -> wackytracky.clientapi.v1.DoneTaskResponse
+	12,  // 137: wackytracky.clientapi.v1.WackyTrackyClientService.MoveTask:output_type -> wackytracky.clientapi.v1.MoveTaskResponse
+	14,  // 138: wackytracky.clientapi.v1.WackyTrackyClientService.DeleteTask:output_type -> wackytracky.clientapi.v1.DeleteTaskResponse
+	16,  // 139: wackytracky.clientapi.v1.WackyTrackyClientService.ListCompletedTasks:output_type -> wackytracky.clientapi.v1.ListCompletedTasksResponse
+	4,   // 140: wackytracky.clientapi.v1.WackyTrackyClientService.CreateList:output_type -> wackytracky.clientapi.v1.CreateListResponse
+	32,  // 141: wackytracky.clientapi.v1.WackyTrackyClientService.Tag:output_type -> wackytracky.clientapi.v1.TagResponse
+	42,  // 142: wackytracky.clientapi.v1.WackyTrackyClientService.UpdateList:output_type -> wackytracky.clientapi.v1.UpdateListResponse
+	44,  // 143: wackytracky.clientapi.v1.WackyTrackyClientService.DeleteList:output_type -> wackytracky.clientapi.v1.DeleteListResponse
+	34,  // 144: wackytracky.clientapi.v1.WackyTrackyClientService.GetTags:output_type -> wackytracky.clientapi.v1.GetTagsResponse
+	50,  // 145: wackytracky.clientapi.v1.WackyTrackyClientService.RepoStatus:output_type -> wackytracky.clientapi.v1.RepoStatusResponse
+	52,  // 146: wackytracky.clientapi.v1.WackyTrackyClientService.RepoSync:output_type -> wackytracky.clientapi.v1.RepoSyncResponse
+	55,  // 147: wackytracky.clientapi.v1.WackyTrackyClientService.GetSavedSearches:output_type -> wackytracky.clientapi.v1.GetSavedSearchesResponse
+	57,  // 148: wackytracky.clientapi.v1.WackyTrackyClientService.SetSavedSearches:output_type -> wackytracky.clientapi.v1.SetSavedSearchesResponse
+	18,  // 149: wackytracky.clientapi.v1.WackyTrackyClientService.GetTaskMetadata:output_type -> wackytracky.clientapi.v1.GetTaskMetadataResponse
+	20,  // 150: wackytracky.clientapi.v1.WackyTrackyClientService.SetTaskMetadata:output_type -> wackytracky.clientapi.v1.SetTaskMetadataResponse
+	23,  // 151: wackytracky.clientapi.v1.WackyTrackyClientService.GetTaskPropertyProperties:output_type -> wackytracky.clientapi.v1.GetTaskPropertyPropertiesResponse
+	25,  // 152: wackytracky.clientapi.v1.WackyTrackyClientService.SetTaskPropertyProperty:output_type -> wackytracky.clientapi.v1.SetTaskPropertyPropertyResponse
+	27,  // 153: wackytracky.clientapi.v1.WackyTrackyClientService.RuleStatus:output_type -> wackytracky.clientapi.v1.RuleStatusResponse
+	29,  // 154: wackytracky.clientapi.v1.WackyTrackyClientService.RuleTest:output_type -> wackytracky.clientapi.v1.RuleTestResponse
+	99,  // [99:155] is the sub-list for method output_type
+	43,  // [43:99] is the sub-list for method input_type
+	43,  // [43:43] is the sub-list for extension type_name
+	43,  // [43:43] is the sub-list for extension extendee
+	0,   // [0:43] is the sub-list for field type_name
 }
 
 func init() { file_wacky_tracky_clientapi_v1_wt_proto_init() }
@@ -6536,7 +6778,7 @@ func file_wacky_tracky_clientapi_v1_wt_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_wacky_tracky_clientapi_v1_wt_proto_rawDesc), len(file_wacky_tracky_clientapi_v1_wt_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   125,
+			NumMessages:   129,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
