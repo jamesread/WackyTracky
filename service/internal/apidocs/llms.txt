@@ -28,7 +28,7 @@ Search query syntax for SearchTasks: plain terms, `#tag`, `@context`, and `-term
 
 - [MCP server](/mcp): Model Context Protocol (Streamable HTTP) endpoint for AI assistants and agents
 
-Available MCP tools: list_lists, list_tasks, search_tasks, create_task, update_task, complete_task, move_task, snooze_task, update_task_metadata, create_list.
+Available MCP tools: list_lists, list_tasks, list_completed_tasks, search_tasks, create_task, update_task, complete_task, move_task, delete_task, snooze_task, update_task_metadata, create_list, delete_list.
 
 For local stdio clients (Claude Desktop, Cursor with a subprocess), run `wt mcp` instead of connecting over HTTP.
 
