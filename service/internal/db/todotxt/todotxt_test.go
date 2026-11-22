@@ -573,3 +573,44 @@ func TestTodoTxt_SetTaskMetadataRejectsPathTraversalInField(t *testing.T) {
 	_, statErr := os.Stat(filepath.Join(d.dir, "..", "escape.txt"))
 	assert.True(t, os.IsNotExist(statErr), "no file may be written outside the metadata dir")
 }
+
+// Lines added by hand (or by another todo.txt tool) have no id: key. Every
+// process and every reload must agree on their ID, otherwise an ID read from
+// one is unknown to the next and writes fail with not found.
+func TestTodoTxt_TasksWithoutIDGetStableIDsAcrossInstances(t *testing.T) {
+	dir, cleanup := setTodotxtDir(t)
+	defer cleanup()
+	require.NoError(t, os.WriteFile(filepath.Join(dir, "todo.txt"), []byte("hand written task\nhand written task\nanother\n"), 0o600))
+
+	first := &TodoTxt{}
+	require.NoError(t, first.Connect())
+	second := &TodoTxt{}
+	require.NoError(t, second.Connect())
+
+	firstTasks, err := first.GetTasks("inbox")
+	require.NoError(t, err)
+	secondTasks, err := second.GetTasks("inbox")
+	require.NoError(t, err)
+	require.Len(t, firstTasks, 3)
+	require.Len(t, secondTasks, 3)
+	for i := range firstTasks {
+		assert.Equal(t, firstTasks[i].ID, secondTasks[i].ID)
+	}
+	assert.NotEqual(t, firstTasks[0].ID, firstTasks[1].ID, "identical lines must still get distinct IDs")
+
+	require.NoError(t, second.DoneTask(firstTasks[0].ID))
+}
+
+func TestTodoTxt_TasksWithoutIDKeepIDsAcrossReload(t *testing.T) {
+	dir, cleanup := setTodotxtDir(t)
+	defer cleanup()
+	require.NoError(t, os.WriteFile(filepath.Join(dir, "todo.txt"), []byte("hand written task\n"), 0o600))
+
+	d := &TodoTxt{}
+	require.NoError(t, d.Connect())
+	before, err := d.GetTasks("inbox")
+	require.NoError(t, err)
+	d.doReload()
+
+	require.NoError(t, d.UpdateTask(before[0].ID, "renamed task"))
+}

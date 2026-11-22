@@ -7,6 +7,7 @@ import (
 	"maps"
 	"os"
 	"path/filepath"
+	"strconv"
 	"strings"
 	"sync"
 	"time"
@@ -176,9 +177,15 @@ func shouldSkipTodoLine(line string) bool {
 	return line == "" || strings.HasPrefix(line, "#")
 }
 
-func ensureTaskIDs(t *Task) {
+// idlessTaskNamespace seeds IDs for lines that have no id: key yet.
+var idlessTaskNamespace = uuid.MustParse("6f1d6b4e-3c8a-4f0e-9d55-2a7c1b9e8f30")
+
+// ensureTaskIDs derives a missing ID from the line text and how many identical
+// lines came before it, so every process and every reload agrees on it until a
+// write persists it. A random ID here made such tasks readable but never writable.
+func ensureTaskIDs(t *Task, line string, occurrence int) {
 	if t.Metadata["id"] == "" {
-		t.Metadata["id"] = uuid.New().String()
+		t.Metadata["id"] = uuid.NewSHA1(idlessTaskNamespace, []byte(line+"\n"+strconv.Itoa(occurrence))).String()
 	}
 	if t.Metadata["listid"] == "" {
 		t.Metadata["listid"] = defaultListID
@@ -208,13 +215,16 @@ func readTasksFromPath(path string) ([]*Task, error) {
 	}
 	defer closeQuietly(f)
 	var out []*Task
+	seen := make(map[string]int)
 	sc := bufio.NewScanner(f)
 	for sc.Scan() {
-		t, skip := parseTodoLineToTask(sc.Text())
+		line := strings.TrimSpace(sc.Text())
+		t, skip := parseTodoLineToTask(line)
 		if skip {
 			continue
 		}
-		ensureTaskIDs(t)
+		ensureTaskIDs(t, line, seen[line])
+		seen[line]++
 		out = append(out, t)
 	}
 	if err := sc.Err(); err != nil {
