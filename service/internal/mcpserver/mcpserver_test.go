@@ -19,8 +19,15 @@ type fakeService struct {
 	lastListTasks  *pb.ListTasksRequest
 	lastDoneTask   *pb.DoneTaskRequest
 	lastMoveTask   *pb.MoveTaskRequest
+	lastSetMeta    *pb.SetTaskMetadataRequest
+	setMetaCalls   []*pb.SetTaskMetadataRequest
+	lastDeleteTask *pb.DeleteTaskRequest
+	lastDeleteList *pb.DeleteListRequest
+	lastCompleted  *pb.ListCompletedTasksRequest
+	deleteErr      error
 	createTaskErr  error
 	moveTaskErr    error
+	setMetaErr     error
 }
 
 func (f *fakeService) GetLists(_ context.Context, _ *connect.Request[pb.GetListsRequest]) (*connect.Response[pb.GetListsResponse], error) {
@@ -69,6 +76,38 @@ func (f *fakeService) MoveTask(_ context.Context, req *connect.Request[pb.MoveTa
 
 func (f *fakeService) CreateList(_ context.Context, _ *connect.Request[pb.CreateListRequest]) (*connect.Response[pb.CreateListResponse], error) {
 	return connect.NewResponse(&pb.CreateListResponse{}), nil
+}
+
+func (f *fakeService) SetTaskMetadata(_ context.Context, req *connect.Request[pb.SetTaskMetadataRequest]) (*connect.Response[pb.SetTaskMetadataResponse], error) {
+	f.lastSetMeta = req.Msg
+	f.setMetaCalls = append(f.setMetaCalls, req.Msg)
+	if f.setMetaErr != nil {
+		return nil, f.setMetaErr
+	}
+	return connect.NewResponse(&pb.SetTaskMetadataResponse{}), nil
+}
+
+func (f *fakeService) DeleteTask(_ context.Context, req *connect.Request[pb.DeleteTaskRequest]) (*connect.Response[pb.DeleteTaskResponse], error) {
+	f.lastDeleteTask = req.Msg
+	if f.deleteErr != nil {
+		return nil, f.deleteErr
+	}
+	return connect.NewResponse(&pb.DeleteTaskResponse{}), nil
+}
+
+func (f *fakeService) DeleteList(_ context.Context, req *connect.Request[pb.DeleteListRequest]) (*connect.Response[pb.DeleteListResponse], error) {
+	f.lastDeleteList = req.Msg
+	if f.deleteErr != nil {
+		return nil, f.deleteErr
+	}
+	return connect.NewResponse(&pb.DeleteListResponse{}), nil
+}
+
+func (f *fakeService) ListCompletedTasks(_ context.Context, req *connect.Request[pb.ListCompletedTasksRequest]) (*connect.Response[pb.ListCompletedTasksResponse], error) {
+	f.lastCompleted = req.Msg
+	return connect.NewResponse(&pb.ListCompletedTasksResponse{
+		Tasks: []*pb.Task{{Id: "d1", Content: "Done thing", Completed: true, CompletedAt: "2026-11-21"}},
+	}), nil
 }
 
 func callWith(args map[string]any) mcp.CallToolRequest {
@@ -172,8 +211,17 @@ func TestHandleMoveTaskPassesArguments(t *testing.T) {
 	assert.Contains(t, resultText(t, res), "list-2")
 }
 
-func TestHandleMoveTaskRequiresIDAndListID(t *testing.T) {
-	for _, args := range []map[string]any{nil, {"id": "t1"}, {"list_id": "list-2"}} {
+func TestHandleMoveTaskPassesParentTaskID(t *testing.T) {
+	f := &fakeService{}
+	res, err := New(f).handleMoveTask(context.Background(), callWith(map[string]any{"id": "t1", "parent_task_id": "t9"}))
+	require.NoError(t, err)
+	assert.False(t, res.IsError)
+	require.NotNil(t, f.lastMoveTask)
+	assert.Equal(t, &pb.MoveTaskRequest{TaskId: "t1", TargetParentTaskId: "t9"}, f.lastMoveTask)
+}
+
+func TestHandleMoveTaskRequiresIDAndOneTarget(t *testing.T) {
+	for _, args := range []map[string]any{nil, {"id": "t1"}, {"list_id": "list-2"}, {"id": "t1", "list_id": "list-2", "parent_task_id": "t9"}} {
 		res, err := New(&fakeService{}).handleMoveTask(context.Background(), callWith(args))
 		require.NoError(t, err)
 		assert.True(t, res.IsError, "args %v should be an error result", args)
@@ -186,4 +234,187 @@ func TestHandleMoveTaskSurfacesServiceError(t *testing.T) {
 	require.NoError(t, err)
 	assert.True(t, res.IsError)
 	assert.Contains(t, resultText(t, res), "list not found")
+}
+
+func TestHandleSnoozeTaskNormalizesUntil(t *testing.T) {
+	cases := map[string]string{
+		"2026-11-25":                "2026-11-25T00:00:00Z",
+		"2026-11-25T09:30:00Z":      "2026-11-25T09:30:00Z",
+		"2026-11-25T09:30:00+02:00": "2026-11-25T07:30:00Z",
+	}
+	for until, want := range cases {
+		f := &fakeService{}
+		res, err := New(f).handleSnoozeTask(context.Background(), callWith(map[string]any{"id": "t1", "until": until}))
+		require.NoError(t, err)
+		assert.False(t, res.IsError, "until %q", until)
+		require.NotNil(t, f.lastSetMeta)
+		assert.Equal(t, "t1", f.lastSetMeta.TaskId)
+		assert.Equal(t, "wait", f.lastSetMeta.Field)
+		assert.Equal(t, want, f.lastSetMeta.Value)
+		assert.Contains(t, resultText(t, res), want)
+	}
+}
+
+func TestHandleSnoozeTaskClearsWhenUntilEmpty(t *testing.T) {
+	for _, args := range []map[string]any{{"id": "t1"}, {"id": "t1", "until": ""}} {
+		f := &fakeService{}
+		res, err := New(f).handleSnoozeTask(context.Background(), callWith(args))
+		require.NoError(t, err)
+		assert.False(t, res.IsError)
+		require.NotNil(t, f.lastSetMeta)
+		assert.Equal(t, "wait", f.lastSetMeta.Field)
+		assert.Empty(t, f.lastSetMeta.Value)
+		assert.Contains(t, resultText(t, res), "no longer snoozed")
+	}
+}
+
+func TestHandleSnoozeTaskRejectsBadInput(t *testing.T) {
+	for _, args := range []map[string]any{nil, {"until": "2026-11-25"}, {"id": "t1", "until": "next tuesday"}} {
+		f := &fakeService{}
+		res, err := New(f).handleSnoozeTask(context.Background(), callWith(args))
+		require.NoError(t, err)
+		assert.True(t, res.IsError, "args %v should be an error result", args)
+		assert.Nil(t, f.lastSetMeta, "args %v should not reach the service", args)
+	}
+}
+
+func TestHandleSnoozeTaskSurfacesServiceError(t *testing.T) {
+	f := &fakeService{setMetaErr: errors.New("task not found")}
+	res, err := New(f).handleSnoozeTask(context.Background(), callWith(map[string]any{"id": "nope", "until": "2026-11-25"}))
+	require.NoError(t, err)
+	assert.True(t, res.IsError)
+	assert.Contains(t, resultText(t, res), "task not found")
+}
+
+func TestHandleUpdateTaskMetadataPassesArguments(t *testing.T) {
+	for _, field := range []string{"notes", "wait", "due", "priority"} {
+		f := &fakeService{}
+		res, err := New(f).handleUpdateTaskMetadata(context.Background(), callWith(map[string]any{"id": "t1", "field": field, "value": "v"}))
+		require.NoError(t, err)
+		assert.False(t, res.IsError, "field %q", field)
+		require.NotNil(t, f.lastSetMeta)
+		assert.Equal(t, &pb.SetTaskMetadataRequest{TaskId: "t1", Field: field, Value: "v"}, f.lastSetMeta)
+	}
+}
+
+func TestHandleUpdateTaskMetadataClearsWhenValueEmpty(t *testing.T) {
+	f := &fakeService{}
+	res, err := New(f).handleUpdateTaskMetadata(context.Background(), callWith(map[string]any{"id": "t1", "field": "notes"}))
+	require.NoError(t, err)
+	assert.False(t, res.IsError)
+	require.NotNil(t, f.lastSetMeta)
+	assert.Empty(t, f.lastSetMeta.Value)
+}
+
+func TestHandleUpdateTaskMetadataRejectsBadInput(t *testing.T) {
+	for _, args := range []map[string]any{nil, {"id": "t1"}, {"field": "notes"}, {"id": "t1", "field": "../../etc"}, {"id": "t1", "field": "id"}} {
+		f := &fakeService{}
+		res, err := New(f).handleUpdateTaskMetadata(context.Background(), callWith(args))
+		require.NoError(t, err)
+		assert.True(t, res.IsError, "args %v should be an error result", args)
+		assert.Nil(t, f.lastSetMeta, "args %v should not reach the service", args)
+	}
+}
+
+func TestHandleUpdateTaskMetadataSurfacesServiceError(t *testing.T) {
+	f := &fakeService{setMetaErr: errors.New("task not found")}
+	res, err := New(f).handleUpdateTaskMetadata(context.Background(), callWith(map[string]any{"id": "nope", "field": "notes", "value": "x"}))
+	require.NoError(t, err)
+	assert.True(t, res.IsError)
+	assert.Contains(t, resultText(t, res), "task not found")
+}
+
+func TestHandleCreateTaskSetsOptionalMetadata(t *testing.T) {
+	f := &fakeService{}
+	res, err := New(f).handleCreateTask(context.Background(), callWith(map[string]any{
+		"content":    "Plan trip",
+		"notes":      "Check passports",
+		"wait_until": "2026-12-01",
+		"due_date":   "2026-12-10",
+		"priority":   "B",
+	}))
+	require.NoError(t, err)
+	assert.False(t, res.IsError, resultText(t, res))
+	got := map[string]string{}
+	for _, call := range f.setMetaCalls {
+		assert.Equal(t, "new", call.TaskId)
+		got[call.Field] = call.Value
+	}
+	assert.Equal(t, map[string]string{"notes": "Check passports", "wait": "2026-12-01T00:00:00Z", "due": "2026-12-10", "priority": "B"}, got)
+	text := resultText(t, res)
+	for _, want := range []string{`"notes":"Check passports"`, `"waitUntil":"2026-12-01T00:00:00Z"`, `"dueDate":"2026-12-10"`, `"priority":"B"`} {
+		assert.Contains(t, text, want)
+	}
+}
+
+func TestHandleCreateTaskWithoutMetadataSetsNone(t *testing.T) {
+	f := &fakeService{}
+	res, err := New(f).handleCreateTask(context.Background(), callWith(map[string]any{"content": "Plain"}))
+	require.NoError(t, err)
+	assert.False(t, res.IsError)
+	assert.Empty(t, f.setMetaCalls)
+}
+
+func TestHandleCreateTaskRejectsBadWaitBeforeCreating(t *testing.T) {
+	f := &fakeService{}
+	res, err := New(f).handleCreateTask(context.Background(), callWith(map[string]any{"content": "x", "wait_until": "soon"}))
+	require.NoError(t, err)
+	assert.True(t, res.IsError)
+	assert.Nil(t, f.lastCreateTask, "no task should be created when arguments are invalid")
+}
+
+func TestHandleCreateTaskReportsMetadataFailureWithTaskID(t *testing.T) {
+	f := &fakeService{setMetaErr: errors.New("disk full")}
+	res, err := New(f).handleCreateTask(context.Background(), callWith(map[string]any{"content": "x", "notes": "n"}))
+	require.NoError(t, err)
+	assert.True(t, res.IsError)
+	text := resultText(t, res)
+	assert.Contains(t, text, "new", "the error should name the task that was created")
+	assert.Contains(t, text, "disk full")
+}
+
+func TestHandleDeleteTask(t *testing.T) {
+	f := &fakeService{}
+	res, err := New(f).handleDeleteTask(context.Background(), callWith(map[string]any{"id": "t1"}))
+	require.NoError(t, err)
+	assert.False(t, res.IsError)
+	require.NotNil(t, f.lastDeleteTask)
+	assert.Equal(t, "t1", f.lastDeleteTask.Id)
+	assert.Contains(t, resultText(t, res), "t1")
+
+	res, err = New(&fakeService{}).handleDeleteTask(context.Background(), callWith(nil))
+	require.NoError(t, err)
+	assert.True(t, res.IsError)
+
+	res, err = New(&fakeService{deleteErr: errors.New("task not found")}).handleDeleteTask(context.Background(), callWith(map[string]any{"id": "x"}))
+	require.NoError(t, err)
+	assert.True(t, res.IsError)
+	assert.Contains(t, resultText(t, res), "task not found")
+}
+
+func TestHandleDeleteList(t *testing.T) {
+	f := &fakeService{}
+	res, err := New(f).handleDeleteList(context.Background(), callWith(map[string]any{"id": "list-2"}))
+	require.NoError(t, err)
+	assert.False(t, res.IsError)
+	require.NotNil(t, f.lastDeleteList)
+	assert.Equal(t, "list-2", f.lastDeleteList.Id)
+
+	res, err = New(&fakeService{}).handleDeleteList(context.Background(), callWith(nil))
+	require.NoError(t, err)
+	assert.True(t, res.IsError)
+
+	res, err = New(&fakeService{deleteErr: errors.New("the default list cannot be deleted")}).handleDeleteList(context.Background(), callWith(map[string]any{"id": "inbox"}))
+	require.NoError(t, err)
+	assert.True(t, res.IsError)
+	assert.Contains(t, resultText(t, res), "default list")
+}
+
+func TestHandleListCompletedTasks(t *testing.T) {
+	f := &fakeService{}
+	res, err := New(f).handleListCompletedTasks(context.Background(), callWith(map[string]any{"since": "2026-11-21", "list_id": "list-1"}))
+	require.NoError(t, err)
+	assert.False(t, res.IsError)
+	assert.Equal(t, &pb.ListCompletedTasksRequest{Since: "2026-11-21", ListId: "list-1"}, f.lastCompleted)
+	assert.Contains(t, resultText(t, res), `"completed":true`)
 }

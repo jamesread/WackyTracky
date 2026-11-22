@@ -384,6 +384,45 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/wackytracky.clientapi.v1.DeleteRbacRoleResponse'
+  /api/wackytracky.clientapi.v1.WackyTrackyClientService/DeleteTask:
+    post:
+      tags:
+        - wackytracky.clientapi.v1.WackyTrackyClientService
+      summary: DeleteTask
+      description: DeleteTask permanently removes a task and its subtasks.
+      operationId: wackytracky.clientapi.v1.WackyTrackyClientService.DeleteTask
+      parameters:
+        - name: Connect-Protocol-Version
+          in: header
+          description: Define the version of the Connect protocol
+          schema:
+            $ref: '#/components/schemas/connect-protocol-version'
+          example: 1
+        - name: Connect-Timeout-Ms
+          in: header
+          description: Define the timeout, in ms
+          schema:
+            $ref: '#/components/schemas/connect-timeout-header'
+          example: 1000
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/wackytracky.clientapi.v1.DeleteTaskRequest'
+        required: true
+      responses:
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/connect.error'
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/wackytracky.clientapi.v1.DeleteTaskResponse'
   /api/wackytracky.clientapi.v1.WackyTrackyClientService/DeleteUser:
     post:
       tags:
@@ -1144,6 +1183,45 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/wackytracky.clientapi.v1.ListApiKeysResponse'
+  /api/wackytracky.clientapi.v1.WackyTrackyClientService/ListCompletedTasks:
+    post:
+      tags:
+        - wackytracky.clientapi.v1.WackyTrackyClientService
+      summary: ListCompletedTasks
+      description: ListCompletedTasks lists done tasks, optionally since a date or in one list.
+      operationId: wackytracky.clientapi.v1.WackyTrackyClientService.ListCompletedTasks
+      parameters:
+        - name: Connect-Protocol-Version
+          in: header
+          description: Define the version of the Connect protocol
+          schema:
+            $ref: '#/components/schemas/connect-protocol-version'
+          example: 1
+        - name: Connect-Timeout-Ms
+          in: header
+          description: Define the timeout, in ms
+          schema:
+            $ref: '#/components/schemas/connect-timeout-header'
+          example: 1000
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/wackytracky.clientapi.v1.ListCompletedTasksRequest'
+        required: true
+      responses:
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/connect.error'
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/wackytracky.clientapi.v1.ListCompletedTasksResponse'
   /api/wackytracky.clientapi.v1.WackyTrackyClientService/ListRbacPermissions:
     post:
       tags:
@@ -2331,6 +2409,22 @@ components:
       type: object
       title: DeleteRbacRoleResponse
       additionalProperties: false
+    wackytracky.clientapi.v1.DeleteTaskRequest:
+      type: object
+      properties:
+        id:
+          type: string
+          title: id
+          description: ID of the task to delete (open or completed).
+      title: DeleteTaskRequest
+      additionalProperties: false
+      description: |-
+        DeleteTaskRequest permanently removes a task, its subtasks and their metadata.
+         Unlike DoneTask, nothing is kept in the completed history.
+    wackytracky.clientapi.v1.DeleteTaskResponse:
+      type: object
+      title: DeleteTaskResponse
+      additionalProperties: false
     wackytracky.clientapi.v1.DeleteUserGroupRequest:
       type: object
       properties:
@@ -2740,6 +2834,32 @@ components:
           title: keys
       title: ListApiKeysResponse
       additionalProperties: false
+    wackytracky.clientapi.v1.ListCompletedTasksRequest:
+      type: object
+      properties:
+        since:
+          type: string
+          title: since
+          description: |-
+            Optional; only tasks completed on or after this date. ISO date (YYYY-MM-DD)
+             or RFC 3339 date-time; completion is recorded per day.
+        listId:
+          type: string
+          title: list_id
+          description: Optional; only tasks in this list.
+      title: ListCompletedTasksRequest
+      additionalProperties: false
+      description: ListCompletedTasksRequest lists completed tasks, most recently completed first.
+    wackytracky.clientapi.v1.ListCompletedTasksResponse:
+      type: object
+      properties:
+        tasks:
+          type: array
+          items:
+            $ref: '#/components/schemas/wackytracky.clientapi.v1.Task'
+          title: tasks
+      title: ListCompletedTasksResponse
+      additionalProperties: false
     wackytracky.clientapi.v1.ListRbacPermissionsRequest:
       type: object
       title: ListRbacPermissionsRequest
@@ -2869,11 +2989,18 @@ components:
           type: string
           title: target_list_id
           description: ID of the list to move the task to (see GetLists).
+        targetParentTaskId:
+          type: string
+          title: target_parent_task_id
+          description: |-
+            ID of the task to make this task a subtask of. The moved task joins that
+             task's list. It cannot be the task itself or one of its own subtasks.
       title: MoveTaskRequest
       additionalProperties: false
       description: |-
         MoveTaskRequest moves an existing task (keeping its ID, metadata and subtasks)
-         to another list. A subtask that is moved becomes a root task in the target list.
+         to another list, or under another task. Set exactly one target. A subtask that
+         is moved to a list becomes a root task in that list.
     wackytracky.clientapi.v1.MoveTaskResponse:
       type: object
       properties:
@@ -3276,6 +3403,18 @@ components:
           type: string
           title: due_date
           description: optional; ISO date YYYY-MM-DD; stored in metadata like wait
+        notes:
+          type: string
+          title: notes
+          description: optional; free-text notes; stored in metadata like wait
+        completed:
+          type: boolean
+          title: completed
+          description: true for tasks marked done
+        completedAt:
+          type: string
+          title: completed_at
+          description: optional; ISO date YYYY-MM-DD the task was marked done
       title: Task
       additionalProperties: false
     wackytracky.clientapi.v1.TaskIdList:

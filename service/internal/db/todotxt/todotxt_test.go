@@ -4,6 +4,7 @@ import (
 	"os"
 	"path/filepath"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -572,4 +573,168 @@ func TestTodoTxt_SetTaskMetadataRejectsPathTraversalInField(t *testing.T) {
 	}
 	_, statErr := os.Stat(filepath.Join(d.dir, "..", "escape.txt"))
 	assert.True(t, os.IsNotExist(statErr), "no file may be written outside the metadata dir")
+}
+
+// Lines added by hand (or by another todo.txt tool) have no id: key. Every
+// process and every reload must agree on their ID, otherwise an ID read from
+// one is unknown to the next and writes fail with not found.
+func TestTodoTxt_TasksWithoutIDGetStableIDsAcrossInstances(t *testing.T) {
+	dir, cleanup := setTodotxtDir(t)
+	defer cleanup()
+	require.NoError(t, os.WriteFile(filepath.Join(dir, "todo.txt"), []byte("hand written task\nhand written task\nanother\n"), 0o600))
+
+	first := &TodoTxt{}
+	require.NoError(t, first.Connect())
+	second := &TodoTxt{}
+	require.NoError(t, second.Connect())
+
+	firstTasks, err := first.GetTasks("inbox")
+	require.NoError(t, err)
+	secondTasks, err := second.GetTasks("inbox")
+	require.NoError(t, err)
+	require.Len(t, firstTasks, 3)
+	require.Len(t, secondTasks, 3)
+	for i := range firstTasks {
+		assert.Equal(t, firstTasks[i].ID, secondTasks[i].ID)
+	}
+	assert.NotEqual(t, firstTasks[0].ID, firstTasks[1].ID, "identical lines must still get distinct IDs")
+
+	require.NoError(t, second.DoneTask(firstTasks[0].ID))
+}
+
+func TestTodoTxt_TasksWithoutIDKeepIDsAcrossReload(t *testing.T) {
+	dir, cleanup := setTodotxtDir(t)
+	defer cleanup()
+	require.NoError(t, os.WriteFile(filepath.Join(dir, "todo.txt"), []byte("hand written task\n"), 0o600))
+
+	d := &TodoTxt{}
+	require.NoError(t, d.Connect())
+	before, err := d.GetTasks("inbox")
+	require.NoError(t, err)
+	d.doReload()
+
+	require.NoError(t, d.UpdateTask(before[0].ID, "renamed task"))
+}
+
+func TestTodoTxt_ReparentTaskMovesTreeUnderNewParent(t *testing.T) {
+	d, otherListID := connectTodoTxtWithOtherList(t)
+
+	newParentID, err := d.CreateTask("new parent", otherListID, "")
+	require.NoError(t, err)
+	taskID, err := d.CreateTask("task", "inbox", "")
+	require.NoError(t, err)
+	childID, err := d.CreateTask("child", "inbox", taskID)
+	require.NoError(t, err)
+
+	require.NoError(t, d.ReparentTask(taskID, newParentID))
+
+	moved, err := d.GetTask(taskID)
+	require.NoError(t, err)
+	assert.Equal(t, "task", moved.ParentType)
+	assert.Equal(t, newParentID, moved.ParentId)
+	subs, err := d.GetSubtasks(newParentID)
+	require.NoError(t, err)
+	require.Len(t, subs, 1)
+	assert.Equal(t, taskID, subs[0].ID)
+	for _, task := range d.tasks {
+		if id := task.Metadata["id"]; id == taskID || id == childID {
+			assert.Equal(t, otherListID, task.Metadata["listid"], "%s should join the new parent's list", id)
+		}
+	}
+	roots, err := d.GetTasks("inbox")
+	require.NoError(t, err)
+	assert.Empty(t, roots)
+}
+
+func TestTodoTxt_ReparentTaskErrors(t *testing.T) {
+	d, _ := connectTodoTxtWithOtherList(t)
+	taskID, err := d.CreateTask("task", "inbox", "")
+	require.NoError(t, err)
+	childID, err := d.CreateTask("child", "inbox", taskID)
+	require.NoError(t, err)
+
+	assert.ErrorIs(t, d.ReparentTask(taskID, taskID), db.ErrInvalidMove)
+	assert.ErrorIs(t, d.ReparentTask(taskID, childID), db.ErrInvalidMove)
+	assert.ErrorIs(t, d.ReparentTask("missing", taskID), db.ErrTaskNotFound)
+	assert.ErrorIs(t, d.ReparentTask(childID, "missing"), db.ErrTaskNotFound)
+}
+
+func TestTodoTxt_DeleteTaskRemovesTreeAndMetadata(t *testing.T) {
+	dir, cleanup := setTodotxtDir(t)
+	defer cleanup()
+	d := &TodoTxt{}
+	require.NoError(t, d.Connect())
+	keepID, err := d.CreateTask("keep", "inbox", "")
+	require.NoError(t, err)
+	taskID, err := d.CreateTask("delete me", "inbox", "")
+	require.NoError(t, err)
+	childID, err := d.CreateTask("child", "inbox", taskID)
+	require.NoError(t, err)
+	require.NoError(t, d.DoneTask(childID))
+	require.NoError(t, d.SetTaskMetadata(taskID, "notes", "gone soon"))
+
+	require.NoError(t, d.DeleteTask(taskID))
+
+	for _, id := range []string{taskID, childID} {
+		task, err := d.GetTask(id)
+		require.NoError(t, err)
+		assert.Nil(t, task, "%s should be deleted", id)
+	}
+	kept, err := d.GetTask(keepID)
+	require.NoError(t, err)
+	assert.NotNil(t, kept)
+	assert.NoDirExists(t, filepath.Join(dir, "metadata", taskID))
+
+	reloaded := &TodoTxt{}
+	require.NoError(t, reloaded.Connect())
+	assert.Len(t, reloaded.tasks, 1, "deletion should be persisted to todo.txt and done.txt")
+	assert.ErrorIs(t, d.DeleteTask(taskID), db.ErrTaskNotFound)
+}
+
+func TestTodoTxt_GetCompletedTasksFiltersBySinceAndList(t *testing.T) {
+	dir, cleanup := setTodotxtDir(t)
+	defer cleanup()
+	done := "x 2026-11-01 old task id:old listid:inbox\nx 2026-11-20 recent task id:recent listid:inbox\nx 2026-11-21 other list id:other listid:work\n"
+	require.NoError(t, os.WriteFile(filepath.Join(dir, "done.txt"), []byte(done), 0o600))
+	require.NoError(t, os.WriteFile(filepath.Join(dir, "todo.txt"), []byte("open task id:open\n"), 0o600))
+	d := &TodoTxt{}
+	require.NoError(t, d.Connect())
+
+	all, err := d.GetCompletedTasks(time.Time{}, "")
+	require.NoError(t, err)
+	assert.Equal(t, []string{"other", "recent", "old"}, taskIDs(all), "most recently completed first, open tasks excluded")
+	assert.True(t, all[0].Completed)
+	assert.Equal(t, "2026-11-21", all[0].CompletedAt)
+
+	since, err := d.GetCompletedTasks(time.Date(2026, 11, 20, 15, 0, 0, 0, time.UTC), "")
+	require.NoError(t, err)
+	assert.Equal(t, []string{"other", "recent"}, taskIDs(since), "since compares by day")
+
+	inList, err := d.GetCompletedTasks(time.Time{}, "inbox")
+	require.NoError(t, err)
+	assert.Equal(t, []string{"recent", "old"}, taskIDs(inList))
+}
+
+func TestTodoTxt_TaskIncludesNotesAndOpenState(t *testing.T) {
+	_, cleanup := setTodotxtDir(t)
+	defer cleanup()
+	d := &TodoTxt{}
+	require.NoError(t, d.Connect())
+	id, err := d.CreateTask("with notes", "inbox", "")
+	require.NoError(t, err)
+	require.NoError(t, d.SetTaskMetadata(id, "notes", "line one\nline two"))
+
+	task, err := d.GetTask(id)
+	require.NoError(t, err)
+	assert.Equal(t, "line one\nline two", task.Notes)
+	assert.False(t, task.Completed)
+	assert.Empty(t, task.CompletedAt)
+}
+
+func taskIDs(tasks []db.DBTask) []string {
+	ids := make([]string, 0, len(tasks))
+	for _, t := range tasks {
+		ids = append(ids, t.ID)
+	}
+	return ids
 }

@@ -58,15 +58,22 @@ The stdio server uses the same backend and configuration as the HTTP server (`co
 | Tool | Parameters | Description |
 |------|------------|-------------|
 | `list_lists` | — | List all task lists with IDs, titles, and item counts |
-| `list_tasks` | `list_id` (required) | List tasks in a list, including subtasks |
+| `list_tasks` | `list_id` (required) | List open tasks in a list, including subtasks, with `notes`, `waitUntil`, `dueDate`, `priority` |
+| `list_completed_tasks` | `since`, `list_id` | List completed tasks, newest first, with `completedAt` (day granularity) |
 | `search_tasks` | `query` (required) | Search across lists (`#tag`, `@context`, `-term` to exclude) |
-| `create_task` | `content` (required), `list_id`, `parent_task_id` | Create a todo.txt-style task |
+| `create_task` | `content` (required), `list_id`, `parent_task_id`, `notes`, `wait_until`, `due_date`, `priority` | Create a todo.txt-style task, optionally with notes, snooze, due date and priority |
 | `update_task` | `id`, `content` (required) | Replace a task's content |
 | `complete_task` | `id` (required) | Mark a task done |
-| `move_task` | `id`, `list_id` (required) | Move a task (and its subtasks) to another list, keeping its ID |
+| `move_task` | `id` (required), `list_id` or `parent_task_id` | Move a task (and its subtasks) to another list or under another task, keeping its ID and metadata |
+| `delete_task` | `id` (required) | Permanently delete a task and its subtasks (not kept in completed history) |
+| `snooze_task` | `id` (required), `until` | Hide a task until `until` (`YYYY-MM-DD` or RFC 3339 date-time, stored as UTC); omit `until` to un-snooze |
+| `update_task_metadata` | `id`, `field` (required), `value` | Set `notes`, `wait`, `due` (`YYYY-MM-DD`) or `priority` (`A`–`Z`) without touching content; empty `value` clears |
 | `create_list` | `title` (required) | Create a new list |
+| `delete_list` | `id` (required) | Delete a list; its tasks move to the Inbox (the Inbox cannot be deleted) |
 
 Tools return JSON (camelCase fields) matching the Connect API responses.
+
+`update_task` replaces the whole line, including `@contexts` and `#tags`, and `content` in task responses omits them (they are in `contexts` / `tags`). To snooze, set a due date or change priority, use `snooze_task` or `update_task_metadata` instead of editing content.
 
 ---
 

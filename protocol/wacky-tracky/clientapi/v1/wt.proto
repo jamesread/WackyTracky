@@ -47,17 +47,43 @@ message DoneTaskRequest {
 message DoneTaskResponse {}
 
 // MoveTaskRequest moves an existing task (keeping its ID, metadata and subtasks)
-// to another list. A subtask that is moved becomes a root task in the target list.
+// to another list, or under another task. Set exactly one target. A subtask that
+// is moved to a list becomes a root task in that list.
 message MoveTaskRequest {
 	// ID of the task to move.
 	string task_id = 1;
 	// ID of the list to move the task to (see GetLists).
 	string target_list_id = 2;
+	// ID of the task to make this task a subtask of. The moved task joins that
+	// task's list. It cannot be the task itself or one of its own subtasks.
+	string target_parent_task_id = 3;
 }
 
 message MoveTaskResponse {
 	// The task after it has been moved.
 	Task task = 1;
+}
+
+// DeleteTaskRequest permanently removes a task, its subtasks and their metadata.
+// Unlike DoneTask, nothing is kept in the completed history.
+message DeleteTaskRequest {
+	// ID of the task to delete (open or completed).
+	string id = 1;
+}
+
+message DeleteTaskResponse {}
+
+// ListCompletedTasksRequest lists completed tasks, most recently completed first.
+message ListCompletedTasksRequest {
+	// Optional; only tasks completed on or after this date. ISO date (YYYY-MM-DD)
+	// or RFC 3339 date-time; completion is recorded per day.
+	string since = 1;
+	// Optional; only tasks in this list.
+	string list_id = 2;
+}
+
+message ListCompletedTasksResponse {
+	repeated Task tasks = 1;
 }
 
 // Task metadata (e.g. notes) — optional per driver
@@ -138,6 +164,9 @@ message Task {
 	string wait_until = 8;  // optional; ISO date-time; task is hidden from list/next-action until this time
 	string priority = 9;  // optional; single letter A–Z; stored as priority:X in todo.txt
 	string due_date = 10;  // optional; ISO date YYYY-MM-DD; stored in metadata like wait
+	string notes = 11;  // optional; free-text notes; stored in metadata like wait
+	bool completed = 12;  // true for tasks marked done
+	string completed_at = 13;  // optional; ISO date YYYY-MM-DD the task was marked done
 }
 
 message ListTasksRequest {
@@ -572,6 +601,12 @@ service WackyTrackyClientService {
 
 	// MoveTask moves a task to another list without deleting and re-creating it.
 	rpc MoveTask(MoveTaskRequest) returns (MoveTaskResponse) {}
+
+	// DeleteTask permanently removes a task and its subtasks.
+	rpc DeleteTask(DeleteTaskRequest) returns (DeleteTaskResponse) {}
+
+	// ListCompletedTasks lists done tasks, optionally since a date or in one list.
+	rpc ListCompletedTasks(ListCompletedTasksRequest) returns (ListCompletedTasksResponse) {}
 
 	rpc CreateList(CreateListRequest) returns (CreateListResponse) {}
 

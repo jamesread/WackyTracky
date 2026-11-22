@@ -78,6 +78,9 @@ func dbTaskToPb(t *dbmdl.DBTask) *pb.Task {
 		WaitUntil:     t.WaitUntil,
 		Priority:      t.Priority,
 		DueDate:       t.DueDate,
+		Notes:         t.Notes,
+		Completed:     t.Completed,
+		CompletedAt:   t.CompletedAt,
 	}
 	return out
 }
@@ -297,25 +300,87 @@ func (api *wackyTrackyClientService) DoneTask(ctx context.Context, req *connect.
 }
 
 func (api *wackyTrackyClientService) MoveTask(ctx context.Context, req *connect.Request[pb.MoveTaskRequest]) (*connect.Response[pb.MoveTaskResponse], error) {
-	mover, err := api.taskMoverFor(req.Msg)
-	if err != nil {
+	if err := validateMoveTaskRequest(req.Msg); err != nil {
 		return nil, err
 	}
-	if err := mover.MoveTask(req.Msg.TaskId, req.Msg.TargetListId); err != nil {
-		return nil, toConnectError(err)
+	if err := api.moveTaskToTarget(req.Msg); err != nil {
+		return nil, err
 	}
 	return connect.NewResponse(&pb.MoveTaskResponse{Task: api.getTaskAsPb(req.Msg.TaskId)}), nil
 }
 
-func (api *wackyTrackyClientService) taskMoverFor(req *pb.MoveTaskRequest) (dbmdl.TaskMover, error) {
+func validateMoveTaskRequest(req *pb.MoveTaskRequest) error {
+	hasList, hasParent := req.TargetListId != "", req.TargetParentTaskId != ""
+	if req.TaskId == "" || hasList == hasParent {
+		return invalidArgument("task_id and exactly one of target_list_id or target_parent_task_id are required")
+	}
+	return nil
+}
+
+func (api *wackyTrackyClientService) moveTaskToTarget(req *pb.MoveTaskRequest) error {
+	if req.TargetParentTaskId != "" {
+		return api.reparentTask(req.TaskId, req.TargetParentTaskId)
+	}
 	mover, ok := api.dbconn.(dbmdl.TaskMover)
 	if !ok {
-		return nil, unimplemented("moving tasks")
+		return unimplemented("moving tasks")
 	}
-	if req.TaskId == "" || req.TargetListId == "" {
-		return nil, invalidArgument("task_id and target_list_id are required")
+	return toConnectError(mover.MoveTask(req.TaskId, req.TargetListId))
+}
+
+func (api *wackyTrackyClientService) reparentTask(taskId, parentTaskId string) error {
+	reparenter, ok := api.dbconn.(dbmdl.TaskReparenter)
+	if !ok {
+		return unimplemented("moving tasks under another task")
 	}
-	return mover, nil
+	return toConnectError(reparenter.ReparentTask(taskId, parentTaskId))
+}
+
+func (api *wackyTrackyClientService) DeleteTask(ctx context.Context, req *connect.Request[pb.DeleteTaskRequest]) (*connect.Response[pb.DeleteTaskResponse], error) {
+	deleter, ok := api.dbconn.(dbmdl.TaskDeleter)
+	if !ok {
+		return nil, unimplemented("deleting tasks")
+	}
+	if req.Msg.Id == "" {
+		return nil, invalidArgument("id is required")
+	}
+	if err := deleter.DeleteTask(req.Msg.Id); err != nil {
+		return nil, toConnectError(err)
+	}
+	return connect.NewResponse(&pb.DeleteTaskResponse{}), nil
+}
+
+func (api *wackyTrackyClientService) ListCompletedTasks(ctx context.Context, req *connect.Request[pb.ListCompletedTasksRequest]) (*connect.Response[pb.ListCompletedTasksResponse], error) {
+	lister, ok := api.dbconn.(dbmdl.CompletedTaskLister)
+	if !ok {
+		return nil, unimplemented("listing completed tasks")
+	}
+	since, err := parseSince(req.Msg.Since)
+	if err != nil {
+		return nil, err
+	}
+	items, err := lister.GetCompletedTasks(since, req.Msg.ListId)
+	if err != nil {
+		return nil, toConnectError(err)
+	}
+	tasks := make([]*pb.Task, 0, len(items))
+	for i := range items {
+		tasks = append(tasks, dbTaskToPb(&items[i]))
+	}
+	return connect.NewResponse(&pb.ListCompletedTasksResponse{Tasks: tasks}), nil
+}
+
+// parseSince accepts a date or an RFC 3339 date-time; an empty value means no lower bound.
+func parseSince(since string) (time.Time, error) {
+	if since == "" {
+		return time.Time{}, nil
+	}
+	for _, layout := range []string{time.RFC3339, time.DateOnly} {
+		if t, err := time.Parse(layout, since); err == nil {
+			return t, nil
+		}
+	}
+	return time.Time{}, invalidArgument("since must be an ISO date (YYYY-MM-DD) or RFC 3339 date-time")
 }
 
 func (api *wackyTrackyClientService) updatableFor(taskId string) (dbmdl.Updatable, error) {
@@ -335,6 +400,7 @@ var errorCodes = map[error]connect.Code{
 	dbmdl.ErrDefaultListNotDeletable: connect.CodeFailedPrecondition,
 	dbmdl.ErrInvalidPropertyType:     connect.CodeInvalidArgument,
 	dbmdl.ErrInvalidMetadataField:    connect.CodeInvalidArgument,
+	dbmdl.ErrInvalidMove:             connect.CodeInvalidArgument,
 }
 
 // toConnectError maps backend sentinel errors to Connect codes; anything else
